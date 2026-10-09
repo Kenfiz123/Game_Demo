@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.next-review/
+.next-dev3000/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+!.env.example

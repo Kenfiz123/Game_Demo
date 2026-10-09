@@ -1,0 +1,18 @@
+import type { Metadata } from "next";
+import { AppShell } from "@/components/layout/AppShell";
+import { XperienceProvider } from "@/components/providers/XperienceProvider";
+import "./globals.css";
+import "./clubs.css";
+import "./mythic.css";
+import "./mythic-ceremony.css";
+import "./inventory-upgrade.css";
+import "./mythic-royal.css";
+import "./trade-up.css";
+import "./odds-settings.css";
+export const metadata: Metadata = {
+  title: { default: "Reward Arcade · FPTU Xperience", template: "%s · FPTU Xperience" },
+  description: "Khám phá vật phẩm của 73 CLB, mở rương, Lucky Orbit và đổi 5 món cùng bậc với EX trải nghiệm.",
+};
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="en"><body><a className="skip-link" href="#main-content">Skip to content</a><XperienceProvider><AppShell>{children}</AppShell></XperienceProvider></body></html>;
+}

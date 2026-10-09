@@ -1,0 +1,47 @@
+/* The sealed reel artwork is identical and static for every Mythic outcome. */
+.reel-card.mythic-vault-card { border-color: #927c4b; background: #211f26; }
+.mythic-sealed-vault { height: 90px; margin-bottom: 7px; place-content: normal; place-items: center; background: radial-gradient(ellipse at 50% 75%, #92704025, transparent 70%), #171922; }
+.mythic-sealed-vault img { display: block; width: 110px; height: 88px; object-fit: contain; animation: none; }
+
+/* A rare ceremony gets one restrained entrance. Ambient motion belongs to shared artwork only. */
+.reward-reveal.mythic-ceremony { width: min(100%, 560px); min-height: 0; padding: 24px 24px 14px; animation: mythic-ceremony-enter 850ms cubic-bezier(.16, 1, .3, 1) both; }
+.mythic-ceremony-heading { width: 100%; }
+.mythic-ceremony-heading h2 { color: #f4e6c9; font-family: var(--font-royal); font-size: clamp(27px, 3.5vw, 36px); line-height: 1.16; font-weight: 400; letter-spacing: -.035em; margin: 4px 0 9px; }
+.reward-reveal.mythic-ceremony .mythic-ceremony-heading p { color: #ae9c80; font-size: 10px; margin: 0 auto; }
+.reward-reveal.mythic-ceremony .reward-art { width: min(320px, 100%); height: 270px; margin: 8px 0 10px; animation: none; }
+.mythic-ceremony-identity { width: 100%; min-width: 0; }
+.mythic-ceremony-edition { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 9px; }
+.mythic-ceremony-edition > span:last-child { color: #baa981; font-size: 9px; line-height: 1.5; }
+.mythic-ceremony-identity h3 { color: #eee7da; font-size: clamp(19px, 2.25vw, 24px); font-weight: 550; letter-spacing: -.025em; line-height: 1.28; overflow-wrap: anywhere; max-width: 460px; margin: 15px auto 7px; }
+.reward-reveal.mythic-ceremony .mythic-ceremony-club { color: #9ca7ba; font-size: 10px; margin: 0 auto 13px; }
+.reward-reveal.mythic-ceremony .mythic-ceremony-description { max-width: 430px; margin: 0 auto; color: #98a4b5; font-size: 10px; line-height: 1.7; }
+.reward-reveal.mythic-ceremony .mythic-ceremony-lifelong { max-width: 370px; margin: 14px auto 6px; color: #e1cea4; font-size: 11px; line-height: 1.65; }
+.mythic-ceremony-pool { display: block; max-width: 370px; margin: 0 auto; color: #7f8ca2; font-size: 9px; line-height: 1.7; }
+.mythic-ceremony .reward-saved { max-width: 100%; justify-content: center; flex-wrap: wrap; line-height: 1.65; margin: 16px 0 16px; }
+.mythic-ceremony .reward-actions { width: 100%; }
+.mythic-ceremony .reward-actions button { min-height: 42px; }
+.mythic-ceremony .text-button { margin-top: 13px; }
+
+@keyframes mythic-ceremony-enter {
+  from { opacity: 0; transform: translateY(12px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (min-width: 961px) and (max-height: 800px) {
+  .reward-reveal.mythic-ceremony { padding-top: 17px; }
+  .reward-reveal.mythic-ceremony .reward-art { height: 220px; width: 270px; margin-top: 4px; }
+}
+@media (max-width: 700px) {
+  .reward-reveal.mythic-ceremony { padding: 20px 13px 12px; }
+  .mythic-ceremony-heading h2 { font-size: clamp(24px, 7.5vw, 32px); }
+  .reward-reveal.mythic-ceremony .reward-art { width: min(270px, 100%); height: 240px; }
+  .mythic-ceremony-identity h3 { font-size: 21px; }
+  .reward-reveal.mythic-ceremony .mythic-ceremony-description { font-size: 9px; }
+  .mythic-ceremony .reward-actions { gap: 8px; }
+}
+@media (max-width: 370px) {
+  .reward-reveal.mythic-ceremony .reward-art { height: 210px; width: min(240px, 100%); }
+  .mythic-ceremony-identity h3 { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reward-reveal.mythic-ceremony { animation: none; }
+}

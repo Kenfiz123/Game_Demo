@@ -1,0 +1,147 @@
+/* Copy counts are separate from unique collection progress. */
+.cosmetic-card { position: relative; }
+.cosmetic-quantity { position: absolute; top: 11px; right: 11px; z-index: 2; min-width: 30px; padding: 5px 8px; border: 1px solid #586272; border-radius: 5px; background: #0c1520ed; color: #eee3cf; font-size: 11px; font-variant-numeric: tabular-nums; font-weight: 650; }
+.inventory-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; padding: 20px; margin-bottom: 20px; }
+.inventory-summary > div { min-width: 0; }
+.inventory-summary > div > span { display: block; color: #91a3b9; font-size: 8px; letter-spacing: .12em; }
+.inventory-summary strong { display: block; font-size: 28px; font-variant-numeric: tabular-nums; font-weight: 550; margin-top: 8px; color: #eee3d0; }
+.inventory-summary strong small { font-size: 11px; color: #a5b1c1; font-weight: 400; }
+.inventory-summary > a { margin-left: auto; gap: 8px; font-size: 11px; min-height: 42px; }
+.inventory-club-filter { flex-wrap: wrap; }
+.inventory-club-filter .inventory-duplicates-filter { flex: 0 0 auto; cursor: pointer; min-height: 40px; }
+.inventory-duplicates-filter input { width: 15px; height: 15px; accent-color: var(--amber); flex-shrink: 0; }
+.inventory-duplicates-filter > span { white-space: nowrap; }
+.collection-track i { transition: none; }
+.history-icon.history-club-art { background: #101b29; border: 1px solid #2c3b50; overflow: hidden; }
+.history-club-art img { width: 100%; height: 100%; object-fit: contain; }
+.history-main .history-duplicate-note, .history-main .history-trade-detail { color: #a5bcaa; font-size: 9px; line-height: 1.6; margin: 7px 0 0; }
+.history-trade-label { display: inline-block; color: #9cc5aa; font-size: 8px; letter-spacing: .08em; line-height: 1.5; }
+.trade-lost .history-trade-label, .trade-lost .history-cost small { color: #ce9a8b; }
+.history-cost small { white-space: normal; text-align: right; line-height: 1.55; }
+.history-cost { max-width: 170px; flex-shrink: 0; }
+.history-trade-record .history-cost { color: #b7a6c3; }
+.history-main { overflow-wrap: anywhere; }
+
+/* Equipped art uses the same visibility-gated renderer as the chest and cards. */
+.cosmetic-card .cosmetic-heritage { color: #d9bd83; font-size: 9px; line-height: 1.6; margin-top: 8px; }
+.mythic-equip-control { margin-top: 13px; }
+.mythic-equip-button { width: 100%; min-height: 38px; border: 1px solid #8d6f41; border-radius: 5px; color: #e3c894; background: #342819; font-size: 10px; cursor: pointer; }
+.mythic-equip-button[aria-pressed="true"] { border-color: #617d75; color: #bcd7c5; background: #1a2b28; }
+.mythic-equip-button:active { transform: scale(.98); }
+.mythic-equip-button:disabled { opacity: .45; cursor: not-allowed; }
+.mythic-equip-control > p { font-size: 9px; color: #a4bda8; line-height: 1.6; margin-top: 8px; }
+.mythic-equip-control > p:empty { display: none; }
+.equipped-profile { margin-bottom: 25px; overflow: hidden; }
+.equipped-profile-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 22px 24px 18px; }
+.equipped-profile-heading h2 { color: #e9d7b6; font-size: 21px; font-weight: 550; letter-spacing: -.025em; margin: 0 0 9px; }
+.equipped-profile-heading p { font-size: 11px; color: #94a5bb; line-height: 1.8; max-width: 560px; margin: 0; }
+.equipped-profile-heading > span { color: #bda783; font-size: 10px; white-space: nowrap; padding-top: 5px; }
+.equipped-profile-preview { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 30px 35px; min-height: 250px; overflow: hidden; border-block: 1px solid #423625; background: radial-gradient(ellipse at 35% 50%,#3e2e1b50,transparent 64%),#0c1521; }
+.equipped-profile-effect { position: absolute; z-index: -1; inset: 0; opacity: .46; pointer-events: none; display: grid; place-items: center; }
+.equipped-profile-effect > .cosmetic-art { width: min(100%,400px); height: 240px; background: none; }
+.equipped-profile-effect .mythic-art { max-width: 100%; height: 100%; }
+.equipped-profile-identity { display: flex; align-items: center; gap: 28px; flex: 1; min-width: 0; }
+.equipped-profile-portrait { position: relative; flex-shrink: 0; width: 175px; height: 175px; display: grid; place-items: center; isolation: isolate; }
+.equipped-profile-frame { position: absolute; inset: 0; pointer-events: none; }
+.equipped-profile-frame > .cosmetic-art { width: 100%; height: 100%; background: none; }
+.equipped-profile-frame .mythic-art { max-width: 100%; height: 100%; }
+.equipped-profile-avatar { position: relative; width: 120px; height: 120px; }
+.equipped-profile-avatar > .cosmetic-art { width: 100%; height: 100%; background: none; }
+.equipped-profile-avatar .mythic-art { max-width: 100%; height: 100%; }
+.equipped-profile-default-avatar { display: grid; place-items: center; width: 100%; height: 100%; border: 1px solid #695334; border-radius: 50%; color: #bba079; background: #1c2430; }
+.equipped-profile-name { min-width: 0; flex: 1; }
+.equipped-profile-name > span { display: block; color: #e9e0d0; font-size: 22px; font-weight: 600; letter-spacing: -.03em; }
+.equipped-profile-name > small { display: block; color: #8a9bb1; font-size: 10px; margin-top: 7px; }
+.equipped-profile-name .equipped-profile-empty-title { color: #8796a9; font-size: 10px; margin-top: 15px; line-height: 1.7; }
+.equipped-profile-title { margin-top: 12px; }
+.equipped-profile-title-art { width: min(100%,320px); height: 110px; }
+.equipped-profile-title-art > .cosmetic-art { width: 100%; height: 100%; background: none; }
+.equipped-profile-title-art .mythic-art { max-width: 100%; height: 100%; }
+.equipped-profile-title .royal-legacy-plaque { padding: 12px; gap: 6px; }
+.equipped-profile-title .royal-legacy-copy strong { font-size: 15px; margin-block: 6px; }
+.equipped-profile-title .equipped-profile-title-name { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.equipped-profile-title p { color: #c7ad7d; font-size: 9px; line-height: 1.6; margin: 7px 0 0; }
+.equipped-profile-logo { flex-shrink: 0; text-align: center; width: 130px; }
+.equipped-profile-logo > .cosmetic-art { width: 130px; height: 120px; background: none; }
+.equipped-profile-logo .mythic-art { max-width: 100%; height: 100%; }
+.equipped-profile-logo > span { display: block; color: #baac96; font-size: 9px; line-height: 1.6; margin-top: 9px; }
+.equipped-profile-slots { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 0; }
+.equipped-profile-slot { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 17px 16px; border-right: 1px solid #293446; }
+.equipped-profile-slot:last-child { border-right: 0; }
+.equipped-profile-slot > div > span { color: #8396ae; font-size: 9px; display: block; margin-bottom: 7px; }
+.equipped-profile-slot strong { display: block; color: #c7d0dd; font-size: 10px; font-weight: 450; line-height: 1.65; overflow-wrap: anywhere; }
+.equipped-profile-slot > button { min-height: 30px; padding: 6px 9px; border: 1px solid #705938; background: #2b241b; border-radius: 4px; color: #d7bc94; font-size: 9px; cursor: pointer; }
+.equipped-profile-slot > button:disabled { opacity: .45; cursor: not-allowed; }
+.equipped-profile-message { margin: 13px 24px; color: #a9c4b0; font-size: 10px; line-height: 1.7; }
+.equipped-profile-footnote { margin: 0; padding: 15px 24px; border-top: 1px solid #293446; color: #8397b0; font-size: 10px; line-height: 1.8; }
+.equipped-profile-footnote a { color: #d0b184; text-decoration: underline; text-underline-offset: 3px; }
+.header-equipped-profile { max-width: 235px; }
+.header-equipped-profile > span:last-child { min-width: 0; }
+.header-equipped-profile .header-equipped-avatar { display: block; width: 40px; height: 40px; flex-shrink: 0; overflow: hidden; background: #111d2a; border-color: #ac8550; }
+.header-equipped-avatar > .cosmetic-art { width: 100%; height: 100%; padding: 0; background: none; }
+.header-equipped-avatar .mythic-art { max-width: 100%; height: 100%; }
+.header-equipped-avatar .mythic-edition { display: none; }
+.header-equipped-title { position: relative; display: block; width: min(180px,100%); max-width: 180px; overflow: hidden; color: #e0c086; white-space: nowrap; text-overflow: ellipsis; isolation: isolate; }
+.header-equipped-title > span:last-child { position: relative; z-index: 1; }
+.header-title-effects { position: absolute; z-index: -1; inset: 0; opacity: .28; pointer-events: none; }
+.header-title-effects > .cosmetic-art { width: 100%; height: 100%; background: none; }
+.header-title-effects .mythic-art { max-width: 100%; height: 100%; }
+
+@media (max-width: 960px) {
+  .inventory-summary { gap: 20px; }
+  .inventory-summary > a { margin-left: 0; }
+  .equipped-profile-preview { padding-inline: 22px; }
+  .equipped-profile-identity { gap: 15px; }
+  .equipped-profile-slots { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .equipped-profile-slot { border-bottom: 1px solid #293446; }
+  .equipped-profile-slot:nth-child(3) { border-right: 0; }
+}
+@media (max-width: 700px) {
+  .bottom-nav { grid-template-columns: repeat(7, minmax(0,1fr)); }
+  .bottom-nav a { min-width: 0; gap: 6px; font-size: 8px; }
+  .bottom-nav a span { text-align: center; max-width: 100%; white-space: nowrap; }
+  .bottom-nav a svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .inventory-summary { gap: 18px 22px; padding: 17px; }
+  .inventory-summary strong { font-size: 25px; }
+  .inventory-summary strong small { font-size: 9px; }
+  .inventory-summary > a { width: 100%; justify-content: center; }
+  .inventory-club-filter .inventory-duplicates-filter { flex: 0 0 auto; align-self: flex-start; }
+  .history-record { flex-wrap: wrap; align-items: flex-start; }
+  .history-icon.history-club-art { width: 43px; height: 48px; }
+  .history-main { flex: 1; }
+  .history-cost { width: calc(100% - 53px); max-width: none; margin-left: 53px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; font-size: 9px; }
+  .history-cost small { text-align: left; font-size: 8px; }
+  .history-paging { align-items: flex-start; flex-wrap: wrap; }
+  .cosmetic-quantity { top: 8px; right: 8px; font-size: 10px; padding: 4px 6px; }
+  .equipped-profile-heading { padding: 18px; gap: 10px; }
+  .equipped-profile-heading h2 { font-size: 18px; }
+  .equipped-profile-heading p { font-size: 10px; }
+  .equipped-profile-heading > span { font-size: 8px; }
+  .equipped-profile-preview { padding: 22px 16px; gap: 12px; }
+  .equipped-profile-identity { width: 100%; flex: 1 0 100%; gap: 14px; }
+  .equipped-profile-portrait { width: 116px; height: 116px; }
+  .equipped-profile-avatar { width: 82px; height: 82px; }
+  .equipped-profile-default-avatar svg { width: 30px; height: 30px; }
+  .equipped-profile-name > span { font-size: 19px; }
+  .equipped-profile-title-art { width: min(100%,320px); height: 130px; }
+  .equipped-profile-title .royal-legacy-copy strong { font-size: 13px; }
+  .equipped-profile-title p { font-size: 8px; }
+  .equipped-profile-logo { width: 90px; margin-left: auto; }
+  .equipped-profile-logo > .cosmetic-art { width: 90px; height: 85px; }
+  .equipped-profile-logo > span { font-size: 8px; }
+  .equipped-profile-effect > .cosmetic-art { width: 250px; height: 225px; }
+  .equipped-profile-slots { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .equipped-profile-slot { padding: 14px; border-right: 1px solid #293446; }
+  .equipped-profile-slot:nth-child(even) { border-right: 0; }
+  .equipped-profile-slot:nth-child(3) { border-right: 1px solid #293446; }
+  .equipped-profile-slot:last-child { grid-column: 1/-1; border-right: 0; }
+  .equipped-profile-message { margin-inline: 18px; }
+  .equipped-profile-footnote { padding: 14px 18px; font-size: 9px; }
+  .inventory-grid .mythic-equip-button { min-height: 39px; }
+  .equipped-profile-slot > button { min-height: 44px; padding-inline: 14px; }
+}
+@media (max-width: 350px) {
+  .bottom-nav a { font-size: 7px; }
+  .inventory-summary > div > span { font-size: 7px; }
+  .inventory-summary { gap: 16px; }
+}

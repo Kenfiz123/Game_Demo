@@ -1,0 +1,53 @@
+/* The raster is the material. Only transform/opacity animate; the emblem stays still. */
+.art-mythic { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); background: radial-gradient(ellipse, #37304655, transparent 75%), #101a27; }
+.mythic-art { position: relative; width: auto; max-width: 95%; height: 94%; max-height: 280px; aspect-ratio: 1; isolation: isolate; display: grid; place-items: center; }
+.mythic-aura { position: absolute; width: 77%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--club-color) 20%, transparent), transparent 64%); }
+.mythic-halo { position: absolute; width: 100%; height: 100%; display: grid; place-items: center; }
+.cosmetic-art .mythic-halo img { width: 100%; height: 100%; object-fit: contain; }
+.mythic-halo-front { animation: mythic-prism-turn 48s linear infinite; animation-play-state: paused; }
+.mythic-halo-back { --halo-scale: .86; --halo-offset: 22.5deg; opacity: .36; transform: scale(.86) rotate(22.5deg); animation: mythic-prism-turn 64s linear infinite reverse; animation-play-state: paused; }
+.mythic-core { position: relative; width: 44%; aspect-ratio: 1; border: 1px solid #d9c2e369; background: radial-gradient(circle, #22304b, #0d1829); border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 3px #b6a4c211, inset 0 0 20px #b8d5ff09; }
+.cosmetic-art .mythic-core img { width: 88%; height: 88%; object-fit: contain; }
+.mythic-core svg { width: 48%; height: 48%; color: #eee0e6; }
+.mythic-star { position: absolute; width: 11px; height: 11px; background: #f1e3c4; clip-path: polygon(50% 0%, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0% 50%, 39% 38%); animation: mythic-starlight 4.8s ease-in-out infinite; animation-play-state: paused; opacity: .6; }
+.mythic-star-0 { left: 12%; top: 18%; animation-delay: -1.2s; }
+.mythic-star-1 { right: 13%; top: 26%; animation-delay: -3.4s; width: 7px; height: 7px; background: #acecff; }
+.mythic-star-2 { right: 5%; top: 64%; animation-delay: -.4s; }
+.mythic-star-3 { left: 23%; bottom: 12%; animation-delay: -2.1s; width: 8px; height: 8px; }
+.mythic-star-4 { left: 5%; top: 58%; animation-delay: -4s; width: 6px; height: 6px; background: #e9bbfa; }
+.mythic-star-5 { right: 29%; top: 7%; animation-delay: -2.8s; width: 6px; height: 6px; }
+.mythic-edition { position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%); font-size: 6px; letter-spacing: .22em; color: #e0cee5; background: #131c2cec; border: 1px solid #b595bd55; border-radius: 3px; padding: 3px 6px; }
+.mythic-art[data-motion-active="true"][data-motion-enabled="true"] .mythic-halo,
+.mythic-art[data-motion-active="true"][data-motion-enabled="true"] .mythic-star { animation-play-state: running; }
+.cosmetic-card-mythic { border-color: #ac83945c; background: #191c2b; }
+.cosmetic-card-mythic .cosmetic-card-content { border-top: 1px solid #ba8c9b33; background: linear-gradient(110deg, #c99bc908, transparent); }
+.reward-reveal.rarity-mythic .reward-art { width: min(280px, 85vw); height: 245px; }
+.reward-reveal.rarity-mythic .mythic-edition { font-size: 7px; }
+.art-compact .mythic-edition { display: none; }
+
+.club-badge-shield { position: relative; display: grid; place-items: center; width: 93px; height: 110px; clip-path: polygon(50% 0, 95% 17%, 92% 66%, 77% 85%, 50% 100%, 23% 85%, 8% 66%, 5% 17%); background: linear-gradient(150deg, var(--club-color), #1b3645 50%, #647b80); }
+.club-badge-shield::before { content: ""; position: absolute; inset: 3px; clip-path: inherit; background: linear-gradient(135deg, #263d48, #0d1f2c); }
+.cosmetic-art .club-badge-shield img { position: relative; width: 78%; height: 78%; object-fit: contain; }
+.club-legendary-frame { position: relative; width: 106px; height: 106px; display: grid; place-items: center; border: 2px solid #f0cf91; border-radius: 25% 7%; background: linear-gradient(135deg, #302d29, #101b27); box-shadow: 0 0 0 4px #2c2924, 0 0 0 5px #c19a60; }
+.club-legendary-frame::before { content: ""; position: absolute; inset: 5px; border: 1px solid #b492605c; border-radius: 23% 5%; }
+.cosmetic-art .club-legendary-frame img { width: 86%; height: 86%; object-fit: contain; }
+.club-legendary-frame > span { position: absolute; width: 10px; height: 10px; background: var(--club-color); border: 1px solid #f8e0b5; transform: rotate(45deg); }
+.club-legendary-frame > span:first-of-type { right: -4px; top: -4px; }.club-legendary-frame > span:last-of-type { left: -4px; bottom: -4px; }
+.art-compact .club-badge-shield { width: 65px; height: 77px; }.art-compact .club-legendary-frame { width: 70px; height: 70px; border-width: 1px; box-shadow: 0 0 0 3px #2c2924, 0 0 0 4px #c19a60; }
+.reward-art .club-legendary-frame { width: 130px; height: 130px; }.reward-art .club-badge-shield { width: 110px; height: 130px; }
+.club-tier-strip { display: flex; align-items: center; gap: 5px; padding-bottom: 13px; }.club-tier-strip > span { width: 5px; height: 5px; border-radius: 50%; }.club-tier-strip > small { margin-left: auto; font-size: 6px; letter-spacing: .08em; color: #8e9cb1; }
+.club-tier-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 19px; margin: 23px 0 17px; }.club-tier-legend > span { font-size: 9px; color: #b0bbcd; display: inline-flex; gap: 6px; align-items: center; }.club-tier-legend i { width: 5px; height: 5px; background: var(--tier-color); border-radius: 50%; }
+.mythic-spotlight { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: 18px; padding: 23px; border: 1px solid #a685a04d; border-radius: 9px; background: radial-gradient(ellipse at 18% 45%, #3e344830, transparent 60%), linear-gradient(115deg, #131d2c, #191c29); }
+.mythic-spotlight-art { min-width: 0; }.mythic-spotlight .cosmetic-art { height: 275px; background: none; overflow: visible; }.mythic-spotlight .mythic-art { height: 260px; }.mythic-spotlight .mythic-edition { font-size: 7px; }
+.mythic-spotlight-copy { min-width: 0; }.mythic-spotlight-copy .mythic-kicker { display: flex; align-items: center; gap: 7px; font-size: 8px; letter-spacing: .15em; color: #c4aebf; margin: 0 0 12px; }.mythic-spotlight-copy h3 { font-size: clamp(20px, 2vw, 26px); font-weight: 550; letter-spacing: -.025em; margin: 14px 0 10px; line-height: 1.3; }.mythic-spotlight-copy > p:not(.mythic-kicker) { font-size: 11px; line-height: 1.8; color: #aeb7c8; margin: 0; }
+.mythic-facts { display: flex; gap: 23px; margin: 18px 0; }.mythic-facts > span { font-size: 8px; line-height: 1.6; color: #8c9db3; }.mythic-facts strong { display: block; font-size: 17px; font-weight: 550; color: #e6d5df; font-variant-numeric: tabular-nums; margin-bottom: 3px; }
+.mythic-motion-toggle { font-size: 9px; min-height: 38px; padding: 8px 10px; border-color: #645063; }.mythic-spotlight-copy > small { display: block; font-size: 8px; line-height: 1.7; color: #8894a9; margin-top: 11px; max-width: 330px; }
+@keyframes mythic-prism-turn { from { transform: rotate(var(--halo-offset, 0deg)) scale(var(--halo-scale, 1)); } to { transform: rotate(calc(360deg + var(--halo-offset, 0deg))) scale(var(--halo-scale, 1)); } }
+@keyframes mythic-starlight { 0%, 100% { opacity: .22; transform: scale(.6) rotate(-12deg); } 45% { opacity: .9; transform: scale(1.08) rotate(12deg); } }
+@media (max-width: 700px) {
+  .mythic-spotlight { grid-template-columns: 1fr; padding: 18px 13px; gap: 14px; }.mythic-spotlight .cosmetic-art { height: 240px; }.mythic-spotlight .mythic-art { width: min(100%, 235px); height: 235px; }.mythic-spotlight-copy { text-align: center; }.mythic-spotlight-copy .mythic-kicker, .mythic-facts { justify-content: center; }.mythic-spotlight-copy > small { margin-inline: auto; }.mythic-spotlight-copy h3 { font-size: 22px; }.mythic-spotlight-copy > p:not(.mythic-kicker) { font-size: 10px; }.club-tier-legend { gap: 10px 14px; }.club-tier-legend > span { font-size: 8px; }
+  .reward-reveal.rarity-mythic .reward-art { width: 210px; height: 190px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mythic-art .mythic-halo, .mythic-art .mythic-star { animation: none; }
+}

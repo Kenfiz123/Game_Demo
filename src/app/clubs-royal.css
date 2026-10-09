@@ -1,0 +1,76 @@
+/* The collection keeps its list quiet; the chosen royal artifact is the focal point. */
+.royal-clubs-page .royal-collection-heading { margin-bottom: 27px; padding-block: 10px 20px; border-bottom: 1px solid #70563480; }
+.royal-clubs-page .royal-collection-heading h1 { font-family: var(--font-royal); color: #e8d7b5; font-size: clamp(32px,4vw,52px); font-weight: 400; letter-spacing: -.035em; line-height: 1.15; }
+.royal-clubs-page .royal-collection-heading p { max-width: 760px; color: #a8b1bf; line-height: 1.9; font-size: 12px; }
+.royal-collection-signature { display: flex; flex-wrap: wrap; gap: 9px 25px; margin-top: 20px; color: #d3b381; font-size: 10px; line-height: 1.7; }
+.royal-collection-signature > span + span { color: #a9b2bf; }
+.royal-clubs-page .club-detail { padding: 26px; border-color: #6f5534; background: #101824; }
+.royal-clubs-page .club-detail-heading h2 { color: #e5d6bd; }
+.royal-clubs-page .collection-meta { flex-wrap: wrap; line-height: 1.7; }
+.royal-clubs-page .club-card-art > span { border-color: #635137; color: #d3bc97; }
+.royal-clubs-page .club-detail-button { color: #d9c4a3; background: #25231f; border-color: #625035; }
+.royal-clubs-page .royal-mythic-spotlight { display: block; padding: 27px; border: 1px solid #8c6e44; border-radius: 8px; background: radial-gradient(ellipse at 25% 65%,#6d432226,transparent 62%),#0b1420; }
+.royal-spotlight-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.royal-spotlight-intro h3 { font-family: var(--font-royal); font-size: 27px; font-weight: 400; letter-spacing: -.02em; color: #eedbb6; margin: 0 0 8px; }
+.royal-spotlight-intro p { color: #a49680; font-size: 11px; line-height: 1.8; margin: 0; }
+.royal-spotlight-intro > span { flex-shrink: 0; color: #b59e77; font-size: 10px; white-space: nowrap; padding-top: 7px; }
+.royal-variant-selector { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; margin-bottom: 24px; }
+.royal-variant-selector button { min-width: 0; min-height: 61px; padding: 11px 12px; text-align: left; border: 1px solid #4b4030; border-radius: 5px; color: #cab898; background: #1a1d21; cursor: pointer; }
+.royal-variant-selector button > span { display: block; font-size: 11px; font-weight: 550; }
+.royal-variant-selector button > small { display: block; color: #8d98a8; font-size: 8px; line-height: 1.6; margin-top: 6px; }
+.royal-variant-selector button[aria-pressed="true"] { border-color: #d2aa6c; background: #362a1a; color: #f1d69d; }
+.royal-variant-selector button[aria-pressed="true"] > small { color: #c5b291; }
+.royal-variant-selector button:active { transform: scale(.985); }
+.royal-spotlight-stage { display: grid; grid-template-columns: minmax(230px,.9fr) minmax(0,1.1fr); gap: 25px; align-items: center; padding: 15px 0 4px; }
+.royal-clubs-page .royal-spotlight-art { display: grid; place-items: center; width: 100%; min-width: 0; }
+.royal-clubs-page .royal-spotlight-art > .cosmetic-art { height: 300px; width: min(100%,300px); background: none; overflow: hidden; }
+.royal-clubs-page .royal-spotlight-art .mythic-art { max-width: 100%; height: 100%; max-height: 300px; }
+.royal-spotlight-copy { min-width: 0; }
+.royal-spotlight-edition { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.royal-spotlight-edition > span:last-child { color: #bca67f; font-size: 10px; }
+.royal-spotlight-copy h4 { color: #f0e0c4; font-family: var(--font-royal); font-size: clamp(23px,2.7vw,32px); line-height: 1.25; font-weight: 400; letter-spacing: -.025em; margin: 16px 0 13px; overflow-wrap: anywhere; }
+.royal-clubs-page .royal-spotlight-copy > p { color: #a8b3c3; font-size: 10px; line-height: 1.9; margin: 0; }
+.royal-clubs-page .royal-spotlight-copy > .royal-heritage { color: #d6b273; border-left: 2px solid #af8550; padding: 3px 0 3px 10px; margin: 0 0 14px; font-size: 12px; }
+.royal-mythic-facts { flex-wrap: wrap; gap: 15px 25px; padding-top: 16px; border-top: 1px solid #3b3328; margin: 18px 0; }
+.royal-mythic-facts strong { color: #e7c995; font-size: 19px; }
+.royal-preview-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.royal-preview-controls > span { color: #b3a084; font-size: 9px; line-height: 1.7; }
+.royal-preview-controls .mythic-motion-toggle { min-height: 41px; border-color: #755837; color: #d3b78e; background: #231f1a; }
+.royal-clubs-page .royal-spotlight-copy > small { color: #8296ae; font-size: 9px; max-width: 440px; margin-top: 13px; line-height: 1.8; }
+.royal-lower-heading { margin: 28px 0 8px; }
+.royal-lower-heading h3 { color: #d3c6b0; font-size: 18px; font-weight: 500; margin: 0 0 8px; }
+.royal-lower-heading p { color: #8d9cb0; font-size: 10px; line-height: 1.8; margin: 0; }
+.royal-clubs-page .royal-lower-grid .club-item-note > span { font-variant-numeric: tabular-nums; }
+.royal-clubs-page .club-detail > .primary-button { margin-top: 7px; }
+@media (hover:hover) and (pointer:fine) {
+  .royal-variant-selector button:hover { border-color: #a68654; }
+}
+@media (max-width: 1150px) {
+  .royal-spotlight-stage { grid-template-columns: 1fr; gap: 15px; }
+  .royal-spotlight-copy { text-align: left; }
+  .royal-clubs-page .royal-spotlight-copy > small { margin-inline: 0; }
+}
+@media (max-width: 700px) {
+  .royal-clubs-page .royal-collection-heading h1 { font-size: 34px; }
+  .royal-clubs-page .royal-collection-heading p { font-size: 10px; max-width: 100%; }
+  .royal-collection-signature { font-size: 9px; gap: 7px 17px; }
+  .royal-clubs-page .club-detail { padding: 17px; }
+  .royal-clubs-page .royal-mythic-spotlight { padding: 17px 13px; }
+  .royal-spotlight-intro { gap: 10px; flex-wrap: wrap; }
+  .royal-spotlight-intro h3 { font-size: 23px; }
+  .royal-spotlight-intro p { font-size: 10px; }
+  .royal-spotlight-intro > span { font-size: 9px; padding-top: 0; }
+  .royal-variant-selector { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .royal-variant-selector button { min-height: 61px; padding: 10px; }
+  .royal-variant-selector button > span { font-size: 10px; }
+  .royal-variant-selector button > small { font-size: 8px; }
+  .royal-spotlight-stage { padding-top: 0; }
+  .royal-clubs-page .royal-spotlight-art > .cosmetic-art { height: 250px; width: min(100%,250px); }
+  .royal-clubs-page .royal-spotlight-art .mythic-art { height: 100%; width: 100%; max-height: 250px; }
+  .royal-spotlight-copy h4 { font-size: 25px; }
+  .royal-spotlight-copy .royal-spotlight-edition { justify-content: flex-start; }
+  .royal-clubs-page .royal-mythic-facts { justify-content: flex-start; }
+  .royal-mythic-facts strong { font-size: 18px; }
+  .royal-preview-controls .mythic-motion-toggle { width: 100%; min-height: 44px; justify-content: center; }
+  .royal-lower-heading h3 { font-size: 17px; }
+}
