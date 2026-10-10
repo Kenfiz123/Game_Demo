@@ -1,4 +1,5 @@
-@import "tailwindcss";
+/* Scan application code only, not generated preview builds or QA artifacts. */
+@import "tailwindcss" source("../");
 
 :root {
   --ink: #edf0f5; --muted: #939dad; --faint: #657082; --line: #242d3b;

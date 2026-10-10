@@ -1,0 +1,126 @@
+/* A quiet gallery around the existing artwork. Outcome selection and reel motion stay untouched. */
+.chest-experience .chest-panel {
+  border-color: #4b4436;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 50% 48%, #302b221c, transparent 59%), #10151c;
+  box-shadow: inset 0 1px #e8d4af0c;
+}
+.chest-panel::before { opacity: .11; background-image: radial-gradient(#b5a48a .6px, transparent .6px); }
+.chest-panel .panel-topline { padding: 22px 28px 17px; font-size: 8px; letter-spacing: .13em; }
+.chest-panel .panel-topline > span:first-child { color: #cfb98e; }
+.chest-panel .panel-topline > span:last-child { color: #989487; }
+.chest-journey { display: flex; align-items: center; justify-content: center; gap: 0; margin: 0; padding: 0 24px; list-style: none; }
+.chest-journey li { display: flex; align-items: center; gap: 7px; color: #747b83; font-size: 9px; line-height: 1.5; white-space: nowrap; }
+.chest-journey li + li::before { content: ""; width: clamp(12px, 3vw, 34px); height: 1px; margin: 0 13px 0 6px; background: #373a3d; }
+.chest-journey li > span:first-of-type { font-variant-numeric: tabular-nums; color: #838075; font-size: 8px; }
+.chest-journey li[aria-current="step"] { color: #ecd8b2; }
+.chest-journey li[aria-current="step"] > span:first-of-type, .chest-journey li.is-complete > span:first-of-type { color: #c7a76c; }
+.chest-journey li.is-complete { color: #a9a08e; }
+.chest-panel .game-intro { margin: 27px 24px 0; }
+.chest-intro-eyebrow { color: #ae9975; font-size: 8px; letter-spacing: .19em; }
+.chest-panel .game-intro h2 { margin: 13px auto 11px; max-width: 530px; font-family: var(--font-royal); font-size: clamp(30px, 3.2vw, 43px); font-weight: 400; letter-spacing: -.035em; line-height: 1.06; text-wrap: balance; color: #f1e8d6; }
+.chest-panel .game-intro h2 em { color: #d6b985; font-weight: 400; }
+.chest-panel .game-intro p { max-width: 370px; margin: 0 auto; color: #9a9da1; font-size: 11px; line-height: 1.65; text-wrap: pretty; }
+.chest-panel .game-stage { padding-bottom: 25px; }
+.chest-panel .chest-stage { height: 300px; }
+.chest-panel .chest-halo { background: radial-gradient(ellipse at 50% 54%, #b38d4314, transparent 65%); }
+.chest-panel .stage-platform { bottom: 18px; border-color: #c7ae7030; background: radial-gradient(ellipse, #c7a4690a, #0b101666 64%, transparent 66%); }
+.chest-panel .stage-orbit { border-color: #bca06922; }
+.chest-panel .stage-coordinate { color: #8b8271; bottom: 40px; font-size: 6px; letter-spacing: .15em; }
+.chest-panel .chest-object { height: 300px; animation: premium-vault-float 6.4s cubic-bezier(.45, 0, .55, 1) infinite; animation-play-state: paused; }
+.chest-panel .chest-object[data-motion-active="true"] { animation-play-state: running; }
+.chest-panel .is-charging .chest-object { animation: chest-charge .45s cubic-bezier(.23, 1, .32, 1) both; animation-play-state: paused; }
+.chest-panel .is-charging .chest-object[data-motion-active="true"] { animation-play-state: running; }
+.chest-panel .game-controls { gap: 10px; padding: 0 24px; }
+.chest-panel .cost-label { color: #a8a293; font-size: 10px; font-variant-numeric: tabular-nums; }
+.chest-panel .cost-label strong { color: #f1e6d1; font-size: 17px; }
+.chest-panel .play-button { width: min(100%, 292px); min-height: 49px; border-radius: 5px; font-size: 12px; letter-spacing: .01em; }
+.chest-panel .control-note { min-height: 30px; max-width: 355px; color: #a2a3a1; font-size: 10px; line-height: 1.6; text-wrap: pretty; }
+.chest-panel .panel-bottomline { padding: 16px 26px; background: #0d111780; border-top-color: #4d463444; color: #aaa08d; font-size: 7px; letter-spacing: .06em; }
+.chest-panel .panel-bottomline i { width: 4px; height: 4px; background: #bb9c63; }
+
+.reward-reveal.premium-reveal { width: min(100%, 560px); padding: 27px 24px 12px; min-height: 0; }
+.premium-reveal:not(.mythic-ceremony) { animation: premium-discovery-enter 280ms cubic-bezier(.23, 1, .32, 1) both; }
+.premium-reveal .reward-eyebrow { color: #c6b28e; font-size: 8px; letter-spacing: .13em; }
+.ceremony-overline { display: block; margin-bottom: 14px; color: #c8a86e; font-size: 8px; line-height: 1.5; letter-spacing: .18em; }
+.premium-reveal .reward-art { position: relative; width: min(280px, 100%); height: 215px; margin: 24px 0 20px; background: radial-gradient(ellipse at center, #b4965b09, transparent 70%); }
+.premium-reveal .reward-art .cosmetic-art { position: relative; z-index: 1; }
+.reward-gallery-corner { position: absolute; width: 22px; height: 22px; border-color: #b5995b55; border-style: solid; pointer-events: none; }
+.reward-gallery-corner.corner-top { left: 0; top: 0; border-width: 1px 0 0 1px; }
+.reward-gallery-corner.corner-bottom { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.premium-reveal h2 { max-width: 100%; margin: 16px 0 9px; color: #f1e9dc; font-size: clamp(24px, 2.6vw, 33px); line-height: 1.18; text-wrap: balance; overflow-wrap: anywhere; }
+.premium-reveal p { color: #a3a7ad; font-size: 11px; line-height: 1.7; }
+.premium-reveal .reward-club { color: #c4af86; margin: 0 0 9px; font-size: 10px; }
+.premium-reveal .reward-type { margin-top: 3px; color: #a59c8c; font-size: 8px; }
+.premium-reveal .reward-saved { max-width: 100%; display: flex; justify-content: center; flex-wrap: wrap; margin: 24px 0 20px; padding: 10px 14px; border: 1px solid #78977a25; border-radius: 4px; background: #73977808; color: #b3c8b6; font-size: 10px; line-height: 1.6; }
+.premium-reveal .reward-saved svg { flex-shrink: 0; }
+.premium-reveal .reward-actions { width: 100%; gap: 9px; }
+.premium-reveal .reward-actions button { min-height: 45px; border-radius: 5px; }
+.premium-reveal .text-button { margin-top: 9px; font-size: 10px; }
+.premium-reveal.mythic-ceremony .reward-art { width: min(350px, 100%); height: 285px; margin: 15px 0 19px; }
+.premium-reveal.mythic-ceremony .mythic-ceremony-heading h2 { margin-top: 0; margin-bottom: 10px; font-size: clamp(29px, 3.5vw, 39px); }
+.premium-reveal .mythic-ceremony-identity h3 { margin-top: 14px; color: #efe4cf; text-wrap: balance; }
+.premium-reveal.mythic-ceremony .mythic-ceremony-lifelong { padding-top: 13px; border-top: 1px solid #b7995b33; margin-top: 18px; }
+.premium-reveal.mythic-ceremony .reward-saved { margin-top: 18px; }
+.premium-reveal.mythic-ceremony .mythic-ceremony-pool { color: #999d9f; }
+.chest-panel button:focus-visible, .premium-reveal button:focus-visible { outline: 2px solid #e1c58c; outline-offset: 4px; }
+.chest-panel button:active:not(:disabled), .premium-reveal button:active:not(:disabled) { transform: scale(.98); }
+
+@keyframes premium-vault-float {
+  0%, 100% { transform: translateY(1px); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes premium-discovery-enter {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (min-width: 961px) and (max-height: 800px) {
+  .chest-experience .chest-panel { min-height: 430px; }
+  .chest-panel .panel-topline { padding-top: 15px; padding-bottom: 12px; }
+  .chest-panel .game-intro { margin-top: 16px; }
+  .chest-panel .chest-intro-eyebrow { display: none; }
+  .chest-panel .game-intro h2 { font-size: 30px; margin-block: 5px 8px; }
+  .chest-panel .game-intro h2 br { display: none; }
+  .chest-panel .game-intro h2 em { margin-left: .25ch; }
+  .chest-panel .chest-stage, .chest-panel .chest-object { height: 185px; }
+  .chest-panel .chest-object { width: min(100%, 370px); }
+  .chest-panel .stage-coordinate { bottom: 18px; }
+  .chest-panel .game-stage { padding-bottom: 14px; }
+  .chest-panel .control-note { min-height: 0; }
+  .chest-panel .panel-bottomline { padding-block: 12px; }
+  .premium-reveal.mythic-ceremony .reward-art { height: 230px; width: min(300px, 100%); }
+}
+@media (max-width: 700px) {
+  .chest-experience .chest-panel { min-height: 540px; }
+  .chest-panel .panel-topline { padding: 14px 17px 12px; font-size: 6px; letter-spacing: .08em; }
+  .chest-journey { padding: 0 14px; }
+  .chest-journey li { gap: 5px; font-size: 8px; }
+  .chest-journey li + li::before { width: 13px; margin-right: 8px; margin-left: 4px; }
+  .chest-panel .game-intro { margin: 14px 18px 0; }
+  .chest-panel .chest-intro-eyebrow { display: none; }
+  .chest-panel .game-intro h2 { font-size: clamp(30px, 8.2vw, 36px); margin-top: 8px; }
+  .chest-panel .game-intro p { max-width: 275px; font-size: 10px; }
+  .chest-panel .chest-stage, .chest-panel .chest-object { height: 185px; }
+  .chest-panel .chest-object { width: min(100%, 350px); }
+  .chest-panel .game-stage { padding-bottom: 12px; }
+  .chest-panel .stage-coordinate { bottom: 18px; font-size: 5px; }
+  .chest-panel .game-controls { padding-right: 18px; padding-left: 18px; }
+  .chest-panel .control-note { font-size: 9px; max-width: 270px; }
+  .chest-panel .panel-bottomline { padding: 14px 17px; font-size: 6px; gap: 8px; flex-wrap: wrap; }
+  .reward-reveal.premium-reveal { padding: 24px 17px 10px; }
+  .premium-reveal .reward-art { height: 190px; width: min(250px, 100%); margin-top: 20px; }
+  .premium-reveal.mythic-ceremony .reward-art { width: min(290px, 100%); height: 250px; }
+  .premium-reveal .reward-actions { flex-direction: column; }
+  .premium-reveal .reward-actions button { width: 100%; }
+  .premium-reveal .reward-saved { margin-top: 20px; padding: 9px 11px; font-size: 9px; }
+  .ceremony-overline { font-size: 7px; letter-spacing: .12em; }
+}
+@media (max-width: 370px) {
+  .chest-panel .panel-topline { flex-wrap: wrap; gap: 8px; }
+  .chest-panel .chest-stage, .chest-panel .chest-object { height: 170px; }
+  .premium-reveal.mythic-ceremony .reward-art { height: 215px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chest-panel .chest-object, .chest-panel .is-charging .chest-object, .premium-reveal:not(.mythic-ceremony) { animation: none; }
+  .chest-panel button:active:not(:disabled), .premium-reveal button:active:not(:disabled) { transform: none; }
+}

@@ -1,8 +1,16 @@
 "use client";
 import { createContext, useContext } from "react";
 import type { ArcadeSettings, EquipSlot, GameId, OpeningAttempt, TradeUpAttempt, XperienceState } from "@/types/gamification";
+export type BackendStatus = "connecting" | "ready" | "error";
 export interface XperienceContextValue {
   state: XperienceState; hydrated: boolean; isPlaying: boolean;
+  backendStatus: BackendStatus;
+  backendError: string | null;
+  retryBackend: () => Promise<void>;
+  demoToolsEnabled: boolean;
+  canImportLegacy: boolean;
+  legacyAvailable: boolean;
+  importLegacy: () => Promise<boolean>;
   playGame: (game: GameId) => Promise<OpeningAttempt>;
   tradeUp: (ids: string[]) => Promise<TradeUpAttempt>;
   updateSettings: (settings: ArcadeSettings) => Promise<boolean>;

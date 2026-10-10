@@ -2,6 +2,7 @@
   "name": "fptu-xperience",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=22.13.0" },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +15,7 @@
     "assets:forge": "node scripts/optimize-forge.mjs",
     "assets:royal": "node scripts/optimize-royal-mythic.mjs",
     "assets:mythic-clubs": "node scripts/optimize-mythic-clubs.mjs",
+    "assets:mythic-finishes": "node scripts/optimize-mythic-finishes.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

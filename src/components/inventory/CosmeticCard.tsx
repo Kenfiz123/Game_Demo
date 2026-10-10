@@ -17,6 +17,7 @@ function MythicEquipControl({ item }: { item: CosmeticItem }) {
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const owned = state.ownedItemIds.includes(item.id);
   const equipped = state.equipped[item.type as EquipSlot] === item.id;
+  const unavailable = !hydrated || !owned || isPlaying;
   const toggle = async () => {
     if (inFlight.current || !hydrated || !owned || isPlaying) return;
     inFlight.current = true;
@@ -25,21 +26,23 @@ function MythicEquipControl({ item }: { item: CosmeticItem }) {
       const success = equipped ? await unequipItem(item.type as EquipSlot) : await equipItem(item.id);
       if (mounted.current) setMessage(success ? (equipped ? "Đã gỡ trang bị." : "Đã trang bị lên hồ sơ.") : "Chưa thay đổi được trang bị. Thử lại sau khi lượt chơi kết thúc.");
     } catch {
-      if (mounted.current) setMessage("Không lưu được trang bị. Kiểm tra bộ nhớ trình duyệt rồi thử lại.");
+      if (mounted.current) setMessage("Chưa xác nhận được trang bị. Kết nối lại backend để tải trạng thái mới nhất.");
     } finally {
       inFlight.current = false;
       if (mounted.current) setPending(false);
     }
   };
-  return <div className="mythic-equip-control"><button type="button" className="mythic-equip-button" aria-label={(equipped ? "Gỡ trang bị " : "Trang bị ") + item.name} aria-pressed={equipped} disabled={!hydrated || !owned || isPlaying || pending} onClick={toggle}>{pending ? "Đang lưu…" : equipped ? "Gỡ trang bị" : "Trang bị"}</button><p role="status">{message}</p></div>;
+  // Keep the pending control focusable until its card is removed; disabling it
+  // natively would blur before InventoryGrid can recover that lost focus.
+  return <div className="mythic-equip-control" data-equipped={equipped && owned ? "true" : "false"}>{equipped && owned ? <span className="mythic-equipped-indicator">Đang trang bị</span> : null}<button type="button" className="mythic-equip-button" aria-label={(equipped ? "Gỡ trang bị " : "Trang bị ") + item.name} aria-pressed={equipped} aria-disabled={unavailable || pending ? true : undefined} aria-busy={pending} disabled={unavailable} onClick={toggle}>{pending ? "Đang lưu…" : equipped ? "Gỡ trang bị" : "Trang bị"}</button><p role="status">{message}</p></div>;
 }
 
 export function CosmeticCard({ item, quantity }: { item: CosmeticItem; quantity?: number }) {
   const club = item.clubId ? getClubById(item.clubId) : undefined;
   const edition = item.mythicVariant ? getMythicVariant(item.mythicVariant) : undefined;
-  return <article className={"cosmetic-card" + (item.rarity === "MYTHIC" ? " cosmetic-card-mythic" : "")}>
+  return <article className={"cosmetic-card" + (item.rarity === "MYTHIC" ? " cosmetic-card-mythic" : "")} data-inventory-item={quantity !== undefined ? item.id : undefined}>
     <CosmeticArt item={item} animated/>
     {quantity !== undefined && <span className="cosmetic-quantity" aria-label={quantity + " bản trong kho"}>×{quantity.toLocaleString("vi-VN")}</span>}
-    <div className="cosmetic-card-content"><RarityBadge rarity={item.rarity}/><h3>{item.name}</h3><p>{edition?.label ?? cosmeticTypeLabels[item.type]}</p>{item.heritage && <p className="cosmetic-heritage">Di sản {item.heritage}</p>}{club && <p className="cosmetic-club-label">{club.shortName} · {club.campus}</p>}{item.rarity === "MYTHIC" && quantity !== undefined && quantity > 0 ? <MythicEquipControl item={item}/> : null}</div>
+    <div className="cosmetic-card-content"><RarityBadge rarity={item.rarity}/><h3>{item.name}</h3><p>{edition ? cosmeticTypeLabels[item.type] + " · " + edition.label : cosmeticTypeLabels[item.type]}</p>{item.heritage && <p className="cosmetic-heritage">Di sản {item.heritage}</p>}{club && <p className="cosmetic-club-label">{club.shortName} · {club.campus}</p>}{item.rarity === "MYTHIC" && quantity !== undefined && quantity > 0 ? <MythicEquipControl item={item}/> : null}</div>
   </article>;
 }

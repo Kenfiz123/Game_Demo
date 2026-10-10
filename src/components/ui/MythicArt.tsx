@@ -1,36 +1,42 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { getClubById } from "@/data/clubs";
 import { getMythicVariant } from "@/data/mythicCatalog";
 import { observeVisibleMotion } from "@/lib/visibleMotion";
 import type { CosmeticItem } from "@/types/gamification";
 
 export const MYTHIC_HALO = "/assets/mythic-prism-halo.webp";
+export const MYTHIC_FINISHES = {
+  SOVEREIGN: "/assets/mythic-finishes/sovereign-v3.webp",
+  AURORA: "/assets/mythic-finishes/aurora-v3.webp",
+  CELESTIAL: "/assets/mythic-finishes/celestial-v3.webp",
+  COMET: "/assets/mythic-finishes/comet-v3.webp",
+  REGALIA: "/assets/mythic-finishes/regalia-v5.webp",
+} as const;
 const stars = [0, 1, 2, 3] as const;
 const trails = [0, 1, 2] as const;
 const embers = [0, 1, 2, 3, 4, 5] as const;
 type ArtProps = { item: CosmeticItem; compact?: boolean; priority?: boolean; animated?: boolean };
 
-/** Animate the wrapper, keeping the soft SVG ribbon on one compositor layer. */
-function AuroraRibbon({ index }: { index: number }) {
-  const gradientId = useId();
-  const curve = "M24 228C-2 146 43 42 128 36S276 114 277 38";
-  return <span className={"royal-aurora royal-aurora-" + index + " royal-motion"}>
-    <svg viewBox="0 0 300 300" fill="none" aria-hidden="true" focusable="false">
-      <defs><linearGradient id={gradientId} x1="28" y1="228" x2="243" y2="33" gradientUnits="userSpaceOnUse">
-        <stop stopColor="currentColor" stopOpacity="0"/>
-        <stop offset=".3" stopColor="currentColor" stopOpacity=".9"/>
-        <stop offset=".7" stopColor="#fff5d7" stopOpacity=".8"/>
-        <stop offset="1" stopColor="currentColor" stopOpacity="0"/>
-      </linearGradient></defs>
-      <g stroke={"url(#" + gradientId + ")"} strokeLinecap="round">
-        <path d={curve} strokeWidth="30" opacity=".08"/>
-        <path d={curve} strokeWidth="12" opacity=".18"/>
-        <path d={curve} strokeWidth="1.5" opacity=".85"/>
-      </g>
-    </svg>
-  </span>;
+/** Each crafted surround keeps its reflection aligned to the exact responsive alpha. */
+function RoyalFinish({ src, variant, compact, priority }: {
+  src: string; variant: string; compact: boolean; priority: boolean;
+}) {
+  const lustre = useRef<HTMLSpanElement>(null);
+  return <div className={"royal-finish royal-finish-" + variant.toLowerCase() + " royal-motion"} aria-hidden="true">
+    <Image src={src} alt="" width={640} height={640} sizes={compact ? "110px" : "(max-width: 700px) 260px, 300px"}
+      priority={priority} onLoad={event => {
+        if (!lustre.current) return;
+        const mask = 'url("' + event.currentTarget.currentSrc + '")';
+        lustre.current.style.maskImage = mask;
+        lustre.current.style.setProperty("-webkit-mask-image", mask);
+        lustre.current.dataset.lustreReady = "true";
+      }}/>
+    <span ref={lustre} className="royal-finish-lustre" data-lustre-ready="false">
+      <span className="royal-finish-sweep royal-motion"/>
+    </span>
+  </div>;
 }
 
 /** A moving reflection is masked to the real item; the club crest never spins. */
@@ -62,6 +68,8 @@ export function MythicArt({ item, compact = false, priority = false, animated = 
   const variant = item.mythicVariant ?? "PRISM";
   const club = item.clubId ? getClubById(item.clubId) : undefined;
   const definition = getMythicVariant(variant);
+  const finish = variant === "SOVEREIGN" || variant === "AURORA" || variant === "CELESTIAL" || variant === "COMET" || variant === "REGALIA"
+    ? MYTHIC_FINISHES[variant] : undefined;
   useEffect(() => {
     if (!shell.current || !animated) return;
     return observeVisibleMotion(shell.current);
@@ -69,11 +77,12 @@ export function MythicArt({ item, compact = false, priority = false, animated = 
 
   return <div ref={shell}
     className={"mythic-art royal-mythic variant-" + variant.toLowerCase() + (compact ? " royal-compact" : "")}
-    data-item-id={item.id} data-mythic-variant={variant} data-mythic-fx="2"
+    data-item-id={item.id} data-mythic-variant={variant} data-mythic-fx="4"
     data-motion-active="false" data-motion-enabled={animated}>
     <div className="royal-aura" aria-hidden="true"/>
     {!compact ? <span className="royal-atmosphere royal-motion" aria-hidden="true"/> : null}
     {variant !== "LEGACY" ? <span className="royal-horizon" aria-hidden="true"/> : null}
+    {finish ? <RoyalFinish key={variant} src={finish} variant={variant} compact={compact} priority={priority}/> : null}
 
     {variant === "PRISM" ? <>
       {["back", "front"].map(layer => <div className={"royal-prism royal-prism-" + layer + " royal-motion"} key={layer}>
@@ -83,20 +92,25 @@ export function MythicArt({ item, compact = false, priority = false, animated = 
     </> : null}
 
     {variant === "SOVEREIGN" ? <>
-      <span className="royal-seal-rays royal-motion" aria-hidden="true"/>
-      <span className="royal-seal-ring" aria-hidden="true"/>
-      <span className="royal-seal-sweep royal-motion" aria-hidden="true"/>
-      {[0, 1].map(sigil => <span className={"royal-sigil royal-sigil-" + sigil} aria-hidden="true" key={sigil}/>)}
+      <span className="royal-court-aura royal-motion" aria-hidden="true"/>
+      {[0, 1].map(jewel => <span className={"royal-court-jewel royal-court-jewel-" + jewel + " royal-motion"} aria-hidden="true" key={jewel}><i/></span>)}
     </> : null}
 
-    {variant === "AURORA" ? <div className="royal-aurora-field" aria-hidden="true">
-      {trails.slice(0, compact ? 2 : 3).map(ribbon => <AuroraRibbon index={ribbon} key={ribbon}/>)}
-    </div> : null}
+    {variant === "AURORA" ? <>
+      <span className="royal-aurora-veil royal-motion" aria-hidden="true"/>
+      {[0, 1].map(ribbon => <span className={"royal-light-ribbon royal-light-ribbon-" + ribbon + " royal-motion"} key={ribbon} aria-hidden="true">
+        <svg className="royal-flow-geometry" viewBox="0 0 100 100" fill="none" aria-hidden="true" focusable="false">
+          <path d="M8 71C-1 31 52 0 87 22C56 9 13 46 19 81Z" fill="currentColor" fillOpacity=".4"/>
+          <path d="M10 70C3 34 52 8 85 22" stroke="#fff5d7" strokeWidth=".4" strokeOpacity=".9"/>
+          <path d="M18 80C13 46 58 13 87 22" stroke="currentColor" strokeWidth="1.2" strokeOpacity=".8"/>
+        </svg>
+      </span>)}
+    </> : null}
 
     {variant === "CELESTIAL" ? <>
-      <span className="royal-nebula royal-motion" aria-hidden="true"/>
-      {trails.slice(0, compact ? 2 : 3).map(orbit => <div className={"royal-orbit-plane royal-orbit-plane-" + orbit} key={orbit} aria-hidden="true">
-        <span className={"royal-orbit royal-orbit-" + orbit + " royal-motion"}><i className="royal-planet"/><b className="royal-satellite"/></span>
+      <span className="royal-galaxy-cloud royal-motion" aria-hidden="true"/>
+      {[0, 1].map(orbit => <div className={"royal-orbit-track royal-orbit-track-" + orbit} key={orbit} aria-hidden="true">
+        <span className={"royal-constellation royal-constellation-" + orbit + " royal-motion"}><i/><b/></span>
       </div>)}
     </> : null}
 
@@ -109,17 +123,14 @@ export function MythicArt({ item, compact = false, priority = false, animated = 
 
     {variant === "COMET" ? <>
       <span className="royal-comet-field" aria-hidden="true"/>
+      {!compact ? <span className="royal-comet-wake royal-motion" aria-hidden="true"/> : null}
       {trails.map(trail => <span className={"royal-comet royal-comet-" + trail + " royal-motion"} key={trail} aria-hidden="true"><i/></span>)}
     </> : null}
 
     {variant === "REGALIA" ? <>
-      <span className="royal-regalia-ring" aria-hidden="true"/>
-      <svg className="royal-regalia-ornament" viewBox="0 0 240 240" fill="none" aria-hidden="true" focusable="false">
-        <path d="M54 17H91M149 17H186L223 54V91M223 149V186L186 223H149M91 223H54L17 186V149M17 91V54L54 17"/>
-        <path d="M72 30H56L30 56V72M168 30H184L210 56V72M210 168V184L184 210H168M72 210H56L30 184V168"/>
-      </svg>
-      <span className="royal-regalia-facet royal-motion" aria-hidden="true"/>
-      {stars.map(gem => <span className={"royal-gem royal-gem-" + gem + " royal-motion"} key={gem} aria-hidden="true"/>)}
+      <span className="royal-regalia-bezel" aria-hidden="true"/>
+      {!compact ? <span className="royal-regalia-radiance royal-motion" aria-hidden="true"/> : null}
+      {stars.slice(0, compact ? 2 : 4).map(glint => <span className={"royal-regalia-glint royal-regalia-glint-" + glint + " royal-motion"} key={glint} aria-hidden="true"/>)}
     </> : null}
 
     {variant === "LEGACY" ? <div className="royal-legacy-plaque">

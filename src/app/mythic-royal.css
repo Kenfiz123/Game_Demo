@@ -163,122 +163,171 @@
 .royal-shard-2 { right: 25%; bottom: 16%; --shard-angle: 42deg; height: 12%; animation-delay: -7s; }
 .royal-shard-3 { left: 17%; bottom: 27%; --shard-angle: -12deg; width: 5%; animation-delay: -2s; }
 
-/* SOVEREIGN: an engraved seal, measured rays and a restrained travelling gold reflection. */
-.royal-mythic.variant-sovereign .royal-core { width: 85%; }
-.royal-seal-ring {
-  position: absolute;
-  inset: 9%;
-  border: 1px solid #f3d59b70;
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px #f3d59b08, 0 0 0 4px #f3d59b2b, inset 0 0 0 5px #f3d59b0c;
-}
-.royal-seal-rays {
-  position: absolute;
-  inset: 16%;
-  border-radius: 50%;
-  background: repeating-conic-gradient(from 4deg, #f3d59b66 0deg 1deg, transparent 1deg 14deg);
-  mask-image: radial-gradient(circle, transparent 53%, #000 56%, #000 68%, transparent 71%);
-  -webkit-mask-image: radial-gradient(circle, transparent 53%, #000 56%, #000 68%, transparent 71%);
-  opacity: .55;
-  animation: royal-revolve 82s linear infinite;
-}
-.royal-seal-sweep {
-  position: absolute;
-  inset: 16%;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0deg 20deg, #f3d59b38 36deg, #fff5d7dc 43deg, transparent 60deg 360deg);
-  mask-image: radial-gradient(circle, transparent 65%, #000 67%, #000 70%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle, transparent 65%, #000 67%, #000 70%, transparent 72%);
-  animation: royal-revolve 19s linear infinite;
-}
-.royal-sigil {
+/* Sculpted finishes preserve their own material motion; the club crest remains still. */
+.royal-finish {
   position: absolute;
   z-index: 4;
-  left: 48%;
-  width: 4%;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #fff5d7, #f3d59b 40%, #8b633c 44%, #f3d59b);
-  transform: rotate(45deg);
-  border: 1px solid #fff5d76b;
-}
-.royal-sigil-0 { top: 9%; }
-.royal-sigil-1 { bottom: 9%; }
-
-/* AURORA: broad folded light curtains; no circular border masquerading as a ribbon. */
-.royal-aurora-field { position: absolute; inset: 0; z-index: 1; }
-.royal-aurora {
-  position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: .8;
-  transform: rotate(var(--ribbon-angle, -10deg));
-  animation: royal-aurora-fold 15s var(--royal-ease) infinite alternate;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  animation: royal-court-float 4.8s var(--royal-ease) infinite;
 }
-.royal-aurora svg { width: 100%; height: 100%; }
-.royal-aurora-0 { color: #73efc7; --ribbon-angle: -10deg; }
-.royal-aurora-1 {
-  color: #bd9bff;
-  --ribbon-angle: 160deg;
-  animation-delay: -6s;
-  animation-duration: 19s;
-  animation-direction: alternate-reverse;
-}
-.royal-aurora-2 {
-  color: #f3d59b;
-  --ribbon-angle: 75deg;
-  animation-delay: -10s;
-  animation-duration: 23s;
-}
-.variant-aurora .royal-core,
-.variant-celestial .royal-core {
-  --royal-core-padding: 4%;
-  width: 76%;
-  border: 1px solid #f3d59b4d;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 38% 27%, #263e50, #0b1422 73%);
-  box-shadow: inset 0 0 0 3px #9edaff06, 0 0 0 4px #9edaff06;
-}
-
-/* CELESTIAL: three fixed elliptical planes, orbiting gems and a quiet nebula. */
-.variant-celestial .royal-core { width: 72%; background: radial-gradient(ellipse at 45% 35%, #28314a, #0b1422 74%); }
-.royal-nebula {
+.royal-finish-aurora { animation-name: royal-aurora-float; animation-duration: 5.4s; }
+.royal-finish-celestial { animation-name: royal-celestial-float; animation-duration: 6s; }
+.royal-finish-comet { animation-name: royal-comet-float; animation-duration: 3.8s; }
+.cosmetic-art .royal-finish > img { width: 100%; height: 100%; object-fit: contain; }
+.royal-finish-lustre {
   position: absolute;
-  inset: 10%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 31% 31%, #bd9bff52, transparent 48%),
-    radial-gradient(ellipse at 72% 65%, #9edaff4a, transparent 49%),
-    radial-gradient(ellipse at 54% 80%, #f3d59b17, transparent 47%);
-  opacity: .75;
-  animation: royal-nebula-breathe 17s var(--royal-ease) infinite alternate;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+  mask-size: contain;
+  -webkit-mask-size: contain;
 }
-.royal-orbit-plane { position: absolute; z-index: 4; inset: 10%; transform: rotate(-24deg) scaleY(.5); }
-.royal-orbit-plane-1 { inset: 13%; transform: rotate(52deg) scaleY(.62); }
-.royal-orbit-plane-2 { inset: 16%; transform: rotate(12deg) scaleY(.84); }
-.royal-orbit {
+.royal-finish-lustre[data-lustre-ready="true"] { visibility: visible; opacity: 1; }
+.royal-finish-sweep {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: 5%;
+  width: 24%;
+  background: linear-gradient(105deg, transparent 12%, #fff5d712 35%, #fff5d799 49%, #9edaff2e 57%, transparent 78%);
+  opacity: 0;
+  animation: royal-finish-glint 6.2s var(--royal-ease) infinite;
+}
+.royal-finish-aurora .royal-finish-sweep { animation-duration: 6.8s; animation-delay: -2s; }
+.royal-finish-celestial .royal-finish-sweep { animation-duration: 7.4s; animation-delay: -3s; }
+.royal-finish-comet .royal-finish-sweep { animation-duration: 5.6s; animation-delay: -1.4s; }
+.royal-mythic.variant-sovereign .royal-core,
+.royal-mythic.variant-aurora .royal-core,
+.royal-mythic.variant-celestial .royal-core,
+.royal-mythic.variant-comet .royal-core {
+  --royal-core-padding: 3%;
+  width: 50%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 38% 26%, #2b3547, #0b1422 72%);
+  box-shadow: inset 0 0 0 1px #f3d59b26, 0 5px 14px #02081266;
+}
+.royal-mythic.variant-aurora .royal-core { background: radial-gradient(ellipse at 38% 26%, #203f41, #0b1422 72%); }
+.royal-mythic.variant-celestial .royal-core { background: radial-gradient(ellipse at 38% 26%, #2e2d4c, #0b1422 72%); }
+
+/* SOVEREIGN: a coronation wave and two diamonds orbiting the outer court bezel. */
+.royal-court-aura {
   position: absolute;
   inset: 8%;
-  border: 1px solid #9edaff75;
   border-radius: 50%;
-  animation: royal-revolve 26s linear infinite;
+  background: radial-gradient(ellipse at 50% 24%, #f3d59b3d, transparent 48%),
+    radial-gradient(ellipse at 50% 78%, #d09b4226, transparent 43%);
+  opacity: .55;
+  animation: royal-veil-breathe 5.2s var(--royal-ease) infinite alternate;
 }
-.royal-orbit-1 { border-color: #bd9bff75; animation-duration: 37s; animation-direction: reverse; }
-.royal-orbit-2 { border-color: #f3d59b47; animation-duration: 49s; }
-.royal-planet,
-.royal-satellite {
+.royal-mythic:not(.royal-compact) .royal-court-aura::before {
+  content: "";
   position: absolute;
-  top: -5%;
-  left: 46%;
-  width: 10%;
-  aspect-ratio: 1;
+  inset: 2%;
+  border: 1px solid #f3d59b99;
   border-radius: 50%;
-  border: 1px solid #fff5d794;
-  background: radial-gradient(circle at 30% 25%, #fff5d7, #9edaff 25%, #597ba7 61%, #17263f 86%);
-  box-shadow: 0 0 0 2px #9edaff1c;
+  box-shadow: 0 0 0 3px #f3d59b0a;
+  opacity: 0;
+  animation: royal-coronation-wave 4.8s var(--royal-ease) infinite;
 }
-.royal-satellite { top: auto; bottom: 12%; left: 9%; width: 5%; background: #f3d59b; }
-.royal-orbit-1 .royal-planet { background: radial-gradient(circle at 30% 25%, #fff5d7, #bd9bff 29%, #6b5195 65%, #221b3e 88%); }
-.royal-orbit-2 .royal-planet { width: 7%; background: radial-gradient(circle at 30% 25%, #fff5d7, #f3d59b 34%, #90704a 75%); }
+.royal-court-jewel {
+  position: absolute;
+  z-index: 5;
+  inset: 8%;
+  opacity: .95;
+  animation: royal-court-orbit 7s linear infinite;
+}
+.royal-court-jewel-1 { inset: 5%; animation-duration: 10s; animation-direction: reverse; animation-delay: -4s; }
+.royal-court-jewel > i {
+  position: absolute;
+  top: 1%;
+  left: 47%;
+  width: clamp(3px, 6%, 13px);
+  aspect-ratio: 1;
+  border: 1px solid #fff5d78c;
+  background: linear-gradient(135deg, #fff5d7, #f3d59b 30%, #896638 35%, #f3d59b 75%, #fff5d7);
+  transform: rotate(45deg);
+  box-shadow: 0 0 6px #f3d59b4d;
+}
+
+/* AURORA: the sculpted frame carries the folds; soft light travels behind its edges. */
+.royal-aurora-veil {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 28% 31%, #73efc74d, transparent 48%),
+    radial-gradient(ellipse at 76% 69%, #bd9bff47, transparent 48%);
+  opacity: .6;
+  animation: royal-veil-breathe 5.8s var(--royal-ease) infinite alternate;
+}
+.royal-light-ribbon {
+  position: absolute;
+  z-index: 5;
+  inset: 5%;
+  --ribbon-angle: -14deg;
+  color: #73efc7;
+  opacity: .9;
+  transform: rotate(var(--ribbon-angle));
+  animation: royal-light-flow 3.8s var(--royal-ease) infinite alternate;
+}
+.royal-light-ribbon svg { display: block; width: 100%; height: 100%; }
+.royal-light-ribbon-1 {
+  --ribbon-angle: 160deg;
+  color: #bd9bff;
+  animation-duration: 5.4s;
+  animation-delay: -2.2s;
+  animation-direction: alternate-reverse;
+}
+
+/* CELESTIAL: fixed inclined planes carry real moving planets around the private crest. */
+.royal-galaxy-cloud {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 28% 34%, #bd9bff52, transparent 47%),
+    radial-gradient(ellipse at 76% 65%, #9edaff47, transparent 49%),
+    radial-gradient(ellipse at 57% 80%, #f3d59b21, transparent 42%);
+  opacity: .6;
+  animation: royal-galaxy-drift 6.4s var(--royal-ease) infinite alternate;
+}
+.royal-orbit-track {
+  position: absolute;
+  z-index: 5;
+  inset: 6%;
+  transform: rotate(-22deg) scaleY(.6);
+}
+.royal-orbit-track-1 { inset: 10%; transform: rotate(51deg) scaleY(.77); }
+.royal-constellation {
+  position: absolute;
+  inset: 0;
+  animation: royal-orbit-travel 9s linear infinite;
+}
+.royal-constellation-1 { animation-duration: 13s; animation-direction: reverse; animation-delay: -5s; }
+.royal-constellation > i,
+.royal-constellation > b {
+  position: absolute;
+  top: 0;
+  left: 46%;
+  width: clamp(3px, 8%, 18px);
+  aspect-ratio: 1;
+  border: 1px solid #fff5d7b3;
+  border-radius: 50%;
+  background: radial-gradient(circle at 29% 24%, #fff5d7, #9edaff 28%, #527da3 65%, #142440 88%);
+  box-shadow: 0 0 5px #9edaff66;
+}
+.royal-constellation > b { top: auto; bottom: 12%; left: 11%; width: clamp(2px, 5%, 11px); background: #f3d59b; }
+.royal-constellation-1 > i {
+  background: radial-gradient(circle at 29% 24%, #fff5d7, #bd9bff 28%, #73559e 65%, #231836 88%);
+  box-shadow: 0 0 5px #bd9bff66;
+}
 
 /* PHOENIX: the generated mantle remains sculptural; plumes and embers supply life. */
 .royal-mythic.variant-phoenix .royal-core { width: 37%; }
@@ -324,17 +373,16 @@
 .royal-ember-5 { left: 70%; bottom: 27%; animation-delay: -3.6s; animation-duration: 8s; }
 
 /* COMET: small owners cross short diagonal paths wholly inside the artwork footprint. */
-.royal-mythic.variant-comet .royal-core { width: 76%; }
 .royal-comet-field {
   position: absolute;
   inset: 10%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at 20% 25%, #9edaff22, transparent 55%),
-    radial-gradient(ellipse at 76% 70%, #bd9bff1c, transparent 47%);
+  background: radial-gradient(ellipse at 20% 25%, #9edaff38, transparent 55%),
+    radial-gradient(ellipse at 76% 70%, #bd9bff26, transparent 47%);
 }
 .royal-comet {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   left: 7%;
   top: 10%;
   width: 34%;
@@ -342,72 +390,103 @@
   --comet-x: 155%;
   --comet-y: 265%;
   opacity: .7;
-  animation: royal-comet-flight 13s var(--royal-ease) infinite;
+  animation: royal-comet-flight 4.8s linear infinite;
 }
-.royal-comet-1 { left: 4%; top: 33%; width: 30%; height: 14%; --comet-x: 175%; --comet-y: 220%; animation-duration: 19s; animation-delay: -8s; }
-.royal-comet-2 { left: 19%; top: 7%; width: 27%; height: 13%; --comet-x: 140%; --comet-y: 330%; animation-duration: 23s; animation-delay: -14s; }
+.royal-comet-1 { left: 4%; top: 33%; width: 30%; height: 14%; --comet-x: 175%; --comet-y: 220%; animation-duration: 6s; animation-delay: -1.8s; }
+.royal-comet-2 { left: 19%; top: 7%; width: 27%; height: 13%; --comet-x: 140%; --comet-y: 330%; animation-duration: 7.2s; animation-delay: -4s; }
 .royal-comet > i {
   position: absolute;
   left: 0;
   top: 46%;
   width: 100%;
-  height: 5%;
+  height: 9%;
   min-height: 1px;
   transform: rotate(38deg);
   border-radius: 50%;
-  background: linear-gradient(90deg, transparent, #9edaff26 35%, #9edaffa6 78%, #fff5d7);
+  background: linear-gradient(90deg, transparent, #9edaff26 28%, #9edaffa6 65%, #e2f5ff 88%, #fff5d7);
+  box-shadow: 0 0 3px #9edaff47;
 }
 .royal-comet > i::after {
   content: "";
   position: absolute;
   right: -1%;
   top: 50%;
-  width: 7%;
+  width: 8%;
   min-width: 3px;
   aspect-ratio: 1;
   transform: translateY(-50%) rotate(45deg);
-  background: #fff5d7;
+  background: #f3fbff;
   border-radius: 2px;
+  box-shadow: 0 0 5px #9edaff80;
 }
-
-/* REGALIA: a static chamfered setting, precisely placed jewels and facet glints. */
-.royal-mythic.variant-regalia .royal-core { width: 65%; }
-.royal-regalia-ring {
-  position: absolute;
-  z-index: 1;
-  inset: 10%;
-  border: 3px double #f3d59ba6;
-  clip-path: polygon(17% 0, 83% 0, 100% 17%, 100% 83%, 83% 100%, 17% 100%, 0 83%, 0 17%);
-  background: linear-gradient(135deg, #f3d59b14, #0b1422 30%, #0b1422 68%, #9edaff12);
-}
-.royal-regalia-ornament { position: absolute; z-index: 2; inset: 4%; width: 92%; height: 92%; stroke: #f3d59b; stroke-width: 1.15; opacity: .8; }
-.royal-regalia-ornament path { vector-effect: non-scaling-stroke; }
-.royal-regalia-ornament path + path { opacity: .35; }
-.royal-regalia-facet {
+.royal-comet-wake {
   position: absolute;
   z-index: 2;
-  inset: 10%;
-  clip-path: polygon(17% 0, 83% 0, 100% 17%, 100% 83%, 83% 100%, 17% 100%, 0 83%, 0 17%);
-  border-top: 2px solid #fff5d7b3;
-  border-right: 1px solid #9edaff75;
-  border-bottom: 2px solid #f3d59b47;
-  opacity: .65;
-  animation: royal-facet-glow 9s var(--royal-ease) infinite;
+  left: 15%;
+  top: 36%;
+  width: 70%;
+  height: 22%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, transparent 33%, #9edaff14 43%, #e2f5ff61 49%, #9edaff33 55%, transparent 67%);
+  opacity: 0;
+  transform: rotate(35deg);
+  animation: royal-comet-wake 6s var(--royal-ease) infinite;
 }
-.royal-gem {
+
+/* REGALIA: a coronation jewel, with a stable aperture and light on real carved gold. */
+.royal-mythic.variant-regalia .royal-aura {
+  background: radial-gradient(ellipse at 50% 55%, #b5873626, #331f2319 48%, transparent 73%);
+}
+.royal-mythic.variant-regalia .royal-core {
+  top: 5.4%;
+  width: 47%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 38% 24%, #2c2630, #0b1422 72%);
+  box-shadow: inset 0 0 0 1px #f3d59b1f;
+}
+.royal-finish-regalia { animation: none; }
+.royal-finish-regalia .royal-finish-sweep {
+  width: 21%;
+  animation-duration: 9.6s;
+  animation-delay: -2.4s;
+  background: linear-gradient(105deg, transparent 12%, #f3d59b18 35%, #fff5d799 49%, #f3d59b29 58%, transparent 78%);
+}
+.royal-regalia-bezel {
+  position: absolute;
+  z-index: 2;
+  top: 30.4%;
+  left: 25.5%;
+  width: 49%;
+  height: 50%;
+  border-radius: 50%;
+  border: 1px solid #e8c58b59;
+  box-shadow: inset 0 0 0 2px #2c1c17, 0 0 0 1px #f3d59b14;
+  background: radial-gradient(ellipse at 50% 12%, #eed5a81c, transparent 63%);
+}
+.royal-regalia-radiance {
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 21%, #f3d59b28, transparent 35%),
+    radial-gradient(ellipse at 19% 58%, #d09b421c, transparent 28%),
+    radial-gradient(ellipse at 81% 58%, #d09b421c, transparent 28%);
+  opacity: .55;
+  animation: royal-regalia-radiance 8.4s var(--royal-ease) infinite;
+}
+.royal-regalia-glint {
   position: absolute;
   z-index: 5;
-  width: 4%;
+  width: clamp(3px, 2.9%, 8px);
   aspect-ratio: 1;
-  border: 1px solid #fff5d7b3;
-  background: linear-gradient(135deg, #fff5d7, #9edaff 32%, #29466b 36%, #bd9bff 74%, #fff5d7);
-  transform: rotate(45deg);
-  animation: royal-gemlight 8s var(--royal-ease) infinite;
+  clip-path: polygon(50% 0, 57% 42%, 100% 50%, 57% 58%, 50% 100%, 43% 58%, 0 50%, 43% 42%);
+  background: radial-gradient(circle, #fffaf0 0 13%, #ffe7b2 30%, #eacb8980 64%, transparent 76%);
+  opacity: .45;
+  animation: royal-regalia-glint 7.8s var(--royal-ease) infinite;
 }
-.royal-gem-0 { top: 12%; left: 15%; }
-.royal-gem-1 { top: 15%; right: 12%; animation-delay: -2s; }
-.royal-gem-2 { bottom: 12%; right: 15%; animation-delay: -4s; }
-.royal-gem-3 { bottom: 15%; left: 12%; animation-delay: -6s; }
+.royal-regalia-glint-0 { top: 20.2%; left: 48.6%; animation-delay: -.6s; }
+.royal-regalia-glint-1 { top: 44.2%; right: 17%; animation-delay: -3.1s; }
+.royal-regalia-glint-2 { top: 80%; left: 70%; width: 2%; animation-delay: -5.4s; }
+.royal-regalia-glint-3 { top: 51.9%; left: 17.4%; width: 2.2%; animation-delay: -6.7s; }
 
 /* LEGACY: native text on an illuminated, engraved heirloom plaque. */
 .mythic-art.royal-mythic.variant-legacy { width: 100%; height: 100%; max-width: 100%; aspect-ratio: auto; }
@@ -461,18 +540,21 @@
 .royal-compact .royal-signature { display: none; }
 .royal-compact .royal-core { width: 80%; }
 .royal-compact.variant-prism .royal-core { width: 62%; }
-.royal-compact.variant-sovereign .royal-core { width: 85%; }
+.royal-compact.variant-sovereign .royal-core,
+.royal-compact.variant-aurora .royal-core,
+.royal-compact.variant-celestial .royal-core,
+.royal-compact.variant-comet .royal-core { width: 50%; }
 .royal-compact.variant-phoenix .royal-core { width: 37%; }
-.royal-compact.variant-regalia .royal-core { width: 65%; }
+.royal-compact.variant-regalia .royal-core { width: 47%; }
+.royal-compact .royal-regalia-glint { width: clamp(2px, 3%, 4px); }
 .royal-compact .royal-star { width: clamp(2px, 3%, 4px); animation-name: royal-compact-twinkle; }
 .royal-compact .royal-shard { width: 6%; height: 13%; animation-name: royal-compact-twinkle; }
-.royal-compact .royal-aurora { animation-name: royal-aurora-shimmer; }
-.royal-compact .royal-nebula { animation-name: royal-aurora-shimmer; }
+.royal-compact .royal-court-aura,
+.royal-compact .royal-aurora-veil { animation-name: royal-compact-twinkle; }
+.royal-compact .royal-court-aura::before { content: none; animation: none !important; }
 .royal-compact .royal-wing { animation-name: royal-compact-twinkle; }
-.royal-compact .royal-comet { animation-name: royal-comet-flash; }
 .royal-compact .royal-metal-sweep { left: 10%; width: 80%; transform: none; animation: royal-compact-lustre 13s var(--royal-ease) infinite; }
-.royal-compact .royal-planet { min-width: 3px; }
-.royal-compact .royal-satellite { min-width: 2px; }
+.royal-compact .royal-finish-sweep { left: 10%; width: 80%; transform: none; animation-name: royal-compact-lustre; }
 .royal-compact .royal-legacy-copy strong { font-size: 10px; }
 .royal-compact .royal-legacy-plaque { min-height: 25px; gap: 4px; padding: 5px; }
 .royal-compact .royal-legacy-copy > span,
@@ -485,13 +567,36 @@
 .cosmetic-card-mythic .cosmetic-card-content { border-color: #f3d59b29; background: linear-gradient(115deg, #f3d59b08, transparent); }
 .equipped-profile-frame .royal-core,
 .equipped-profile-frame .royal-signature { display: none; }
-.equipped-profile-frame .royal-regalia-ring { background: none; }
+.equipped-profile-frame:has(.variant-regalia) { z-index: 2; }
+.equipped-profile-frame .variant-regalia .royal-aura,
+.equipped-profile-frame .variant-regalia .royal-atmosphere,
+.equipped-profile-frame .variant-regalia .royal-horizon,
+.equipped-profile-frame .variant-regalia .royal-regalia-bezel,
+.equipped-profile-frame .variant-regalia .royal-regalia-radiance { display: none; }
+/* Keep any chosen avatar inside the crown's genuinely transparent opening. */
+.equipped-profile-portrait:has(.variant-regalia) .equipped-profile-avatar {
+  top: 5.4%;
+  width: 46.5%;
+  height: 46.5%;
+}
+/* A wearable crown replaces the avatar's surround, not its identity or living light. */
+.equipped-profile-portrait:has(.equipped-profile-frame .variant-regalia) .equipped-profile-avatar .royal-finish,
+.equipped-profile-portrait:has(.equipped-profile-frame .variant-regalia) .equipped-profile-avatar .royal-signature {
+  display: none;
+}
+.equipped-profile-portrait:has(.equipped-profile-frame .variant-regalia) .equipped-profile-avatar .royal-core {
+  --royal-core-padding: 0px;
+  width: 87%;
+  background: none;
+  box-shadow: none;
+}
 .equipped-profile-effect .royal-core,
-.equipped-profile-effect .royal-signature { opacity: .32; }
+.equipped-profile-effect .royal-signature { opacity: 1; }
 .header-equipped-avatar .royal-mythic { width: 100%; height: 100%; max-width: 100%; }
 .header-equipped-avatar .royal-core { width: 80%; }
 .header-equipped-avatar .royal-core { --royal-core-padding: 3%; }
-.header-equipped-avatar .royal-orbit { border-width: .75px; }
+.header-equipped-avatar .royal-mythic.variant-aurora .royal-core,
+.header-equipped-avatar .royal-mythic.variant-celestial .royal-core { width: 50%; }
 .header-title-effects .royal-legacy-copy,
 .header-title-effects .royal-core,
 .header-title-effects .royal-star { visibility: hidden; }
@@ -521,13 +626,51 @@
   from { opacity: .4; transform: translateY(6%) rotate(var(--shard-angle, 0deg)); }
   to { opacity: .85; transform: translateY(-9%) rotate(calc(var(--shard-angle, 0deg) + 8deg)); }
 }
-@keyframes royal-aurora-fold {
-  from { opacity: .5; transform: translate(-2%, -5%) rotate(calc(var(--ribbon-angle, 0deg) - 3deg)) scaleY(.92); }
-  to { opacity: .95; transform: translate(2%, 5%) rotate(calc(var(--ribbon-angle, 0deg) + 3deg)) scaleY(1.08); }
+@keyframes royal-court-float {
+  0%, 100% { transform: translateY(1.2%) rotate(-1.2deg); }
+  50% { transform: translateY(-1.6%) rotate(1.2deg); }
 }
-@keyframes royal-nebula-breathe {
-  from { opacity: .45; transform: translate(-1%, 1%) scale(.97); }
-  to { opacity: .85; transform: translate(1%, -1%) scale(1.03); }
+@keyframes royal-aurora-float {
+  0%, 100% { transform: translate(-1%, .8%) rotate(-1.5deg); }
+  50% { transform: translate(1%, -1%) rotate(1.5deg); }
+}
+@keyframes royal-celestial-float {
+  0%, 100% { transform: translateY(1%) rotate(.7deg); }
+  50% { transform: translateY(-1.4%) rotate(-.7deg); }
+}
+@keyframes royal-comet-float {
+  0%, 100% { transform: translate(-.7%, .5%) rotate(-1deg); }
+  50% { transform: translate(.7%, -1.1%) rotate(1deg); }
+}
+@keyframes royal-finish-glint {
+  0%, 22% { opacity: 0; transform: translateX(0); }
+  37% { opacity: .6; }
+  62%, 100% { opacity: 0; transform: translateX(275%); }
+}
+@keyframes royal-veil-breathe {
+  from { opacity: .35; transform: scale(.94); }
+  to { opacity: .75; transform: scale(1.04); }
+}
+@keyframes royal-coronation-wave {
+  0%, 12% { opacity: 0; transform: scale(.72); }
+  33% { opacity: .65; }
+  75%, 100% { opacity: 0; transform: scale(1.08); }
+}
+@keyframes royal-court-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes royal-light-flow {
+  from { opacity: .65; transform: translate(-1.5%, -2%) rotate(calc(var(--ribbon-angle, 0deg) - 8deg)) scaleY(.94); }
+  to { opacity: 1; transform: translate(1.5%, 2%) rotate(calc(var(--ribbon-angle, 0deg) + 8deg)) scaleY(1.05); }
+}
+@keyframes royal-galaxy-drift {
+  from { opacity: .4; transform: translate(-2%, 2%) rotate(-3deg) scale(.94); }
+  to { opacity: .8; transform: translate(2%, -2%) rotate(3deg) scale(1.04); }
+}
+@keyframes royal-orbit-travel {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 @keyframes royal-wing-breathe {
   from { opacity: .85; transform: scale(.985); }
@@ -547,14 +690,24 @@
   83%, 100% { opacity: 0; transform: translateY(-950%) scale(.95); }
 }
 @keyframes royal-comet-flight {
-  0%, 13% { opacity: 0; transform: translate(0, 0); }
-  22% { opacity: .85; }
-  39% { opacity: .7; }
-  49%, 100% { opacity: 0; transform: translate(var(--comet-x, 150%), var(--comet-y, 250%)); }
+  0% { opacity: 0; transform: translate(0, 0); }
+  8% { opacity: 1; }
+  32% { opacity: .95; }
+  46%, 100% { opacity: 0; transform: translate(var(--comet-x, 150%), var(--comet-y, 250%)); }
 }
-@keyframes royal-facet-glow {
-  0%, 100% { opacity: .25; }
-  47% { opacity: .9; }
+@keyframes royal-comet-wake {
+  0%, 8% { opacity: 0; transform: translate(-8%, -12%) rotate(35deg) scaleX(.92); }
+  23% { opacity: .55; }
+  50% { opacity: .1; }
+  70%, 100% { opacity: 0; transform: translate(8%, 12%) rotate(35deg) scaleX(1.06); }
+}
+@keyframes royal-regalia-radiance {
+  0%, 100% { opacity: .3; transform: scale(.98); }
+  50% { opacity: .75; transform: scale(1.035); }
+}
+@keyframes royal-regalia-glint {
+  0%, 18%, 55%, 100% { opacity: .12; transform: scale(.86) rotate(-8deg); }
+  34% { opacity: 1; transform: scale(1.2) rotate(8deg); }
 }
 @keyframes royal-gemlight {
   0%, 100% { opacity: .5; transform: rotate(45deg) scale(.93); }
@@ -572,14 +725,6 @@
 @keyframes royal-compact-twinkle {
   0%, 100% { opacity: .45; }
   50% { opacity: .9; }
-}
-@keyframes royal-aurora-shimmer {
-  0%, 100% { opacity: .5; }
-  50% { opacity: .95; }
-}
-@keyframes royal-comet-flash {
-  0%, 18%, 72%, 100% { opacity: 0; }
-  37%, 48% { opacity: .75; }
 }
 @keyframes royal-compact-lustre {
   0%, 28%, 74%, 100% { opacity: 0; }

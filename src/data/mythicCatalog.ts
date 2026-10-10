@@ -3,13 +3,13 @@ import type { EquipSlot, MythicVariant } from "@/types/gamification";
 
 export const MYTHIC_VARIANTS = [
   { variant: "PRISM", suffix: "mythic", type: "EFFECT", label: "Vạn Hoa", description: "Lăng kính đa sắc xoay đối chiều, những tia sao phản chiếu qua huy hiệu vương giả." },
-  { variant: "SOVEREIGN", suffix: "mythic-logo", type: "LOGO", label: "Quân Vương", description: "Biểu trưng Mythic chạm khắc như một bảo vật, mang dấu ấn vương giả của cộng đồng." },
-  { variant: "AURORA", suffix: "mythic-avatar-aurora", type: "AVATAR", label: "Cực Quang", description: "Avatar trong quầng cực quang xanh ngọc và dải ánh sáng hoàng kim." },
-  { variant: "CELESTIAL", suffix: "mythic-avatar-celestial", type: "AVATAR", label: "Thiên Hà", description: "Avatar nổi giữa quỹ đạo thiên thể, bụi sao và những lớp ánh sáng tím bạc." },
+  { variant: "SOVEREIGN", suffix: "mythic-logo", type: "LOGO", label: "Quân Vương", description: "Vương miện ruby, nguyệt quế vàng chạm nổi và những tia sáng lướt trên bảo vật đăng quang. Huy hiệu CLB nằm giữa tâm ngọc, vững vàng như một ấn tín hoàng gia." },
+  { variant: "AURORA", suffix: "mythic-avatar-aurora", type: "AVATAR", label: "Cực Quang", description: "Dải cực quang ngọc lục bảo ôm lấy avatar, giao thoa cùng opal và những đường vàng tinh xảo. Nếp sáng chuyển động chậm như lụa, giữ dấu ấn CLB rõ nét giữa quầng sáng." },
+  { variant: "CELESTIAL", suffix: "mythic-avatar-celestial", type: "AVATAR", label: "Thiên Hà", description: "Avatar trong bảo khí thiên văn sapphire: quỹ đạo vàng, trăng lưỡi liềm và sao kim cương giữa chiều sâu tinh vân. Những chòm sao lấp lánh quanh huy hiệu riêng của CLB." },
   { variant: "LEGACY", suffix: "mythic-title", type: "TITLE", label: "Truyền Nhân", description: "Danh hiệu mang tinh thần kế thừa một hình tượng truyền cảm hứng trong lĩnh vực của CLB." },
   { variant: "PHOENIX", suffix: "mythic-phoenix", type: "EFFECT", label: "Hỏa Phượng", description: "Dấu ấn phượng hoàng tái sinh với cánh lửa, tàn sao và sắc vàng đỏ rực rỡ." },
-  { variant: "COMET", suffix: "mythic-comet", type: "EFFECT", label: "Sao Băng", description: "Dấu ấn sao băng với vệt sáng lam bạc, đuôi tinh vân và quỹ đạo băng qua huy hiệu." },
-  { variant: "REGALIA", suffix: "mythic-frame", type: "FRAME", label: "Vương Miện", description: "Khung vương miện với đường chạm khắc, bảo thạch và các lớp ánh sáng hoàng gia." },
+  { variant: "COMET", suffix: "mythic-comet", type: "EFFECT", label: "Sao Băng", description: "Bạch kim và kim cương băng kết thành đuôi sao chéo trời, điểm sáng thiên thạch lướt qua lớp tinh thể xanh bạc. Một bảo vật có dáng chuyển động ngay cả khi đứng yên." },
+  { variant: "REGALIA", suffix: "mythic-frame", type: "FRAME", label: "Vương Miện", description: "Vương miện vàng chạm nổi với ruby đỏ thẫm, ngọc trai và những tia kim cương lấp lánh. Ánh kim lướt trên đường chạm khắc; khung ôm quanh avatar mà không che dấu ấn của bạn." },
 ] as const satisfies readonly { variant: MythicVariant; suffix: string; type: EquipSlot; label: string; description: string }[];
 
 const variantsById = new Map<MythicVariant, (typeof MYTHIC_VARIANTS)[number]>(MYTHIC_VARIANTS.map(variant => [variant.variant, variant]));

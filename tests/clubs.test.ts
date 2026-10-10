@@ -75,13 +75,35 @@ test("each club has an exclusive Mythic crest shared by its eight variants, neve
 test("royal spotlight starts with Sovereign, eight native selectors, a pause control and one live artwork", () => {
   const mythics=getClubMythics(CLUBS[0].id);
   const html=renderToStaticMarkup(createElement(MythicSpotlight,{items:mythics,rarityChance:.2,chance:.2/cosmeticsByRarity("MYTHIC").length}));
-  assert.equal(Array.from(html.matchAll(/aria-pressed="true"/g)).length,1);
-  assert.equal(Array.from(html.matchAll(/aria-pressed="false"/g)).length,8); // Seven alternatives plus the pause button.
+  const selector=html.match(/<div class="royal-variant-selector"[^>]*>([\s\S]*?)<\/div>/)?.[1];
+  assert.ok(selector);
+  assert.equal(Array.from(selector.matchAll(/aria-pressed="true"/g)).length,1);
+  assert.equal(Array.from(selector.matchAll(/aria-pressed="false"/g)).length,7);
   assert.ok(html.includes(mythics.find(item=>item.mythicVariant==="SOVEREIGN")!.name));
   assert.ok(html.includes("0,000342%"));
   assert.ok(html.includes("Tạm dừng hiệu ứng xem trước"));
   assert.ok(html.includes("Xem trước không cấp vật phẩm"));
   assert.equal(Array.from(html.matchAll(/class="mythic-art\b/g)).length,1);
+});
+test("each club spotlight exposes existing Mythic avatar and cosmetic achievement quick previews without granting items", () => {
+  for (const club of CLUBS) {
+    const mythics=getClubMythics(club.id), before=mythics.map(item=>item.id);
+    const avatars=mythics.filter(item=>item.mythicVariant==="AURORA"||item.mythicVariant==="CELESTIAL");
+    const legacy=mythics.find(item=>item.mythicVariant==="LEGACY")!;
+    const html=renderToStaticMarkup(createElement(MythicSpotlight,{items:mythics,rarityChance:.2,chance:.2/cosmeticsByRarity("MYTHIC").length,ownedItemIds:[avatars[0].id,legacy.id]}));
+    assert.ok(html.includes("Avatar Mythic"));
+    assert.ok(html.includes("Thành tích Mythic"));
+    assert.ok(html.includes(legacy.name));
+    assert.ok(html.includes("không phải thành tích được công nhận ngoài đời"));
+    const quickButtons=Array.from(html.matchAll(/<button\b[^>]*data-preview-variant="([^"]+)"[^>]*>/g));
+    assert.deepEqual(quickButtons.map(match=>match[1]),["AURORA","CELESTIAL","LEGACY"]);
+    for (const item of [...avatars,legacy]) assert.ok(quickButtons.some(match=>match[0].includes('data-preview-item="'+item.id+'"')));
+    assert.equal(Array.from(html.matchAll(/class="mythic-art\b/g)).length,1);
+    assert.ok(html.includes("2 / 8 đã sở hữu"));
+    assert.deepEqual(mythics.map(item=>item.id),before);
+    assert.equal(legacy.type,"TITLE");
+    assert.equal(mythics.length,8);
+  }
 });
 test("every club cosmetic can be drawn by the real chest engine", () => {
   const draw = {COMMON:.25, UNCOMMON:.65, RARE:.85, EPIC:.95, LEGENDARY:.99, MYTHIC:.999} as const;

@@ -1,0 +1,13 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "source": "design/source/mythic-finishes/regalia-v5.png",
+  "asset": "public/assets/mythic-finishes/regalia-v5.webp",
+  "prompt": "Use case: stylized-concept\nAsset type: transparent high-end game avatar FRAME, jewellery only, NOT an emblem or portrait. A new Mythic 'Vương Miện' coronation frame used around many different existing club crests and user avatars on a dark navy web interface.\nPrimary request: one exquisite three-dimensional imperial crown avatar surround, bold and convincingly precious. A substantial open gold coronet sits above the opening: five elegant raised fleur-de-lis points, a polished deep burgundy ruby centerpiece, tiny brilliant diamonds and a strand of seed pearls. Below the coronet, a circular fine engraved inner bezel is supported on both sides by restrained sculpted acanthus scrolls in warm 18K champagne gold, with a small ruby drop at the bottom. Crisp material depth, intricate but legible silhouette, realistic polished gold edges against dark engraved recesses. Royal jewellery craftsmanship, not flat line art, not cartoon plastic.\nComposition: FRONT VIEW, square canvas, symmetrical, object fits within x=8%..92%, y=4%..94%. Perfectly empty transparent circular opening DIAMETER 55% OF CANVAS, centered x=50% y=53%; opening must remain clear with no crown, scrolls, backdrop, glow, portrait or emblem crossing it. Crown entirely above the empty opening. Filigree and jewels confined to outer ring. Outside the jewellery and entire inside opening are genuinely alpha-transparent. No background surface. Clean transparent cutout with generous margin around every point.\nLighting: refined jewellery studio lighting, warm ivory highlights, sharply defined facets and dimensional metal. No painted bloom or baked sparkles, because real animated glints will be added in code.\nConstraints: no text, letters, numbers, logo, coat of arms, wings, animals, chess pieces, swords, medals, watermark, checkerboard or extra objects. No filled center. This is a wearable avatar border rather than a central trophy. Render one finished asset only.",
+  "aperture": {
+    "centerX": 0.5,
+    "centerY": 0.5545,
+    "clearDiskRadius": 0.238
+  },
+  "notes": "Jewellery-only shared frame. The 73 existing club crests remain separate and unchanged. IDs, rarity and inventory are unchanged."
+}

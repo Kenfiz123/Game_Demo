@@ -1,0 +1,23 @@
+.backend-notices { width: min(1380px, 100%); margin: 0 auto; padding: 8px clamp(24px, 3.3vw, 52px) 0; }
+.backend-status { display: flex; align-items: center; gap: 8px; min-height: 20px; color: #9eabb7; font-size: 10px; line-height: 1.6; }
+.backend-status > svg { flex: 0 0 auto; color: #98bba5; }
+.backend-status.is-error { border: 1px solid #bb795b50; background: #39251b66; padding: 12px 14px; border-radius: 6px; color: #f0c5aa; flex-wrap: wrap; }
+.backend-status.is-error > svg { color: #f0c5aa; }
+.backend-status .text-button { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: #f3d9b3; }
+.backend-import { display: flex; gap: 20px; align-items: center; justify-content: space-between; border: 1px solid #b6956040; border-radius: 7px; background: #29231966; padding: 18px 20px; margin-top: 12px; }
+.backend-import > div { min-width: 0; }
+.backend-import strong { font-size: 12px; color: #e8d7b9; }
+.backend-import p { margin: 7px 0 0; max-width: 74ch; color: #b2ada3; font-size: 11px; line-height: 1.75; }
+.backend-import-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; flex-shrink: 0; gap: 10px; max-width: 370px; }
+.backend-import-actions > span { flex: 1 0 100%; font-size: 11px; color: #e8d7b9; text-align: right; }
+.backend-import-actions .text-button { min-height: 44px; }
+.backend-import-message { margin: 10px 0 0; font-size: 11px; color: #c4d5c8; line-height: 1.7; }
+@media (max-width: 800px) {
+  .backend-notices { padding: 10px 20px 0; }
+  /* Reuse heading whitespace so the connected status does not cover the play CTA with the bottom nav. */
+  .experience-premium .backend-notices + .page-wrap { padding-top: 0; }
+  .backend-import { flex-direction: column; align-items: stretch; padding: 16px; gap: 14px; }
+  .backend-import-actions { justify-content: flex-start; flex-shrink: 1; max-width: none; }
+  .backend-import-actions > span { text-align: left; }
+}
+@media (max-width: 390px) { .backend-notices { padding-inline: 16px; } }

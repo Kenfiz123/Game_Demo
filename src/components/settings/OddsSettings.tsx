@@ -29,8 +29,8 @@ const toSettings = (draft: OddsDraft): ArcadeSettings => ({
 });
 
 function OddsEditor() {
-  const { state, isPlaying, updateSettings } = useXperience();
-  // This component mounts only after storage hydration; saved settings initialize the draft.
+  const { state, isPlaying, updateSettings, demoToolsEnabled } = useXperience();
+  // This component mounts after server hydration; saved settings initialize the draft.
   const [draft, setDraft] = useState(() => toDraft(state.settings));
   const [notice, setNotice] = useState<Notice | null>(null);
   const [pending, setPending] = useState(false);
@@ -75,9 +75,9 @@ function OddsEditor() {
     setNotice(null);
     try {
       const saved = await updateSettings(parsed);
-      if (mounted.current) setNotice(saved ? { kind: "success", text: "Đã lưu tỷ lệ. Các lượt chơi tiếp theo sẽ dùng cấu hình này." } : { kind: "error", text: "Chưa lưu được. Kiểm tra bộ nhớ trình duyệt hoặc chờ lượt chơi hiện tại kết thúc rồi thử lại." });
+      if (mounted.current) setNotice(saved ? { kind: "success", text: "Đã lưu tỷ lệ trên server. Các lượt chơi tiếp theo sẽ dùng cấu hình này." } : { kind: "error", text: "Chưa lưu được. Kiểm tra kết nối backend hoặc chờ lượt chơi hiện tại kết thúc rồi thử lại." });
     } catch {
-      if (mounted.current) setNotice({ kind: "error", text: "Chưa lưu được tỷ lệ. Kiểm tra bộ nhớ trình duyệt rồi thử lại." });
+      if (mounted.current) setNotice({ kind: "error", text: "Chưa lưu được tỷ lệ. Kiểm tra kết nối backend rồi thử lại." });
     } finally {
       saveInFlight.current = false;
       if (mounted.current) setPending(false);
@@ -85,8 +85,8 @@ function OddsEditor() {
   };
 
   return <form className="odds-editor" onSubmit={submit} noValidate aria-busy={pending}>
-    <fieldset className="odds-controls" disabled={pending}><legend className="sr-only">Cấu hình tỷ lệ mở rương và đổi đồ</legend>
-    <div className="odds-local-note"><LockKeyhole size={17}/><p>Đây là bảng test của prototype: cấu hình chỉ lưu trong trình duyệt hiện tại, không phải cài đặt máy chủ. Không áp dụng cho lượt chơi đã bắt đầu.</p></div>
+    <fieldset className="odds-controls" disabled={pending || !demoToolsEnabled}><legend className="sr-only">Cấu hình tỷ lệ mở rương và đổi đồ</legend>
+    <div className="odds-local-note"><LockKeyhole size={17}/><p>{demoToolsEnabled ? "Bảng test local: tỷ lệ được lưu riêng cho phiên ẩn danh trên server, không ảnh hưởng các phiên khác. Không áp dụng cho lượt chơi đã bắt đầu." : "Công cụ chỉnh tỷ lệ demo đã được tắt trên server. Tỷ lệ đang hiển thị là cấu hình của phiên này."}</p></div>
     <div className="odds-layout">
       <section className="odds-section panel" aria-labelledby="chest-odds-heading">
         <div className="odds-section-heading"><div><h2 id="chest-odds-heading">Tỷ lệ mở rương</h2><p>Chọn độ hiếm trước, rồi chọn ngẫu nhiên một vật phẩm trong bậc đó.</p></div><SlidersHorizontal size={20}/></div>
@@ -117,12 +117,12 @@ function OddsEditor() {
     </div>
     </fieldset>
     {notice && <p className={"odds-notice notice-" + notice.kind} role={notice.kind === "error" ? "alert" : "status"}>{notice.kind === "success" ? <Check size={16}/> : null}{notice.text}</p>}
-    {pending && <p className="odds-notice" role="status">Đang lưu tỷ lệ trong trình duyệt…</p>}
+    {pending && <p className="odds-notice" role="status">Đang lưu tỷ lệ trên server…</p>}
     <p className="odds-footer-note">Đồ mở trùng vẫn thêm bản sao vào kho. <Link href="/chest">Mở rương</Link> hoặc <Link href="/trade-up">thử đổi đồ</Link> sau khi lưu.</p>
   </form>;
 }
 
 export function OddsSettings() {
   const { hydrated } = useXperience();
-  return hydrated ? <OddsEditor/> : <div className="empty-state panel" role="status"><p>Đang tải tỷ lệ đã lưu trong trình duyệt…</p></div>;
+  return hydrated ? <OddsEditor/> : <div className="empty-state panel" role="status"><p>Đang tải tỷ lệ đã lưu trên server…</p></div>;
 }

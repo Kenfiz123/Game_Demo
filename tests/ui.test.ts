@@ -26,6 +26,8 @@ function fixture(state: XperienceState = createDemoState()) {
   let settingsWrites = 0;
   const context: XperienceContextValue = {
     state, hydrated: true, isPlaying: false,
+    backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,
+    canImportLegacy: false, legacyAvailable: false, importLegacy: async () => false,
     playGame: async () => ({ success: false, reason: "BUSY" }),
     tradeUp: async () => ({ success: false, reason: "BUSY" }),
     updateSettings: async () => { settingsWrites += 1; return true; },
@@ -100,7 +102,7 @@ test("history includes successful and failed trade-ups with consumed copies and 
   assert.ok(text.includes("+1 UNCOMMON"));
 });
 
-test("settings mount their editor only after browser storage hydration", () => {
+test("settings mount their editor only after saved state hydration", () => {
   const harness = fixture();
   harness.context.hydrated = false;
   const html = harness.render(OddsSettings);
@@ -210,6 +212,23 @@ test("profile rejects unowned equipment and wrong-rarity slot assignments withou
   const wrongRarity = fixture(state).render(EquippedProfile);
   assert.ok(visibleText(wrongRarity).includes("0 / 5 vị trí"));
   assert.deepEqual(state.ownedItemIds, [rare.id]);
+});
+
+test("equipped effects have a labeled showcase without replacing an empty avatar or changing inventory", () => {
+  for (const variant of ["PRISM", "PHOENIX", "COMET"] as const) {
+    const effect = cosmeticsByRarity("MYTHIC").find(item => item.mythicVariant === variant)!;
+    const state = createDemoState();
+    state.ownedItemIds = [effect.id, effect.id];
+    state.equipped = { EFFECT: effect.id };
+    const before = JSON.stringify(state), html = fixture(state).render(EquippedProfile);
+    assert.ok(html.includes('class="equipped-profile-default-avatar"'), "an effect must not silently equip an avatar");
+    assert.ok(html.includes('class="equipped-profile-effect-label"'), "identify the separate effect display");
+    assert.ok(visibleText(html).includes("Hiệu ứng Mythic"));
+    assert.ok(html.indexOf('class="equipped-profile-effect"') > html.indexOf('class="equipped-profile-name"'), "effect must follow identity, not be its obscured backdrop");
+    assert.ok(html.includes('data-item-id="' + effect.id + '"'));
+    assert.ok(html.includes('data-motion-enabled="true"'), "equipped effects retain animation");
+    assert.equal(JSON.stringify(state), before, "display changes must not touch copies, EX or equipment");
+  }
 });
 
 test("header uses owned equipped Mythic avatar and title, not catalog preview gear", () => {

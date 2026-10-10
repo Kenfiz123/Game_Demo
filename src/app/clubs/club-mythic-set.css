@@ -1,0 +1,27 @@
+/* Two entry points into the existing club collection, not additional rewards. */
+.royal-clubs-page .club-mythic-set {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 22px;
+  padding-block: 17px;
+  margin-bottom: 22px;
+  border-block: 1px solid #8c6e444f;
+}
+.royal-clubs-page .club-mythic-set-entry { min-width: 0; }
+.royal-clubs-page .club-mythic-set-entry + .club-mythic-set-entry { border-left: 1px solid #8c6e443d; padding-left: 22px; }
+.royal-clubs-page .club-mythic-set h4 { margin: 0 0 7px; color: #ebd6b1; font-size: 13px; font-weight: 550; }
+.royal-clubs-page .club-mythic-set p { margin: 0; color: #a5b3c6; font-size: 10px; line-height: 1.8; max-width: 43ch; }
+.royal-clubs-page .club-mythic-set .club-mythic-achievement-name { color: #d8c3a1; overflow-wrap: anywhere; }
+.royal-clubs-page .club-mythic-set-entry > small { display: block; margin-top: 5px; color: #899bb2; font-size: 9px; line-height: 1.7; max-width: 48ch; }
+.royal-clubs-page .club-mythic-set-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 11px; }
+.royal-clubs-page .club-mythic-set-actions button { display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 7px; min-height: 36px; max-width: 100%; padding: 7px 11px; border: 1px solid #715a3a; border-radius: 4px; color: #d9c4a2; background: #211f1c; font: inherit; font-size: 10px; line-height: 1.5; cursor: pointer; }
+.royal-clubs-page .club-mythic-set-actions button small { color: #9fbbad; font-size: 8px; }
+.royal-clubs-page .club-mythic-set-actions button[aria-pressed="true"] { color: #f1d69d; border-color: #d2aa6c; background: #362a1a; }
+.royal-clubs-page .club-mythic-set-actions button:focus-visible { outline: 2px solid #e8c890; outline-offset: 3px; }
+.royal-clubs-page .club-mythic-set-actions button:active { transform: scale(.97); }
+@media (hover:hover) and (pointer:fine) { .royal-clubs-page .club-mythic-set-actions button:hover { border-color: #b69764; } }
+@media (max-width: 700px) {
+  .royal-clubs-page .club-mythic-set { grid-template-columns: 1fr; gap: 15px; padding-block: 15px; margin-bottom: 18px; }
+  .royal-clubs-page .club-mythic-set-entry + .club-mythic-set-entry { border-left: 0; padding-left: 0; border-top: 1px solid #8c6e443d; padding-top: 15px; }
+  .royal-clubs-page .club-mythic-set-actions button { min-height: 44px; padding-inline: 13px; }
+}

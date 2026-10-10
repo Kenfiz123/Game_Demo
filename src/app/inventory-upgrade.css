@@ -37,10 +37,11 @@
 .equipped-profile-heading p { font-size: 11px; color: #94a5bb; line-height: 1.8; max-width: 560px; margin: 0; }
 .equipped-profile-heading > span { color: #bda783; font-size: 10px; white-space: nowrap; padding-top: 5px; }
 .equipped-profile-preview { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 30px 35px; min-height: 250px; overflow: hidden; border-block: 1px solid #423625; background: radial-gradient(ellipse at 35% 50%,#3e2e1b50,transparent 64%),#0c1521; }
-.equipped-profile-effect { position: absolute; z-index: -1; inset: 0; opacity: .46; pointer-events: none; display: grid; place-items: center; }
-.equipped-profile-effect > .cosmetic-art { width: min(100%,400px); height: 240px; background: none; }
+.equipped-profile-effect { position: relative; flex: 0 1 240px; max-width: 100%; opacity: 1; pointer-events: none; display: grid; place-items: center; gap: 10px; }
+.equipped-profile-effect > .cosmetic-art { width: 100%; height: 240px; background: none; }
 .equipped-profile-effect .mythic-art { max-width: 100%; height: 100%; }
-.equipped-profile-identity { display: flex; align-items: center; gap: 28px; flex: 1; min-width: 0; }
+.equipped-profile-effect-label { margin: 0; color: #d0bb95; font-size: 9px; letter-spacing: .08em; text-align: center; }
+.equipped-profile-identity { display: flex; align-items: center; gap: 28px; flex: 1 1 380px; min-width: 0; }
 .equipped-profile-portrait { position: relative; flex-shrink: 0; width: 175px; height: 175px; display: grid; place-items: center; isolation: isolate; }
 .equipped-profile-frame { position: absolute; inset: 0; pointer-events: none; }
 .equipped-profile-frame > .cosmetic-art { width: 100%; height: 100%; background: none; }
@@ -129,7 +130,8 @@
   .equipped-profile-logo { width: 90px; margin-left: auto; }
   .equipped-profile-logo > .cosmetic-art { width: 90px; height: 85px; }
   .equipped-profile-logo > span { font-size: 8px; }
-  .equipped-profile-effect > .cosmetic-art { width: 250px; height: 225px; }
+  .equipped-profile-effect { flex: 1 0 100%; }
+  .equipped-profile-effect > .cosmetic-art { width: min(100%,240px); height: 240px; }
   .equipped-profile-slots { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .equipped-profile-slot { padding: 14px; border-right: 1px solid #293446; }
   .equipped-profile-slot:nth-child(even) { border-right: 0; }

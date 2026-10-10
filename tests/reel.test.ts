@@ -24,6 +24,8 @@ function context(): XperienceContextValue {
   state.settings.chestOdds = { COMMON: 0, UNCOMMON: 0, RARE: 0, EPIC: 0, LEGENDARY: 0, MYTHIC: 100 };
   return {
     state, hydrated: true, isPlaying: true,
+    backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,
+    canImportLegacy: false, legacyAvailable: false, importLegacy: async () => false,
     playGame: async () => ({ success: false, reason: "BUSY" }),
     tradeUp: async () => ({ success: false, reason: "BUSY" }),
     updateSettings: async () => false, equipItem: async () => false, unequipItem: async () => false,
@@ -101,7 +103,7 @@ test("ordinary rewards retain existing headings, actions, and duplicate trade-up
   const item = cosmeticsByRarity("COMMON")[0], html = renderReveal(rewardOf(item, true)), visible = text(html);
   assert.equal(html.includes("mythic-ceremony"), false);
   assert.ok(html.includes('<h2 tabindex="-1">' + item.name + "</h2>"));
-  for (const label of ["View collection", "Play again · 100 EX", "Back to game", "Bản sao mới đã cất vào kho", "Có thể dùng để đổi đồ"]) assert.ok(visible.includes(label), label);
+  for (const label of ["Xem trong kho", "Mở tiếp · 100 EX", "Quay lại", "Bản sao mới đã cất vào kho", "Có thể dùng để đổi đồ"]) assert.ok(visible.includes(label), label);
 });
 test("ceremony entrance is bounded transform/opacity motion with reduced-motion support and existing focus semantics", async () => {
   const css = await readFile(new URL("../src/app/mythic-ceremony.css", import.meta.url), "utf8");

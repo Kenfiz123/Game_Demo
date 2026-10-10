@@ -9,10 +9,14 @@ import "./inventory-upgrade.css";
 import "./mythic-royal.css";
 import "./trade-up.css";
 import "./odds-settings.css";
+import "./experience-premium.css";
+import "./chest-premium.css";
+import "./inventory-premium.css";
+import "./backend-status.css";
 export const metadata: Metadata = {
   title: { default: "Reward Arcade · FPTU Xperience", template: "%s · FPTU Xperience" },
   description: "Khám phá vật phẩm của 73 CLB, mở rương, Lucky Orbit và đổi 5 món cùng bậc với EX trải nghiệm.",
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><a className="skip-link" href="#main-content">Skip to content</a><XperienceProvider><AppShell>{children}</AppShell></XperienceProvider></body></html>;
+  return <html lang="vi"><body><a className="skip-link" href="#main-content">Đến nội dung chính</a><XperienceProvider><AppShell>{children}</AppShell></XperienceProvider></body></html>;
 }

@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { CLUBS } from "../src/data/clubs";
 import { getClubMythics } from "../src/data/clubCosmetics";
 import { MYTHIC_VARIANTS, getMythicImage } from "../src/data/mythicCatalog";
-import { MythicArt } from "../src/components/ui/MythicArt";
+import { MYTHIC_FINISHES, MythicArt } from "../src/components/ui/MythicArt";
 import { CosmeticArt } from "../src/components/ui/CosmeticArt";
 import type { CosmeticItem, MythicVariant } from "../src/types/gamification";
 
@@ -14,9 +14,9 @@ import type { CosmeticItem, MythicVariant } from "../src/types/gamification";
 Object.assign(globalThis, { React });
 
 const finishMarkers: Record<MythicVariant, string> = {
-  PRISM: "royal-prism", SOVEREIGN: "royal-seal-sweep", AURORA: "royal-aurora",
-  CELESTIAL: "royal-orbit", LEGACY: "royal-legacy-plaque", PHOENIX: "royal-wing",
-  COMET: "royal-comet", REGALIA: "royal-regalia-ring",
+  PRISM: "royal-prism", SOVEREIGN: "royal-finish-sovereign", AURORA: "royal-finish-aurora",
+  CELESTIAL: "royal-finish-celestial", LEGACY: "royal-legacy-plaque", PHOENIX: "royal-wing",
+  COMET: "royal-finish-comet", REGALIA: "royal-finish-regalia",
 };
 const classes = (html: string) => new Set(Array.from(html.matchAll(/\bclass="([^"]*)"/g), match => match[1].split(/\s+/)).flat());
 const images = (html: string) => Array.from(html.matchAll(/<img\b[^>]*>/g), match => match[0]);
@@ -30,12 +30,19 @@ for (const definition of MYTHIC_VARIANTS) {
     const html = render(item), tokens = classes(html);
     assert.ok(html.includes(`data-item-id="${item.id}"`));
     assert.ok(html.includes(`data-mythic-variant="${definition.variant}"`));
+    assert.ok(html.includes('data-mythic-fx="4"'));
     assert.ok(tokens.has("variant-" + definition.variant.toLowerCase()));
     assert.ok(tokens.has(finishMarkers[definition.variant]), definition.variant + " must have its own visible finish");
     for (const [otherVariant, marker] of Object.entries(finishMarkers)) {
       if (otherVariant !== definition.variant) assert.equal(tokens.has(marker), false, definition.variant + " must not reuse " + otherVariant + " finish");
     }
     assert.ok(images(html).some(tag => tag.includes(encodeURIComponent(item.image!))), "render the item image, not just decorative rings");
+    const variant = definition.variant;
+    if (variant === "SOVEREIGN" || variant === "AURORA" || variant === "CELESTIAL" || variant === "COMET" || variant === "REGALIA") {
+      assert.ok(images(html).some(tag => tag.includes(encodeURIComponent(MYTHIC_FINISHES[variant]))), variant + " must render its actual sculpted frame");
+      assert.match(html, /<div class="royal-finish [^"]*\broyal-motion\b[^"]*"/, "the decorative finish must participate in shared motion gates");
+      assert.notEqual(item.image, MYTHIC_FINISHES[variant], "the decorative finish must never become the owned club avatar image");
+    }
     if (definition.variant === "PHOENIX") {
       assert.ok(images(html).some(tag => tag.includes(encodeURIComponent("/assets/mythic/phoenix-mantle.webp"))), "Phoenix must use its generated wing mantle rather than generic CSS triangles");
       assert.equal(Array.from(html.matchAll(/\bclass="royal-wing royal-motion"/g)).length, 1);

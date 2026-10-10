@@ -36,7 +36,7 @@ export function EquippedProfile() {
       const success = await unequipItem(slot);
       if (mounted.current) setMessage(success ? "Đã gỡ " + slots.find(entry => entry.slot === slot)?.label.toLocaleLowerCase("vi-VN") + ". Vật phẩm vẫn ở trong kho." : "Chưa gỡ được trang bị. Chờ lượt chơi kết thúc rồi thử lại.");
     } catch {
-      if (mounted.current) setMessage("Không lưu được thay đổi. Kiểm tra bộ nhớ trình duyệt rồi thử lại.");
+      if (mounted.current) setMessage("Chưa xác nhận được thay đổi. Kết nối lại backend để tải trang bị mới nhất.");
     } finally {
       inFlight.current = false;
       if (mounted.current) setPending(null);
@@ -44,21 +44,22 @@ export function EquippedProfile() {
   };
 
   return <section className="equipped-profile panel" aria-labelledby="equipped-profile-heading">
-    <div className="equipped-profile-heading"><div><h2 id="equipped-profile-heading">Hồ sơ đang trang bị</h2><p>Mythic không chỉ hiện lúc mở rương. Nhận được, trang bị và giữ chuyển động đặc biệt trên hồ sơ.</p></div><span>{equippedCount} / {slots.length} vị trí</span></div>
+    <div className="equipped-profile-heading"><div><span className="inventory-eyebrow">DẤU ẤN MYTHIC</span><h2 id="equipped-profile-heading">Hồ sơ đang trang bị</h2><p>Vật phẩm quý không chỉ nằm trong kho. Trang bị Mythic để giữ dấu ấn và chuyển động riêng trên hồ sơ.</p></div><div className="equipped-profile-completion"><span>{equippedCount} / {slots.length} vị trí</span><progress max={slots.length} value={equippedCount} aria-label="Số vị trí đã trang bị"/></div></div>
     <div className={"equipped-profile-preview" + (equippedCount ? " has-equipped-mythic" : "")}>
-      {equipped.EFFECT ? <div className="equipped-profile-effect"><CosmeticArt item={equipped.EFFECT} animated/></div> : null}
       <div className="equipped-profile-identity">
         <div className="equipped-profile-portrait">
           {equipped.FRAME ? <div className="equipped-profile-frame"><CosmeticArt item={equipped.FRAME} animated/></div> : null}
           <div className="equipped-profile-avatar">{equipped.AVATAR ? <CosmeticArt item={equipped.AVATAR} animated/> : <div className="equipped-profile-default-avatar" aria-hidden="true"><UserRound size={43}/></div>}</div>
+          <span className="equipped-profile-portrait-label">{equipped.AVATAR ? "AVATAR MYTHIC" : "CHƯA TRANG BỊ AVATAR"}</span>
         </div>
         <div className="equipped-profile-name"><span>Student</span><small>FPT University</small>
           {equipped.TITLE ? <div className="equipped-profile-title"><div className="equipped-profile-title-art"><CosmeticArt item={equipped.TITLE} animated/></div><h3 className="equipped-profile-title-name">{equipped.TITLE.name}</h3>{equipped.TITLE.heritage ? <p>Di sản {equipped.TITLE.heritage}</p> : null}</div> : <p className="equipped-profile-empty-title">Chưa trang bị danh hiệu Mythic</p>}
         </div>
       </div>
       {equipped.LOGO ? <div className="equipped-profile-logo"><CosmeticArt item={equipped.LOGO} animated/><span>{equipped.LOGO.name}</span></div> : null}
+      {equipped.EFFECT ? <div className="equipped-profile-effect"><CosmeticArt item={equipped.EFFECT} animated/><p className="equipped-profile-effect-label">Hiệu ứng Mythic</p></div> : null}
     </div>
-    <div className="equipped-profile-slots">{slots.map(({ slot, label }) => <div className="equipped-profile-slot" key={slot}>
+    <div className="equipped-profile-slots">{slots.map(({ slot, label }) => <div className="equipped-profile-slot" data-filled={equipped[slot] ? "true" : "false"} key={slot}>
       <div><span>{label}</span><strong>{equipped[slot]?.name ?? "Chưa trang bị"}</strong></div>
       {equipped[slot] ? <button type="button" aria-label={"Gỡ " + label.toLocaleLowerCase("vi-VN")} disabled={isPlaying || pending !== null} onClick={() => clear(slot)}>{pending === slot ? "Đang gỡ…" : "Gỡ"}</button> : null}
     </div>)}</div>

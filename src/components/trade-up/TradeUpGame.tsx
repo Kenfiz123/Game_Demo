@@ -26,7 +26,7 @@ const errors = {
   INVALID_SETTINGS: "Tỷ lệ chưa hợp lệ. Hãy kiểm tra trang Tỷ lệ.",
   BUSY: "Một lượt chơi khác đang xử lý. Hãy đợi hoàn tất.",
   NOT_READY: "Kho đang tải. Vui lòng thử lại.",
-  STORAGE_UNAVAILABLE: "Không thể lưu dữ liệu an toàn. Cần trình duyệt hiện đại, bật lưu trữ và mở trên localhost hoặc HTTPS. Chưa tiêu thụ vật phẩm.",
+  STORAGE_UNAVAILABLE: "Chưa xác nhận được kết quả từ backend. Kết nối lại và kiểm tra Lịch sử trước khi đổi tiếp; lượt vừa gửi có thể đã được lưu.",
 };
 
 export function TradeUpGame() {

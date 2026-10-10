@@ -49,9 +49,9 @@ export function useRewardGame(game: GameId) {
       return;
     }
     if (!attempt.success) {
-      setError(attempt.reason === "INSUFFICIENT_EX" ? "You need " + cost + " EX to play. Earn more EX through campus activities." :
-        attempt.reason === "STORAGE_UNAVAILABLE" ? "Your progress could not be saved safely. Use a modern browser with storage enabled." :
-        attempt.reason === "NOT_READY" ? "Your collection is still loading." : "Please wait for the current round to finish.");
+      setError(attempt.reason === "INSUFFICIENT_EX" ? "Bạn cần " + cost + " EX để chơi. Hãy nhận thêm EX từ hoạt động tại trường." :
+        attempt.reason === "STORAGE_UNAVAILABLE" ? "Chưa thể xác nhận kết quả trên backend. Hãy kết nối lại và kiểm tra lịch sử trước khi chơi tiếp." :
+        attempt.reason === "NOT_READY" ? "Đang kết nối và tải bộ sưu tập đã lưu." : "Hãy chờ lượt hiện tại kết thúc.");
       return;
     }
     activeId.current = attempt.id;
