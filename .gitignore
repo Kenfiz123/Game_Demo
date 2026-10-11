@@ -8,7 +8,7 @@ out/
 next-env.d.ts
 .env*
 !.env.example
-data/
+/data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm

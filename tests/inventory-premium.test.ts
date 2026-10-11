@@ -10,12 +10,14 @@ import { XperienceContext, type XperienceContextValue } from "../src/hooks/useXp
 import { cosmeticsByRarity } from "../src/data/cosmetics";
 import { getClubById, normalizeClubSearch } from "../src/data/clubs";
 import { createDemoState } from "../src/lib/storage";
+import { emptyEconomy } from "../src/data/eventEconomy";
 import type { EquipSlot, XperienceState } from "../src/types/gamification";
 
 Object.assign(globalThis, { React });
 const base: InventoryFilters = { query: "", type: "ALL", rarity: "ALL", club: "", duplicatesOnly: false, equippedOnly: false, sort: "rarity" };
 function render(Component: ComponentType, state: XperienceState = createDemoState(), hydrated = true) {
   const context: XperienceContextValue = {
+    economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state, hydrated, isPlaying: false,
     backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,
     canImportLegacy: false, legacyAvailable: false, importLegacy: async () => false,

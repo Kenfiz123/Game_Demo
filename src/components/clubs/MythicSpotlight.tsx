@@ -47,7 +47,7 @@ export function MythicSpotlight({ items, chance, rarityChance, ownedItemIds = EM
         {item.heritage ? <p className="royal-heritage">Di sản {item.heritage}</p> : null}
         <p>{item.description}</p>
         <div className="mythic-facts royal-mythic-facts"><span><strong>{rarityChance.toLocaleString("vi-VN", { maximumFractionDigits: 4 })}%</strong>Trúng bậc Mythic</span><span><strong>{exactChance(chance)}%</strong>Riêng bảo vật này / rương</span></div>
-        <div className="royal-preview-controls"><button type="button" className="secondary-button mythic-motion-toggle" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? <Play size={13}/> : <Pause size={13}/>} {paused ? "Tiếp tục hiệu ứng xem trước" : "Tạm dừng hiệu ứng xem trước"}</button><span>{owned.has(item.id) ? "Đã có trong kho — có thể trang bị" : "Chỉ nhận từ rương"}</span></div>
+        <div className="royal-preview-controls"><button type="button" className="secondary-button mythic-motion-toggle" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? <Play size={13}/> : <Pause size={13}/>} {paused ? "Tiếp tục hiệu ứng xem trước" : "Tạm dừng hiệu ứng xem trước"}</button><span>{owned.has(item.id) ? "Đã có trong kho — có thể trang bị" : "Nhận từ rương, luyện Mythic hoặc chợ"}</span></div>
         <small>Xem trước không cấp vật phẩm. Trang bị Mythic đã sở hữu trong kho để giữ chuyển động trên hồ sơ. Trong rương, Mythic ẩn trong ô bí mật đến lúc kết thúc.</small>
       </div>
     </div>

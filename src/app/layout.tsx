@@ -13,9 +13,10 @@ import "./experience-premium.css";
 import "./chest-premium.css";
 import "./inventory-premium.css";
 import "./backend-status.css";
+import "./economy-shell.css";
 export const metadata: Metadata = {
   title: { default: "Reward Arcade · FPTU Xperience", template: "%s · FPTU Xperience" },
-  description: "Khám phá vật phẩm của 73 CLB, mở rương, Lucky Orbit và đổi 5 món cùng bậc với EX trải nghiệm.",
+  description: "Khám phá 73 CLB, mở rương, nhận XCoin từ sự kiện, giao dịch với người chơi và luyện Mythic từ 5 Legendary.",
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="vi"><body><a className="skip-link" href="#main-content">Đến nội dung chính</a><XperienceProvider><AppShell>{children}</AppShell></XperienceProvider></body></html>;

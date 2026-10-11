@@ -1,11 +1,13 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { copyArcadeSettings, validateArcadeSettings } from "@/data/economyConfig";
+import { emptyEconomy } from "@/data/eventEconomy";
 import { BackendRequestError, bootstrapBackend, readBackend, reconcileBackendSnapshot, sendBackendCommand } from "@/lib/backendClient";
 import { createDemoState, parseStoredState, STORAGE_KEY } from "@/lib/storage";
 import { XperienceContext, type BackendStatus } from "@/hooks/useXperience";
 import type { BackendCommand, BackendCommandResult, BackendSnapshot } from "@/types/backend";
 import type { ArcadeSettings, EquipSlot, GameId, OpeningAttempt, TradeUpAttempt } from "@/types/gamification";
+import type { EconomyCommand, EconomyResult } from "@/types/economy";
 
 const SYNC_CHANNEL = "fptu-xperience-backend-v1";
 const MAX_LEGACY_LENGTH = 512 * 1024;
@@ -32,6 +34,7 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
   const [snapshot, setSnapshot] = useState<BackendSnapshot | null>(null);
   // Do not present the prototype's initial balance as server-confirmed progress.
   const [emptyState] = useState(() => ({ ...createDemoState(), exPoints: 0 }));
+  const [initialEconomy] = useState(() => emptyEconomy(0));
   const [backendStatus, setBackendStatus] = useState<BackendStatus>("connecting");
   const [backendError, setBackendError] = useState<string | null>(null);
   const [legacyAvailable, setLegacyAvailable] = useState(false);
@@ -163,7 +166,7 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
       const reply = await sendBackendCommand(command, current.player.id, controller.signal);
       if (!mounted.current || controller.signal.aborted || activeOpening.current !== token) return null;
       applySnapshot(reply.snapshot);
-      if ((command.type === "play" || command.type === "trade-up") && reply.result.success && "id" in reply.result) activeOpening.current = reply.result.id;
+      if ((command.type === "play" || command.type === "trade-up") && reply.result.success && "id" in reply.result && typeof reply.result.id === "string") activeOpening.current = reply.result.id;
       try { channel.current?.postMessage({ type: "invalidate" }); } catch { /* A later focus refresh is sufficient. */ }
       return reply.result;
     } catch (error) {
@@ -193,6 +196,11 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
     if (activeOpening.current) return { success: false, reason: "BUSY" };
     return await runMutation({ type: "trade-up", itemIds: [...ids] }) as TradeUpAttempt | null ?? { success: false, reason: "STORAGE_UNAVAILABLE" };
   }, [runMutation]);
+  const economyAction = useCallback(async (command: EconomyCommand): Promise<EconomyResult> => {
+    if (statusRef.current !== "ready") return { success: false, reason: "NOT_READY" };
+    if (activeOpening.current) return { success: false, reason: "BUSY" };
+    return await runMutation(command) as EconomyResult | null ?? { success: false, reason: "STORAGE_UNAVAILABLE" };
+  }, [runMutation]);
   const updateSettings = useCallback(async (settings: ArcadeSettings): Promise<boolean> => {
     if (!snapshotRef.current?.demoToolsEnabled || !validateArcadeSettings(settings)) return false;
     return (await runMutation({ type: "settings", settings: copyArcadeSettings(settings) }))?.success ?? false;
@@ -218,9 +226,11 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
   const hydrated = snapshot !== null && backendStatus === "ready";
   const demoToolsEnabled = snapshot?.demoToolsEnabled ?? false;
   const canImportLegacy = snapshot?.canImportLegacy ?? false;
+  const economy = snapshot?.economy ?? initialEconomy;
+  const playerId = snapshot?.player.id ?? null;
   const value = useMemo(() => ({ state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
+    economy, playerId, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
   [state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
+    economy, playerId, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
   return <XperienceContext.Provider value={value}>{children}</XperienceContext.Provider>;
 }

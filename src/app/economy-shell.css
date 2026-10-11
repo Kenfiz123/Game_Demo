@@ -1,0 +1,16 @@
+.experience-premium .xcoin-pill { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 8px 12px; border: 1px solid #b9955655; border-radius: 6px; color: #efd5a6; background: #241e16; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.xcoin-pill strong { font-size: 14px; }
+.xcoin-pill > span { font-size: 9px; letter-spacing: .08em; color: #beab87; }
+.xcoin-pill:focus-visible { outline: 2px solid #f2dfb7; outline-offset: 3px; }
+.experience-premium .header-actions { gap: 12px; }
+@media (max-width: 1100px) { .experience-premium .header-breadcrumb { display: none; } }
+@media (max-width: 700px) {
+  .experience-premium .xcoin-pill { min-height: 38px; padding: 7px; gap: 5px; }
+  .xcoin-pill strong { font-size: 12px; }
+  .experience-premium .header-actions { gap: 4px; }
+  .experience-premium .bottom-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .experience-premium .mobile-menu { max-height: calc(100dvh - 150px); overflow-y: auto; }
+}
+@media (max-width: 420px) {
+  .experience-premium .header-actions .ex-pill { display: none; }
+}

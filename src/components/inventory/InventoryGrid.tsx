@@ -140,6 +140,6 @@ export function InventoryGrid() {
       <p>{ownedItems.length ? (query.trim() ? "Không tìm thấy “" + query.trim() + "” trong bộ lọc hiện tại. Thử tên CLB hoặc xóa bộ lọc." : "Thử CLB, độ hiếm hoặc loại vật phẩm khác.") : "Mở rương để nhận vật phẩm đầu tiên. Mọi bản sao đều được giữ lại trong kho."}</p>
       {ownedItems.length ? <button className="secondary-button" onClick={clear}>Xóa bộ lọc</button> : <Link className="primary-button" href="/chest">Mở rương</Link>}
     </div>}
-    <p className="collection-footnote">Bản sao không đổi thành EX: mỗi lần nhận đều thêm một bản vào kho, có thể dùng cho game Đổi đồ. Mythic chỉ nhận từ rương, không dùng để đổi; trang bị Mythic đã sở hữu để giữ hiệu ứng trên hồ sơ. Vật phẩm CLB là thiết kế concept, không xác nhận tư cách thành viên.</p>
+    <p className="collection-footnote">Mỗi lần nhận đều giữ thêm một bản sao. Dùng đồ Common–Epic để Đổi đồ, 5 Legendary để luyện Mythic, hoặc rao bán bằng XCoin trên chợ. Mythic không làm nguyên liệu; trang bị đồ đã sở hữu để giữ hiệu ứng trên hồ sơ. Vật phẩm concept, không xác nhận tư cách thành viên.</p>
   </section>;
 }

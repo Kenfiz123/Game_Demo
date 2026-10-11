@@ -1,0 +1,10 @@
+.controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 23px 12px; color: #9ba8b9; font-size: 11px; }
+.toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 10px; border: 1px solid #33404f; border-radius: 7px; background: #131e2b; color: #c6d0dd; cursor: pointer; transition: border-color .16s, background-color .16s; }
+.toggle[aria-pressed="true"] { border-color: #786446; color: #e3c895; background: #211f1b; }
+.toggle:hover { border-color: #bda172; }
+.toggle:focus-visible, .range:focus-visible { outline: 2px solid #e3c895; outline-offset: 4px; }
+.volume { display: flex; align-items: center; gap: 8px; }
+.range { width: 80px; height: 24px; accent-color: #d7b77d; cursor: pointer; }
+.hint { color: #b9a17e; }
+@media (max-width: 600px) { .controls { justify-content: flex-start; padding: 0 16px 10px; gap: 10px; flex-wrap: wrap; }.volume > span { display: none; }.range { width: 70px; } }
+@media (prefers-reduced-motion: reduce) { .toggle { transition: none; } }

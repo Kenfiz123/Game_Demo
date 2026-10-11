@@ -64,6 +64,6 @@ export function EquippedProfile() {
       {equipped[slot] ? <button type="button" aria-label={"Gỡ " + label.toLocaleLowerCase("vi-VN")} disabled={isPlaying || pending !== null} onClick={() => clear(slot)}>{pending === slot ? "Đang gỡ…" : "Gỡ"}</button> : null}
     </div>)}</div>
     {message ? <p className="equipped-profile-message" role="status">{message}</p> : null}
-    {!equippedCount ? <p className="equipped-profile-footnote">Chọn Trang bị trên đồ Mythic trong kho. Chỉ trang bị đồ đã sở hữu; không cấp đồ khi xem trước. <Link href="/chest">Mythic chỉ nhận từ rương.</Link></p> : <p className="equipped-profile-footnote">Trang bị được lưu cùng kho và giữ lại khi tải trang. Gỡ trang bị không mất vật phẩm. Chuyển động tự nghỉ khi ngoài màn hình, tab ẩn hoặc bật giảm chuyển động.</p>}
+    {!equippedCount ? <p className="equipped-profile-footnote">Chọn Trang bị trên đồ Mythic trong kho. Chỉ trang bị đồ đã sở hữu; không cấp đồ khi xem trước. Nhận Mythic qua rương, <Link href="/forge">Lò Thần Thoại</Link> hoặc chợ.</p> : <p className="equipped-profile-footnote">Trang bị được lưu cùng kho và giữ lại khi tải trang. Gỡ trang bị không mất vật phẩm. Chuyển động tự nghỉ khi ngoài màn hình, tab ẩn hoặc bật giảm chuyển động.</p>}
   </section>;
 }

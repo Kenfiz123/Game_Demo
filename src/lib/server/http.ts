@@ -130,7 +130,7 @@ async function readJson(request: Request): Promise<unknown> {
   }
 }
 
-type StoreApi = Pick<XperienceStore, "bootstrapSession" | "getSnapshot" | "execute" | "health">;
+type StoreApi = Pick<XperienceStore, "bootstrapSession" | "getSnapshot" | "execute" | "health"> & Partial<Pick<XperienceStore, "getMarket">>;
 interface ApiDependencies { getStore?: () => StoreApi; getConfig?: () => ServerConfig; }
 
 export function createApiHandlers(dependencies: ApiDependencies = {}) {
@@ -173,6 +173,20 @@ export function createApiHandlers(dependencies: ApiDependencies = {}) {
         if (!isUuid(requestId) || !isUuid(playerId)) throw new HttpError("INVALID_REQUEST");
         const command = validateCommand(await readJson(request));
         return json(resolveStore().execute(token, requestId, command, playerId));
+      } catch (error) { return failure(error); }
+    },
+    market: async (request: Request): Promise<Response> => {
+      try {
+        const token = readToken(request, resolveConfig().sessionCookie);
+        if (!token) throw new HttpError("NO_SESSION");
+        const params = new URL(request.url).searchParams;
+        const cursor = params.get("cursor");
+        if ([...params.keys()].some(key => key !== "cursor") || params.getAll("cursor").length > 1 || (cursor !== null && !isUuid(cursor))) throw new HttpError("INVALID_REQUEST");
+        const store = resolveStore();
+        if (!store.getMarket) throw new HttpError("STORAGE_UNAVAILABLE");
+        const page = store.getMarket(token, cursor?.toLowerCase());
+        if (!page) throw new HttpError("NO_SESSION");
+        return json(page);
       } catch (error) { return failure(error); }
     },
     health: async (): Promise<Response> => {

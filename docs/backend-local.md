@@ -17,7 +17,7 @@ Nguồn kỹ thuật: [Node 22.20 – node:sqlite / DatabaseSync](https://nodejs
 
 - Mỗi phiên ẩn danh có player UUID riêng. Cookie HttpOnly / SameSite=Strict / Path=/ giữ token ngẫu nhiên trong 30 ngày; dùng Secure khi truy cập HTTPS. DB chỉ giữ hash token, không giữ token thô. Không gửi token trong JSON, URL hoặc localStorage.
 - Lưu state v2: EX, danh sách **từng bản sao** vật phẩm, lịch sử mở rương/vòng quay, lịch sử đổi đồ (kể cả thất bại), tỷ lệ và 5 ô trang bị. ID catalog / artwork không đổi.
-- SQLite schema version 1 có players, sessions và operations. State được giữ dạng JSON có phiên bản để tương thích prototype; revision tăng khi thực sự thay đổi dữ liệu.
+- SQLite schema version 2 có players, sessions, operations, player_economies và market_listings. Tự migrate v1 và giữ nguyên state v2, bổ sung ví XCoin riêng. Revision tăng khi thực sự thay đổi dữ liệu; mua bán tăng revision cả người mua lẫn người bán.
 - Server tạo kết quả, kiểm tra quyền sở hữu và trừ EX/đồ trong cùng transaction `BEGIN IMMEDIATE`. WAL / busy timeout hỗ trợ các kết nối local. Không giữ transaction trong suốt animation.
 - Idempotency-Key theo player: cùng mã + cùng lệnh trả lại kết quả cũ với snapshot hiện tại; mã cũ + lệnh khác bị từ chối. Không được tự retry một lượt chơi mới bằng mã mới khi chưa biết lượt cũ đã lưu chưa.
 - Frontend chỉ giữ snapshot tạm trong bộ nhớ. Các tab nhận thông báo cần tải lại; refresh khi tab hiện lại / có focus. Không có polling mỗi frame. Lỗi API khóa thao tác; nút Kết nối lại tải trạng thái mới nhất.
@@ -60,12 +60,13 @@ Tất cả response có `Cache-Control: private, no-store`. Mọi POST chỉ nh�
 | --- | --- |
 | `POST /api/session` body `{}` | Tạo/khôi phục phiên ẩn danh, trả snapshot; đặt cookie nếu mới |
 | `GET /api/state` | Snapshot của cookie hợp lệ; thiếu/hết phiên trả 401 |
+| `GET /api/market?cursor=<UUID>` | Tin đang bán phân trang 40 tin và tối đa 20 tin riêng; cần cookie, cursor tùy chọn |
 | `POST /api/commands` | Lệnh đã xác thực phiên, có `Idempotency-Key` UUID và `X-Xperience-Player` UUID |
 | `GET /api/health` | Kiểm tra storage, chỉ trả trạng thái và loại storage |
 
-Các command: `play` (`game: chest|orbit`), `trade-up` (`itemIds`: đúng 5 ID), `equip` (`itemId`), `unequip` (`slot`), `settings` (`settings`), `grant-test-ex`, `reset-demo`, `import-legacy` (`raw`). Không có API PUT state/số dư tùy ý. Các tool demo bị kiểm tra cả ở server, không chỉ ẩn nút UI.
+Các command: `play` (`game: chest|orbit`), `trade-up` (`itemIds`: đúng 5 ID), `equip` (`itemId`), `unequip` (`slot`), `settings` (`settings`), `grant-test-ex`, `reset-demo`, `import-legacy` (`raw`), `claim-event` (`eventId`), `forge-mythic` (`itemIds`, `coins`), `market-list` (`itemId`, `price`), `market-buy` / `market-cancel` (`listingId`). Không có API PUT state/số dư tùy ý. Các tool demo bị kiểm tra cả ở server, không chỉ ẩn nút UI. [Luật XCoin](event-economy.md).
 
-Snapshot: player `{id, createdAt}`, state, revision, `demoToolsEnabled`, `canImportLegacy`. Command trả `{snapshot,result}`. Cookie quyết định player; header public player UUID chỉ giúp phát hiện phiên bị thay đổi, không dùng để truy cập player khác.
+Snapshot: player `{id, createdAt}`, state, economy (coinBalance, day, progress, claimedEventIds, forgeHistory), revision, `demoToolsEnabled`, `canImportLegacy`. Command trả `{snapshot,result}`. Cookie quyết định player; header public player UUID chỉ giúp phát hiện phiên bị thay đổi, không dùng để truy cập player khác.
 
 Origin được đối chiếu với Host thực của request (hỗ trợ localhost / 127.0.0.1), không tin `X-Forwarded-Host` hoặc port forwarded. Bản này dành cho truy cập local trực tiếp; chưa cấu hình trusted reverse proxy / TLS termination. Nếu đưa qua proxy cần xác định rõ origin/protocol tin cậy trước khi triển khai.
 

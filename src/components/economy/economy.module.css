@@ -1,0 +1,346 @@
+.page {
+  --coin-gold: #d7b77d;
+  --coin-ivory: #f2e7cf;
+  --coin-muted: #9aa9b9;
+  --coin-border: #d7b77d28;
+  color: var(--coin-ivory);
+  min-width: 0;
+}
+.pageHeading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 25px; }
+.pageHeading h1 { margin: 0 0 10px; font: 400 clamp(34px, 3.4vw, 49px)/1.12 var(--font-royal); letter-spacing: -.03em; }
+.pageHeading p { color: var(--coin-muted); font-size: 13px; line-height: 1.75; max-width: 60ch; }
+.wallet { display: flex; align-items: center; gap: 13px; padding: 16px 22px; background: #d7b77d0a; border: 1px solid var(--coin-border); flex-shrink: 0; color: var(--coin-gold); border-radius: 10px; }
+.wallet div { display: grid; gap: 4px; }
+.wallet div > span { color: var(--coin-muted); font-size: 11px; }
+.wallet strong { font-size: 27px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+.wallet small { margin-left: 9px; font-size: 10px; font-weight: 600; color: var(--coin-gold); }
+.nav { display: flex; align-items: stretch; gap: 5px; padding-bottom: 13px; margin-bottom: 25px; border-bottom: 1px solid #ffffff10; }
+.nav a { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 18px; border: 1px solid transparent; color: var(--coin-muted); font-size: 12px; border-radius: 6px; transition: background 160ms ease, color 160ms ease; }
+.nav a[aria-current="page"] { color: var(--coin-gold); background: #d7b77d0e; border-color: var(--coin-border); }
+.coinSeal { position: relative; display: grid; place-items: center; width: 154px; aspect-ratio: 1; border-radius: 50%; color: #fff3d6; background: radial-gradient(circle at 32% 25%, #fff1c4 0%, #a17b3f 25%, #e5cb8c 37%, #76542b 68%, #c3a56b 85%, #f7dda0 96%); border: 3px solid #d9bc80; box-shadow: inset 0 0 0 6px #73552f, inset 0 0 0 8px #e0c48b, inset 0 0 0 11px #806034, 6px 11px 0 #0b1119, 8px 12px 0 #665034, 0 22px 65px #d7b77d13; transform: rotate(-12deg); isolation: isolate; }
+.coinSeal > span { position: absolute; inset: 21px; border: 1px solid #f6deb5b5; border-radius: 50%; background: linear-gradient(135deg, #402c15, #ac8d51 50%, #4c351c); box-shadow: inset 0 0 0 4px #291e1340; }
+.coinSeal b { font-size: 77px; font-weight: 400; line-height: 1; text-shadow: 1px 2px #6c4a24, -1px -1px #fff2c8; position: relative; }
+.coinSeal i { position: absolute; inset: -9px; border: 1px solid #d7b77d20; border-radius: 50%; }
+.smallCoin { width: 31px; height: 31px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; color: #ead09a; border: 1px solid #b29159; box-shadow: inset 0 0 0 3px #1c2027, inset 0 0 0 4px #ad8b4f; background: #554526; }
+.smallCoin b { line-height: 1; font-size: 19px; font-weight: 400; }
+.eventBanner { display: grid; grid-template-columns: 190px minmax(0, 1fr) 145px; align-items: center; gap: 28px; min-height: 284px; padding: 35px; border: 1px solid var(--coin-border); border-radius: 12px; background: radial-gradient(ellipse at 0 100%, #d7b77d0d, transparent 50%), linear-gradient(120deg, #16212b, #0d1723); }
+.eventSeal { display: grid; place-items: center; }
+.eventSeason { color: var(--coin-gold); font-size: 12px; }
+.eventIntroduction h2 { font: 400 clamp(26px, 2.6vw, 36px)/1.2 var(--font-royal); letter-spacing: -.025em; margin: 13px 0; }
+.eventIntroduction > p { color: #b2bcc8; font-size: 12px; line-height: 1.9; max-width: 59ch; }
+.inlineLinks { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 21px; }
+.inlineLinks a { display: inline-flex; gap: 6px; align-items: center; font-size: 11px; color: var(--coin-gold); }
+.eventDaily { align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 17px; padding-left: 27px; border-left: 1px solid var(--coin-border); color: var(--coin-gold); }
+.eventDaily strong { font: 400 49px/1 var(--font-royal); font-variant-numeric: tabular-nums; }
+.eventDaily strong > span { display: block; font: 400 11px/1.5 Arial, sans-serif; margin-top: 8px; }
+.eventDaily p { color: var(--coin-muted); font-size: 10px; line-height: 1.7; }
+.sectionHeading { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin: 32px 0 19px; }
+.sectionHeading h2 { font-size: 19px; font-weight: 500; margin: 0 0 7px; }
+.sectionHeading p { font-size: 12px; line-height: 1.7; color: var(--coin-muted); }
+.eventLedger { border-block: 1px solid #ffffff15; }
+.task { display: grid; grid-template-columns: 126px minmax(0, 1fr) 160px; align-items: center; gap: 25px; padding: 25px 12px; border-bottom: 1px solid #ffffff10; }
+.task:last-child { border-bottom: 0; }
+.taskReward { display: flex; align-items: center; gap: 13px; }
+.taskReward strong { font-size: 23px; font-weight: 500; color: var(--coin-gold); font-variant-numeric: tabular-nums; }
+.taskReward strong span { display: block; font-size: 10px; font-weight: 400; color: var(--coin-muted); margin-top: 3px; }
+.taskCopy h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.taskCopy > p { font-size: 12px; line-height: 1.65; color: var(--coin-muted); }
+.taskProgress { display: flex; align-items: center; gap: 13px; margin-top: 12px; }
+.taskProgress progress { width: min(230px, 100%); height: 3px; appearance: none; border: 0; border-radius: 2px; overflow: hidden; background: #26333f; }
+.taskProgress progress::-webkit-progress-bar { background: #26333f; }
+.taskProgress progress::-webkit-progress-value { background: var(--coin-gold); }
+.taskProgress progress::-moz-progress-bar { background: var(--coin-gold); }
+.taskProgress > span { font-size: 10px; white-space: nowrap; color: var(--coin-muted); font-variant-numeric: tabular-nums; }
+.task[data-claimed="true"] .taskProgress progress::-webkit-progress-value { background: #8fc9b0; }
+.taskAction { display: grid; justify-items: center; gap: 10px; }
+.taskAction > button { width: 100%; }
+.taskAction > a { display: flex; gap: 5px; align-items: center; color: var(--coin-muted); font-size: 10px; }
+.goldButton, .subtleButton, .claimedButton, .loadMore { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 5px; min-height: 42px; padding: 11px 16px; font-family: inherit; font-weight: 500; font-size: 12px; line-height: 1.4; cursor: pointer; border: 1px solid transparent; transition: transform 120ms cubic-bezier(.23,1,.32,1), background 160ms ease, border-color 160ms ease; text-align: center; }
+.goldButton { background: #d7b77d; border-color: #ecd29f; color: #201c15; }
+.subtleButton, .loadMore { background: #ffffff04; border-color: #ffffff1c; color: #d3dbe3; }
+.claimedButton { background: #8fc9b00a; border-color: #8fc9b02a; color: #8fc9b0; }
+.goldButton:disabled, .subtleButton:disabled, .claimedButton:disabled, .loadMore:disabled, .inlineButton:disabled { cursor: not-allowed; opacity: .48; }
+.claimedButton:disabled { opacity: .85; }
+.goldButton:active:not(:disabled), .subtleButton:active:not(:disabled), .loadMore:active:not(:disabled) { transform: scale(.98); }
+.inlineButton { padding: 5px 0; display: inline-flex; color: var(--coin-gold); font: inherit; font-size: 11px; background: transparent; border: 0; cursor: pointer; }
+.page :is(button,a,input,select):focus-visible { outline: 2px solid #f0d49f; outline-offset: 4px; }
+.notice, .error { padding: 16px 19px; border-radius: 6px; font-size: 12px; line-height: 1.8; margin-top: 20px; color: #b4dcc9; background: #8fc9b00b; border: 1px solid #8fc9b032; }
+.error { color: #efb5b5; background: #bb6d780e; border-color: #bb6d7840; }
+.policy { display: flex; align-items: flex-start; gap: 15px; color: var(--coin-muted); border-top: 1px solid #ffffff10; margin-top: 32px; padding-top: 24px; }
+.policy > svg { flex-shrink: 0; color: var(--coin-gold); margin-top: 3px; }
+.policy h3 { font-size: 12px; color: #d8d3c8; font-weight: 500; margin-bottom: 7px; }
+.policy p { font-size: 11px; line-height: 1.9; max-width: 85ch; }
+.marketLayout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; }
+.marketBoard, .sellPanel { min-width: 0; }
+.marketBoard > .sectionHeading { margin-top: 4px; }
+.search { display: flex; align-items: center; gap: 10px; width: 100%; border: 1px solid #ffffff20; padding: 0 13px; border-radius: 5px; background: #0c1521; color: #8596a8; }
+.search input { width: 100%; min-width: 0; background: transparent; padding: 13px 0; border: 0; color: #e4e6e9; outline: none; font-size: 12px; }
+.search:focus-within { border-color: #d7b77d90; outline: 1px solid #d7b77d80; outline-offset: 2px; }
+.search input::placeholder { color: #8795a7; }
+.marketRows { margin-top: 13px; }
+.marketRow { display: grid; grid-template-columns: 85px minmax(0, 1fr) auto; gap: 15px; align-items: center; padding: 17px 0; border-bottom: 1px solid #ffffff10; }
+.marketArt { width: 85px; height: 85px; border: 1px solid #ffffff15; border-radius: 6px; overflow: hidden; }
+.marketArt :global(.cosmetic-art) { height: 85px; width: 85px; }
+.marketArt :global(.mythic-art) { width: 80px; height: 80px; }
+.marketIdentity { min-width: 0; }
+.marketIdentity h3 { font-size: 12px; line-height: 1.65; font-weight: 500; margin: 7px 0 4px; overflow-wrap: anywhere; }
+.marketIdentity small { font-size: 10px; color: var(--coin-muted); }
+.marketPrice { text-align: right; display: grid; justify-items: end; gap: 9px; }
+.marketPrice strong { font-size: 18px; font-weight: 500; color: var(--coin-gold); font-variant-numeric: tabular-nums; }
+.marketPrice strong > span { font-size: 10px; font-weight: 400; }
+.marketPrice .goldButton { min-height: 34px; padding: 8px 11px; font-size: 10px; }
+.sellPanel { padding: 24px; background: #15202b; border: 1px solid #d7b77d20; border-radius: 9px; align-self: start; }
+.sellHeading { display: flex; align-items: center; gap: 12px; }
+.sellHeading svg { color: var(--coin-gold); }
+.sellHeading h2 { font: 400 24px/1.2 var(--font-royal); }
+.sellPanel > p { color: var(--coin-muted); font-size: 11px; line-height: 1.9; margin-block: 14px 22px; }
+.field { display: grid; gap: 8px; margin-bottom: 16px; }
+.field > span { font-size: 11px; color: #c3ccd5; }
+.field input, .field select { width: 100%; min-width: 0; background: #0c1521; color: #e0e3e7; border: 1px solid #ffffff24; border-radius: 5px; padding: 12px; font: inherit; font-size: 12px; color-scheme: dark; }
+.field input:disabled, .field select:disabled { opacity: .5; }
+.fieldNote { display: block; font-size: 10px; line-height: 1.8; color: var(--coin-muted); margin-top: -7px; margin-bottom: 18px; }
+.sellPreview { display: flex; gap: 13px; align-items: center; border-block: 1px solid #ffffff0d; padding: 14px 0; margin-bottom: 18px; }
+.sellPreview > div { width: 65px; height: 65px; flex-shrink: 0; overflow: hidden; }
+.sellPreview :global(.cosmetic-art) { height: 65px; }
+.sellPreview :global(.mythic-art) { height: 65px; width: 65px; }
+.sellPreview > p { min-width: 0; font-size: 10px; line-height: 1.6; }
+.sellPreview strong { font-weight: 500; display: block; overflow-wrap: anywhere; }
+.sellPreview span { display: block; color: var(--coin-muted); margin-top: 4px; }
+.sellPreview small { display: block; color: #d9b18d; font-size: 9px; margin-top: 5px; }
+.sellPanel form > .goldButton { width: 100%; }
+.confirmation { background: #d7b77d0a; border: 1px solid #d7b77d50; padding: 18px; border-radius: 6px; grid-column: 1 / -1; }
+.confirmation > strong { font-size: 12px; color: #f1d6a6; font-weight: 500; line-height: 1.7; }
+.confirmation > p { color: #bdc5ce; font-size: 11px; line-height: 1.9; margin: 9px 0 15px; }
+.confirmation > div { display: flex; flex-wrap: wrap; gap: 9px; }
+.sellPanel .confirmation > div { flex-direction: column; }
+.ownListings { margin-top: 28px; padding-top: 23px; border-top: 1px solid #ffffff13; }
+.ownListings h3 { font-size: 12px; font-weight: 500; display: flex; justify-content: space-between; gap: 12px; }
+.ownListings h3 > span { color: var(--coin-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.ownListings > p, .sellEmpty > p { font-size: 11px; color: var(--coin-muted); line-height: 1.9; margin-block: 15px; }
+.ownListing { display: flex; align-items: center; gap: 13px; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #ffffff0b; }
+.ownListing > div { min-width: 0; }
+.ownListing strong { display: block; font-size: 11px; line-height: 1.7; font-weight: 400; overflow-wrap: anywhere; }
+.ownListing span { display: block; color: var(--coin-gold); font-size: 10px; margin-top: 4px; }
+.ownListing button { flex-shrink: 0; }
+.empty { display: grid; justify-items: center; text-align: center; padding: 51px 20px; color: var(--coin-muted); border: 1px dashed #ffffff18; border-radius: 7px; margin-top: 20px; }
+.empty > svg { color: var(--coin-gold); margin-bottom: 19px; }
+.empty h3 { color: #e8dcc8; font-size: 16px; font-weight: 500; line-height: 1.6; }
+.empty p { font-size: 12px; line-height: 1.8; max-width: 45ch; margin: 10px 0 20px; }
+.loadMore { display: flex; margin: 22px auto 0; }
+.forgeLayout { display: grid; grid-template-columns: minmax(0, 1fr) 276px; align-items: start; gap: 26px; }
+.forgeWorkbench { min-width: 0; border: 1px solid #d7b77d33; border-radius: 10px; padding: 25px; background: #101b28; }
+.forgeTopline { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #d7b77d20; padding-bottom: 16px; }
+.forgeTopline > span { display: flex; gap: 8px; align-items: center; color: #b9b6ac; font-size: 11px; }
+.forgeTopline svg { color: var(--coin-gold); }
+.forgeRitual { position: relative; overflow: hidden; text-align: center; display: grid; justify-items: center; padding: 50px 10px 25px; }
+.ritualSeal .coinSeal { width: 100px; box-shadow: inset 0 0 0 5px #73552f, inset 0 0 0 7px #e0c48b, inset 0 0 0 9px #806034, 5px 7px 0 #0b1119, 6px 8px 0 #665034; }
+.ritualSeal .coinSeal > span { inset: 15px; }
+.ritualSeal .coinSeal > b { font-size: 54px; }
+.ritualRing { position: absolute; width: 220px; aspect-ratio: 1; border-radius: 50%; top: -6px; left: calc(50% - 110px); border: 1px solid #d7b77d25; box-shadow: 0 0 0 9px #d7b77d04, 0 0 0 10px #d7b77d12, 0 0 0 28px #d7b77d03, 0 0 0 29px #d7b77d09; pointer-events: none; }
+.forgeRitual h2 { position: relative; font: 400 clamp(26px, 2.7vw, 36px)/1.2 var(--font-royal); letter-spacing: -.03em; margin-top: 26px; }
+.forgeRitual > p { font-size: 11px; line-height: 1.9; color: var(--coin-muted); max-width: 52ch; margin-top: 11px; }
+.forgeWorkbench[data-pending="true"] .ritualSeal { animation: seal-pulse .7s ease-in-out alternate infinite; }
+.selectedHeader { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 8px 0 13px; font-size: 11px; }
+.selectedHeader strong { font-weight: 500; }
+.selectedHeader > span { color: var(--coin-gold); }
+.forgeSlots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.forgeSlot, .emptySlot { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 118px; border: 1px solid #d7b77d42; border-radius: 6px; color: var(--coin-gold); background: #0b1420; min-width: 0; overflow: hidden; }
+.forgeSlot { cursor: pointer; padding: 0 3px 8px; }
+.forgeSlot:disabled { cursor: default; }
+.forgeSlot :global(.cosmetic-art) { height: 76px; width: 100%; background: transparent; }
+.forgeSlot :global(.club-legendary-frame) { width: 70px; height: 70px; }
+.forgeSlot > span { font-size: 8px; width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.forgeSlot > svg { position: absolute; top: 4px; right: 4px; color: #c9d0d8; }
+.emptySlot { border-style: dashed; border-color: #d7b77d25; gap: 11px; color: #82775f; }
+.emptySlot > span { font-size: 9px; }
+.catalyst { border-top: 1px solid #ffffff10; padding-top: 24px; margin-top: 23px; }
+.catalystHeading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.catalystHeading label { font-size: 12px; }
+.catalystHeading strong { color: var(--coin-gold); font-size: 23px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.catalystHeading strong > span { font-size: 10px; font-weight: 400; }
+.catalyst > input { display: block; width: 100%; margin: 18px 0 10px; accent-color: var(--coin-gold); cursor: pointer; height: 21px; }
+.catalyst > input:disabled { opacity: .4; cursor: default; }
+.catalystScale { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--coin-muted); font-size: 10px; }
+.catalystScale button { text-align: right; font-size: 10px; }
+.catalyst > p { font-size: 10px; line-height: 1.9; color: var(--coin-muted); margin-top: 14px; }
+.catalyst > .fundingRequired { padding: 13px 15px; border: 1px solid #d7b77d33; border-radius: 5px; background: #d7b77d08; color: #ddc99f; }
+.fundingRequired > a { display: inline-flex; align-items: center; gap: 5px; color: #f0d49f; text-decoration: underline; text-underline-offset: 3px; }
+.forgeChance { text-align: center; display: grid; justify-items: center; gap: 9px; background: #d7b77d05; border: 1px solid #d7b77d15; border-radius: 6px; margin-block: 23px; padding: 20px; }
+.forgeChance > span { color: var(--coin-muted); font-size: 11px; }
+.forgeChance > strong { font: 400 56px/1 var(--font-royal); color: var(--coin-gold); font-variant-numeric: tabular-nums; }
+.forgeChance > strong > span { font-size: 25px; margin-left: 4px; }
+.forgeChance > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-size: 10px; color: #c4bcaf; margin-top: 4px; }
+.forgeActions { display: grid; justify-items: center; gap: 12px; }
+.forgeActions > .goldButton { width: 100%; }
+.riskNote { display: flex; justify-content: center; align-items: flex-start; gap: 7px; font-size: 10px; line-height: 1.8; color: #cda398; text-align: center; margin-top: 16px; }
+.riskNote svg { flex-shrink: 0; margin-top: 1px; }
+.forgeRules { padding: 25px 4px 15px 4px; }
+.forgeRules > svg { color: var(--coin-gold); }
+.forgeRules h2 { font: 400 26px/1.25 var(--font-royal); letter-spacing: -.02em; margin: 19px 0 14px; }
+.forgeRules p { font-size: 11px; color: var(--coin-muted); line-height: 1.95; margin-block: 13px; }
+.forgeRules dl { border-block: 1px solid #ffffff13; margin: 22px 0; padding: 10px 0; }
+.forgeRules dl > div { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; font-size: 11px; }
+.forgeRules dt { color: #b4bfca; }
+.forgeRules dd { color: var(--coin-gold); font-size: 17px; font-variant-numeric: tabular-nums; }
+.forgeRules > a { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid #ffffff10; font-size: 11px; color: var(--coin-gold); padding-block: 14px; }
+.inventoryGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.inventoryItem { position: relative; display: grid; grid-template-rows: 125px auto auto; min-width: 0; padding: 0 0 16px; text-align: left; border: 1px solid #d7b77d24; border-radius: 6px; background: #121d29; color: #e7dfcf; overflow: hidden; cursor: pointer; }
+.inventoryItem:disabled { opacity: .5; cursor: default; }
+.inventoryItem > div { height: 125px; overflow: hidden; }
+.inventoryItem :global(.cosmetic-art) { height: 125px; }
+.inventoryItem > span { font-size: 11px; line-height: 1.7; margin: 12px 13px 5px; overflow-wrap: anywhere; }
+.inventoryItem > small { color: var(--coin-muted); font-size: 10px; padding: 0 13px; }
+.inventoryItem > svg { position: absolute; right: 8px; top: 8px; color: var(--coin-gold); }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 22px; font-size: 11px; color: var(--coin-muted); }
+.forgeOutcome { display: flex; flex-direction: column; align-items: center; text-align: center; min-height: 530px; justify-content: center; padding: 28px 0; animation: reveal .26s cubic-bezier(.23,1,.32,1); }
+.forgeOutcome[data-animate="false"] { animation: none; }
+.outcomeArt { width: 100%; height: 310px; position: relative; }
+.outcomeArt :global(.cosmetic-art) { height: 310px; overflow: visible; background: transparent; }
+.outcomeArt :global(.mythic-art) { width: min(100%, 300px); height: 300px; }
+.outcomeArt :global(.mythic-title-art) { width: 100%; max-width: 430px; }
+.forgeOutcome h2 { font: 400 clamp(27px, 3vw, 40px)/1.15 var(--font-royal); margin-block: 23px 14px; }
+.forgeOutcome h3 { font-size: 15px; font-weight: 500; line-height: 1.7; color: #ead3aa; max-width: 40ch; }
+.forgeOutcome p { font-size: 12px; color: var(--coin-muted); line-height: 1.9; max-width: 45ch; margin: 13px 0; }
+.forgeOutcome > small { font-size: 10px; line-height: 1.8; color: #acb5c0; margin-top: 21px; }
+.saved { color: #8fc9b0; font-size: 10px; display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; }
+.spentSeal { display: grid; place-items: center; width: 136px; aspect-ratio: 1; border-radius: 50%; background: #bb6d7806; border: 1px solid #bb6d7830; color: #bb8f7c; box-shadow: 0 0 0 13px #bb6d7803, 0 0 0 14px #bb6d7810; margin-bottom: 14px; }
+.outcomeActions { display: flex; justify-content: center; flex-wrap: wrap; gap: 11px; margin-top: 25px; }
+.history { margin-top: 35px; }
+.history article { display: flex; align-items: center; gap: 18px; padding: 18px 0; border-bottom: 1px solid #ffffff10; }
+.history article > div { flex: 1; min-width: 0; }
+.history article strong { display: block; font-size: 12px; font-weight: 400; line-height: 1.7; }
+.history article small { display: block; font-size: 10px; color: var(--coin-muted); margin-top: 5px; }
+.history article > span:last-child { font-size: 11px; color: var(--coin-muted); white-space: nowrap; }
+.legacyRule { color: #d6c29a; }
+.historyWon, .historyLost { font-size: 10px; min-width: 75px; color: #8fc9b0; }
+.historyLost { color: #c7a19b; }
+@keyframes seal-pulse { from { transform: scale(.97); opacity: .65; } to { transform: scale(1.02); opacity: 1; } }
+@keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (hover: hover) and (pointer: fine) {
+  .goldButton:hover:not(:disabled) { background: #e5c994; border-color: #ffe5b6; }
+  .subtleButton:hover:not(:disabled), .loadMore:hover:not(:disabled) { background: #ffffff0a; border-color: #d7b77d60; }
+  .nav a:hover, .inlineButton:hover:not(:disabled) { color: #ffe0a6; }
+  .inventoryItem:hover:not(:disabled), .forgeSlot:hover:not(:disabled) { border-color: #d7b77d90; }
+}
+@media (max-width: 1160px) {
+  .eventBanner { grid-template-columns: 135px minmax(0, 1fr); gap: 23px; padding: 28px; }
+  .eventSeal .coinSeal { width: 120px; }
+  .eventSeal .coinSeal b { font-size: 60px; }
+  .eventDaily { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; border-left: 0; border-top: 1px solid var(--coin-border); padding: 20px 0 0; gap: 16px; }
+  .eventDaily strong { font-size: 32px; display: flex; gap: 10px; align-items: baseline; }
+  .eventDaily strong > span { margin-top: 0; }
+  .eventDaily p { margin-left: auto; }
+  .marketLayout { grid-template-columns: minmax(0, 1fr) 285px; gap: 24px; }
+  .sellPanel { padding: 21px; }
+  .forgeLayout { grid-template-columns: minmax(0, 1fr) 230px; gap: 22px; }
+  .forgeWorkbench { padding: 20px; }
+  .inventoryGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .marketRow { grid-template-columns: 65px minmax(0, 1fr); gap: 13px; }
+  .marketArt, .marketArt :global(.cosmetic-art) { width: 65px; height: 65px; }
+  .marketArt :global(.mythic-art) { width: 60px; height: 60px; }
+  .marketPrice { grid-column: 2; display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; }
+}
+@media (max-width: 850px) {
+  .marketLayout { grid-template-columns: 1fr; }
+  .sellPanel { width: 100%; }
+  .sellHeading h2 { font-size: 26px; }
+  .marketRow { grid-template-columns: 80px minmax(0, 1fr) auto; gap: 15px; }
+  .marketArt, .marketArt :global(.cosmetic-art) { width: 80px; height: 80px; }
+  .marketArt :global(.mythic-art) { width: 75px; height: 75px; }
+  .marketPrice { grid-column: auto; display: grid; width: auto; justify-content: end; text-align: right; }
+  .sellPanel .confirmation > div { flex-direction: row; }
+  .forgeLayout { grid-template-columns: 1fr; }
+  .forgeRules { padding: 22px; border: 1px solid #ffffff12; border-radius: 8px; }
+  .forgeRules > svg { float: right; }
+  .forgeRules h2 { margin-top: 0; padding-right: 35px; }
+  .forgeRules dl { display: flex; gap: 20px; justify-content: space-between; }
+  .forgeRules dl > div { flex-direction: column; gap: 9px; padding: 8px 0; }
+}
+@media (max-width: 600px) {
+  .pageHeading { align-items: flex-start; flex-direction: column; gap: 17px; margin-bottom: 21px; }
+  .pageHeading h1 { font-size: 36px; }
+  .pageHeading p { font-size: 12px; }
+  .wallet { padding: 12px 17px; gap: 12px; width: 100%; }
+  .wallet div { display: flex; justify-content: space-between; align-items: center; flex: 1; }
+  .wallet strong { font-size: 24px; }
+  .nav { gap: 3px; margin-bottom: 20px; }
+  .nav a { font-size: 10px; padding: 10px 8px; gap: 6px; flex: 1; white-space: nowrap; }
+  .nav svg { width: 14px; flex-shrink: 0; }
+  .eventBanner { grid-template-columns: 1fr; padding: 25px 22px; gap: 25px; }
+  .eventSeal { justify-self: start; padding-left: 5px; }
+  .eventSeal .coinSeal { width: 101px; }
+  .eventSeal .coinSeal > span { inset: 15px; }
+  .eventSeal .coinSeal b { font-size: 53px; }
+  .eventIntroduction h2 { font-size: 31px; }
+  .eventIntroduction > p { font-size: 11px; }
+  .eventDaily { grid-column: auto; flex-wrap: wrap; gap: 13px; }
+  .eventDaily p { margin-left: 0; width: 100%; }
+  .sectionHeading { align-items: flex-start; gap: 12px; }
+  .sectionHeading h2 { font-size: 18px; }
+  .sectionHeading p { font-size: 11px; }
+  .sectionHeading .subtleButton { padding: 8px 10px; min-height: 36px; font-size: 10px; flex-shrink: 0; }
+  .task { grid-template-columns: 85px minmax(0, 1fr); gap: 15px; padding: 22px 0; }
+  .taskReward { gap: 9px; }
+  .taskReward .smallCoin { width: 25px; height: 25px; }
+  .taskReward strong { font-size: 21px; }
+  .taskCopy h3 { font-size: 13px; }
+  .taskCopy > p { font-size: 11px; }
+  .taskAction { grid-column: 2; justify-items: start; }
+  .taskAction > button { width: auto; min-width: 140px; min-height: 37px; font-size: 11px; }
+  .taskAction > a { padding: 3px 0; }
+  .marketRow { grid-template-columns: 65px minmax(0, 1fr); }
+  .marketArt, .marketArt :global(.cosmetic-art) { width: 65px; height: 65px; }
+  .marketArt :global(.mythic-art) { width: 60px; height: 60px; }
+  .marketPrice { grid-column: 2; display: flex; justify-content: space-between; width: 100%; }
+  .marketPrice strong { font-size: 16px; }
+  .marketPrice strong > span { font-size: 9px; }
+  .sellPanel { padding: 22px 18px; }
+  .forgeWorkbench { padding: 19px 14px; }
+  .forgeSlots { gap: 4px; }
+  .forgeSlot, .emptySlot { height: 90px; border-radius: 4px; }
+  .forgeSlot :global(.cosmetic-art) { height: 54px; }
+  .forgeSlot :global(.club-legendary-frame) { height: 49px; width: 49px; }
+  .forgeSlot > span { font-size: 7px; }
+  .selectedHeader { font-size: 10px; }
+  .catalystHeading label { font-size: 11px; }
+  .catalystScale { font-size: 9px; }
+  .catalystScale button { font-size: 9px; }
+  .forgeChance { padding: 20px 11px; }
+  .forgeChance > div { font-size: 9px; gap: 5px; }
+  .confirmation { padding: 16px; }
+  .confirmation > div { flex-direction: column; }
+  .confirmation > div > button { width: 100%; }
+  .forgeRules { padding: 22px 18px; }
+  .forgeRules h2 { font-size: 26px; }
+  .forgeRules dl { gap: 12px; }
+  .forgeRules dt { font-size: 10px; }
+  .forgeInventory .sectionHeading { flex-direction: column; }
+  .inventoryGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .inventoryItem { grid-template-rows: 110px auto auto; }
+  .inventoryItem > div, .inventoryItem :global(.cosmetic-art) { height: 110px; }
+  .inventoryItem > span { font-size: 10px; margin: 12px 10px 5px; }
+  .inventoryItem > small { font-size: 9px; padding-inline: 10px; }
+  .outcomeArt, .outcomeArt :global(.cosmetic-art) { height: 250px; }
+  .outcomeArt :global(.mythic-art) { height: 235px; width: 235px; }
+  .outcomeArt :global(.mythic-title-art) { width: 100%; max-width: 330px; }
+  .outcomeActions { flex-direction: column; width: 100%; }
+  .history article { gap: 10px; flex-wrap: wrap; }
+  .history article > div { width: calc(100% - 85px); flex: auto; }
+  .history article > span:last-child { padding-left: 85px; font-size: 10px; }
+}
+@media (max-width: 360px) {
+  .nav a { padding: 10px 6px; font-size: 9px; gap: 4px; }
+  .nav svg { width: 12px; }
+  .eventIntroduction h2 { font-size: 28px; }
+  .eventBanner { padding: 23px 18px; }
+  .marketPrice { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .task { grid-template-columns: 77px minmax(0, 1fr); gap: 11px; }
+  .taskReward { gap: 7px; }
+  .taskReward strong { font-size: 19px; }
+  .forgeSlot, .emptySlot { height: 79px; }
+  .forgeSlot :global(.club-legendary-frame) { width: 42px; height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; }
+  .goldButton:active:not(:disabled), .subtleButton:active:not(:disabled), .loadMore:active:not(:disabled) { transform: none; }
+}

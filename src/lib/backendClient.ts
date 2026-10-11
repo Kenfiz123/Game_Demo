@@ -1,5 +1,7 @@
 import type { BackendCommand, BackendCommandReply, BackendErrorCode, BackendSnapshot } from "@/types/backend";
 import { validateArcadeSettings } from "@/data/economyConfig";
+import type { MarketListing, MarketPage, PlayerEconomy } from "@/types/economy";
+import { EVENT_TASKS, MAX_ACTIVE_LISTINGS, MAX_MARKET_PRICE, forgeChance, isRecordedForgeChance } from "@/data/eventEconomy";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 export class BackendRequestError extends Error {
@@ -66,7 +68,30 @@ function verifySnapshot(value: BackendSnapshot): BackendSnapshot {
     !value.state.equipped || typeof value.state.equipped !== "object" || Array.isArray(value.state.equipped)) {
     throw new BackendRequestError("Dữ liệu lưu trên server chưa hợp lệ. Hãy kết nối lại.", 502);
   }
+  if (value.economy !== undefined && !validEconomy(value.economy)) throw new BackendRequestError("Ví XCoin trên server chưa hợp lệ. Hãy kết nối lại.", 502);
   return value;
+}
+const validUuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+const validTimestamp = (value: unknown): value is string => typeof value === "string" && value.length <= 64 && Number.isFinite(Date.parse(value));
+const validId = (value: unknown): value is string => typeof value === "string" && value.length > 0 && value.length <= 256;
+function validEconomy(value: PlayerEconomy): boolean {
+  if (!value || typeof value !== "object" || !Number.isSafeInteger(value.coinBalance) || value.coinBalance < 0 ||
+    typeof value.day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value.day) || !validTimestamp(`${value.day}T00:00:00Z`) ||
+    new Date(`${value.day}T00:00:00Z`).toISOString().slice(0, 10) !== value.day || !value.progress ||
+    !Number.isSafeInteger(value.progress.chests) || value.progress.chests < 0 || !Number.isSafeInteger(value.progress.trades) || value.progress.trades < 0 ||
+    !Array.isArray(value.claimedEventIds) || !value.claimedEventIds.every(id => EVENT_TASKS.some(task => task.id === id)) ||
+    new Set(value.claimedEventIds).size !== value.claimedEventIds.length || !Array.isArray(value.forgeHistory) || value.forgeHistory.length > 100) return false;
+  return value.forgeHistory.every(record => !!record && typeof record === "object" && validId(record.id) && validTimestamp(record.timestamp) &&
+    Array.isArray(record.inputItemIds) && record.inputItemIds.length === 5 && record.inputItemIds.every(validId) &&
+    isRecordedForgeChance(record.coins, record.chance, record.ruleVersion) && typeof record.won === "boolean" && (record.won ? validId(record.rewardItemId) : record.rewardItemId === undefined));
+}
+export async function readMarketplace(cursor?: string, signal?: AbortSignal): Promise<MarketPage> {
+  const page = await backendRequest<MarketPage>(`/api/market${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`, { signal });
+  const validListing = (item: MarketListing) => !!item && validUuid(item.id) && validId(item.itemId) &&
+    validUuid(item.sellerId) && validTimestamp(item.createdAt) && Number.isSafeInteger(item.price) && item.price > 0 && item.price <= MAX_MARKET_PRICE;
+  if (!page || !Array.isArray(page.listings) || page.listings.length > 40 || !page.listings.every(validListing) || !Array.isArray(page.ownListings) || page.ownListings.length > MAX_ACTIVE_LISTINGS ||
+      !page.ownListings.every(validListing) || (page.nextCursor !== null && !validUuid(page.nextCursor))) throw new BackendRequestError("Chợ chưa trả về dữ liệu hợp lệ. Hãy tải lại.", 502);
+  return page;
 }
 export function reconcileBackendSnapshot(current: BackendSnapshot | null, next: BackendSnapshot, allowPlayerChange = false): BackendSnapshot {
   if (current && current.player.id !== next.player.id && !allowPlayerChange) throw new BackendRequestError("Phiên lưu dữ liệu đã thay đổi. Hãy kết nối lại trước khi chơi.", 409, "SESSION_CHANGED");
@@ -91,6 +116,11 @@ export async function sendBackendCommand(command: BackendCommand, playerId: stri
       (command.type === "trade-up" && (!("won" in reply.result) || typeof reply.result.won !== "boolean"))) {
       throw new BackendRequestError("Server chưa xác nhận đầy đủ kết quả. Hãy kết nối lại.", 502);
     }
+  }
+  if (command.type === "forge-mythic" && reply.result.success && (!("won" in reply.result) || typeof reply.result.won !== "boolean" ||
+      !("chance" in reply.result) || reply.result.chance !== forgeChance(command.coins) || !("id" in reply.result) || !validUuid(reply.result.id) ||
+      !("reward" in reply.result) || (reply.result.won ? (!reply.result.reward || !validId(reply.result.reward.item?.id) || reply.result.reward.item.rarity !== "MYTHIC") : reply.result.reward !== null))) {
+    throw new BackendRequestError("Server chưa xác nhận kết quả luyện Mythic. Hãy tải lại dữ liệu.", 502);
   }
   return reply;
 }

@@ -1,9 +1,13 @@
 "use client";
 import { createContext, useContext } from "react";
 import type { ArcadeSettings, EquipSlot, GameId, OpeningAttempt, TradeUpAttempt, XperienceState } from "@/types/gamification";
+import type { EconomyCommand, EconomyResult, PlayerEconomy } from "@/types/economy";
 export type BackendStatus = "connecting" | "ready" | "error";
 export interface XperienceContextValue {
   state: XperienceState; hydrated: boolean; isPlaying: boolean;
+  economy: PlayerEconomy;
+  playerId: string | null;
+  economyAction: (command: EconomyCommand) => Promise<EconomyResult>;
   backendStatus: BackendStatus;
   backendError: string | null;
   retryBackend: () => Promise<void>;

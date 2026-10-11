@@ -22,7 +22,7 @@ function countCopies(ids: readonly string[]) {
 const errors = {
   INVALID_SELECTION: "Chọn đúng 5 món cùng bậc để đổi.",
   INSUFFICIENT_ITEMS: "Kho đã thay đổi. Một số bản sao đã được sử dụng; hãy chọn lại.",
-  UNSUPPORTED_RARITY: "Legendary và Mythic không thể mang đi đổi.",
+  UNSUPPORTED_RARITY: "Bàn này chỉ nhận Common đến Epic. Đổi Legendary tại Lò Thần Thoại.",
   INVALID_SETTINGS: "Tỷ lệ chưa hợp lệ. Hãy kiểm tra trang Tỷ lệ.",
   BUSY: "Một lượt chơi khác đang xử lý. Hãy đợi hoàn tất.",
   NOT_READY: "Kho đang tải. Vui lòng thử lại.",
@@ -138,7 +138,7 @@ export function TradeUpGame() {
         <h2>Tỷ lệ thành công</h2><p>Áp dụng cho mỗi hợp đồng, không cộng dồn may mắn.</p>
         <div className="forge-rates">{TRADE_UP_PATHS.map(entry => <div key={entry.inputRarity} data-selected={rarity === entry.inputRarity}><span><i style={{ background: getRarityConfig(entry.targetRarity).color }}/>{getRarityConfig(entry.inputRarity).label}<ArrowRight size={12}/>{getRarityConfig(entry.targetRarity).label}</span><strong>{state.settings.tradeUpOdds[entry.inputRarity].toLocaleString("vi")}%</strong></div>)}</div>
         <Link className="odds-edit-link" href="/settings">Chỉnh tỷ lệ <Settings2 size={13}/></Link>
-        <div className="forge-rule-note"><ShieldCheck size={18}/><div><h3>Mythic chỉ có trong rương</h3><p>Không đổi Legendary hoặc Mythic. Có thể trộn CLB khác nhau, nhưng 5 món phải cùng bậc.</p><p>{cosmeticsByRarity(path.targetRarity).length} món trong bậc đích có cơ hội như nhau. Bản sao trùng vẫn được giữ.</p></div></div>
+        <div className="forge-rule-note"><ShieldCheck size={18}/><div><h3>Muốn luyện lên Mythic?</h3><p>Bàn này nhận Common đến Epic. Dùng 5 Legendary cùng XCoin tại <Link href="/forge">Lò Thần Thoại</Link>. Mythic không làm nguyên liệu.</p><p>{cosmeticsByRarity(path.targetRarity).length} món trong bậc đích có cơ hội như nhau. Bản sao trùng vẫn được giữ.</p></div></div>
         <Link className="forge-inventory-link" href="/inventory">Xem tất cả kho đồ <ArrowRight size={14}/></Link>
       </aside>
     </div>

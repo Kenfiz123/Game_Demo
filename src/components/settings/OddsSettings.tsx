@@ -99,7 +99,7 @@ function OddsEditor() {
         </div>)}</div>
         <div id="chest-total-status" className={"odds-total " + (chestValid ? "is-valid" : "is-invalid")} role="status" aria-live="polite"><span>Tổng bản nháp</span><strong>{Number.isFinite(total) ? percentage.format(total) + "%" : "Chưa đủ tỷ lệ"}</strong><small>{chestValid ? "Đủ 100% — có thể áp dụng" : chestFieldsValid ? "Điều chỉnh tổng về đúng 100%" : "Mỗi ô cần một số từ 0 đến 100"}</small></div>
         <div className="odds-test-presets"><span>Test nhanh · chỉ tạo bản nháp</span><div><button type="button" className="secondary-button" onClick={() => presetChest("COMMON")}>100% Common</button><button type="button" className="secondary-button" onClick={() => presetChest("MYTHIC")}>100% Mythic</button></div></div>
-        <p className="odds-section-note">Mythic chỉ mở bằng rương, luôn đi qua ô bí mật trong hoạt ảnh. Vòng quay không có Mythic và không dùng bảng tỷ lệ này.</p>
+        <p className="odds-section-note">Mythic trong rương luôn đi qua ô bí mật. Ngoài rương, có thể luyện 5 Legendary ở Lò Thần Thoại với tỷ lệ riêng. Vòng quay không có Mythic và không dùng bảng tỷ lệ này.</p>
       </section>
       <section className="odds-section panel" aria-labelledby="trade-odds-heading">
         <div className="odds-section-heading"><div><h2 id="trade-odds-heading">Tỷ lệ đổi đồ</h2><p>Mỗi hợp đồng dùng 5 đồ cùng bậc. Thành công nhận 1 đồ ngẫu nhiên của bậc kế tiếp; thất bại mất cả 5.</p></div></div>
@@ -107,7 +107,7 @@ function OddsEditor() {
           <label htmlFor={"trade-odds-" + path.inputRarity}>5 {getRarityConfig(path.inputRarity).label}<strong>1 {getRarityConfig(path.targetRarity).label}</strong><small>Đang áp dụng {percentage.format(state.settings.tradeUpOdds[path.inputRarity])}%</small></label>
           <div className="odds-number"><input id={"trade-odds-" + path.inputRarity} name={"trade-" + path.inputRarity} type="number" inputMode="decimal" min="0" max="100" step="0.0001" required value={draft.tradeUpOdds[path.inputRarity]} onChange={event => editTrade(path.inputRarity, event.target.value)} aria-invalid={!isValidField(draft.tradeUpOdds[path.inputRarity])} aria-describedby="trade-validation-status"/><span aria-hidden="true">%</span></div>
         </div>)}</div>
-        <p id="trade-validation-status" className={"odds-section-note" + (!tradeValid ? " odds-field-error" : "")}>{tradeValid ? "Mỗi bậc có xác suất riêng, không cần cộng thành 100%. Đổi đồ dừng ở Legendary; không thể đổi Legendary lên Mythic." : "Điền đủ 4 tỷ lệ; mỗi tỷ lệ là một số từ 0 đến 100%."}</p>
+        <p id="trade-validation-status" className={"odds-section-note" + (!tradeValid ? " odds-field-error" : "")}>{tradeValid ? "Mỗi bậc có xác suất riêng, không cần cộng thành 100%. Đổi đồ thường dừng ở Legendary. Muốn luyện Mythic, dùng 5 Legendary và XCoin ở Lò Thần Thoại, tỷ lệ riêng 1–25%." : "Điền đủ 4 tỷ lệ; mỗi tỷ lệ là một số từ 0 đến 100%."}</p>
         <div className="odds-test-presets"><span>Test kết quả · chỉ tạo bản nháp</span><div><button type="button" className="secondary-button" onClick={() => presetTrade(100)}>Tất cả 100%</button><button type="button" className="secondary-button" onClick={() => presetTrade(0)}>Tất cả 0%</button></div></div>
       </section>
     </div>

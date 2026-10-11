@@ -12,6 +12,7 @@ import { XperienceContext, type XperienceContextValue } from "../src/hooks/useXp
 import { CHEST_RARITIES } from "../src/data/chestConfig";
 import { COSMETICS, cosmeticsByRarity, getCosmeticById } from "../src/data/cosmetics";
 import { createDemoState } from "../src/lib/storage";
+import { emptyEconomy } from "../src/data/eventEconomy";
 import type { CosmeticItem, EquipSlot, OpeningHistoryRecord, TradeUpHistoryRecord, XperienceState } from "../src/types/gamification";
 
 // tsx uses the classic JSX runtime for imported TSX under this repo's jsx: preserve.
@@ -25,6 +26,7 @@ const articleCount = (html: string) => Array.from(html.matchAll(/<article\b[^>]*
 function fixture(state: XperienceState = createDemoState()) {
   let settingsWrites = 0;
   const context: XperienceContextValue = {
+    economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state, hydrated: true, isPlaying: false,
     backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,
     canImportLegacy: false, legacyAvailable: false, importLegacy: async () => false,
@@ -128,7 +130,7 @@ test("default settings render ten labeled native percentage fields and the actua
     assert.equal(fields.find(field => field.id === "trade-odds-" + rarity)?.value, String(value));
   }
   const text = visibleText(html);
-  for (const label of ["100% Common", "100% Mythic", "Tất cả 100%", "Tất cả 0%", "Mythic chỉ mở bằng rương"]) assert.ok(text.includes(label), label);
+  for (const label of ["100% Common", "100% Mythic", "Tất cả 100%", "Tất cả 0%", "luyện 5 Legendary ở Lò Thần Thoại"]) assert.ok(text.includes(label), label);
   assert.equal(harness.writes(), 0, "Rendering or showing presets must not write settings");
 });
 

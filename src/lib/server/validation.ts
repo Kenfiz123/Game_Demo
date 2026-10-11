@@ -1,5 +1,7 @@
 import { copyArcadeSettings, validateArcadeSettings } from "../../data/economyConfig";
 import type { BackendCommand } from "../../types/backend";
+import { EVENT_TASKS, FORGE_COIN_STEP, FORGE_MIN_COINS, FORGE_MAX_COINS, MAX_MARKET_PRICE } from "../../data/eventEconomy";
+import type { EventId } from "../../types/economy";
 
 export class CommandValidationError extends Error {
   readonly code = "INVALID_REQUEST";
@@ -33,6 +35,28 @@ export function validateCommand(value: unknown): BackendCommand {
           value.itemIds.length === 5 && value.itemIds.every(isItemId)) {
         return { type: "trade-up", itemIds: [...value.itemIds] };
       }
+      break;
+    case "claim-event":
+      if (exactKeys(value, ["type", "eventId"]) && EVENT_TASKS.some(task => task.id === value.eventId)) {
+        return { type: "claim-event", eventId: value.eventId as EventId };
+      }
+      break;
+    case "forge-mythic":
+      if (exactKeys(value, ["type", "itemIds", "coins"]) && Array.isArray(value.itemIds) &&
+          value.itemIds.length === 5 && value.itemIds.every(isItemId) && typeof value.coins === "number" &&
+          Number.isSafeInteger(value.coins) && value.coins >= FORGE_MIN_COINS && value.coins <= FORGE_MAX_COINS && value.coins % FORGE_COIN_STEP === 0) {
+        return { type: "forge-mythic", itemIds: [...value.itemIds], coins: value.coins };
+      }
+      break;
+    case "market-list":
+      if (exactKeys(value, ["type", "itemId", "price"]) && isItemId(value.itemId) && typeof value.price === "number" &&
+          Number.isSafeInteger(value.price) && value.price > 0 && value.price <= MAX_MARKET_PRICE) {
+        return { type: "market-list", itemId: value.itemId, price: value.price };
+      }
+      break;
+    case "market-buy":
+    case "market-cancel":
+      if (exactKeys(value, ["type", "listingId"]) && isUuid(value.listingId)) return { type: value.type, listingId: value.listingId.toLowerCase() };
       break;
     case "equip":
       if (exactKeys(value, ["type", "itemId"]) && isItemId(value.itemId)) return { type: "equip", itemId: value.itemId };

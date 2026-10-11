@@ -329,7 +329,7 @@ test("server store rejects malformed identities, commands, and unsupported datab
     expectCode(() => command(store, player, { type: "unequip", slot: "INVALID" } as unknown as BackendCommand), "INVALID_REQUEST");
     assert.deepEqual(store.getSnapshot(player.token), player.snapshot);
     h.close(store);
-    const database = new DatabaseSync(h.path); database.exec("PRAGMA user_version = 2"); database.close();
+    const database = new DatabaseSync(h.path); database.exec("PRAGMA user_version = 3"); database.close();
     expectCode(() => h.open(), "STORAGE_UNAVAILABLE");
   } finally { h.cleanup(); }
 });

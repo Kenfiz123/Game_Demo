@@ -1,6 +1,6 @@
 # FPTU Xperience · Reward Arcade
 
-Prototype Next.js / React cho ba mini game với vật phẩm CLB và EX trải nghiệm. Giao diện midnight titanium / champagne gold, artwork gốc được tạo bằng ImageGen.
+Prototype Next.js / React với rương, vòng quay, đổi đồ, luyện Mythic, sự kiện XCoin và chợ người chơi. Giao diện midnight titanium / champagne gold, artwork gốc được tạo bằng ImageGen.
 
 ## Chạy dự án
 
@@ -12,6 +12,10 @@ npm run dev
 ```
 
 Mở `http://localhost:3000`. Trang đầu chuyển đến `/chest`.
+
+### Sự kiện XCoin và chợ người chơi
+
+`/events`: tối đa 160 XCoin/ngày từ điểm danh, mở rương và đổi đồ. `/market`: đăng bán, mua hoặc thu hồi từng bản sao bằng XCoin. `/forge`: 5 Legendary → 1 Mythic ngẫu nhiên, bắt buộc dùng 10–250 XCoin, tỷ lệ 1–25% (mỗi 10 coin = 1 điểm %). Cả đồ và coin đều mất nếu luyện thất bại. Rương có âm thanh tổng hợp và nhạc ăn mừng sôi động riêng khi hiện Mythic, nút bật/tắt và âm lượng. XCoin không có giá trị tiền thật. [Luật và cách thử hai người chơi](docs/event-economy.md).
 
 ### Backend local · phiên ẩn danh
 
@@ -75,11 +79,11 @@ Mỗi lượt độc lập. RNG dùng `crypto.getRandomValues`. Trong mỗi rari
 | 5 Rare → 1 Epic | 30% |
 | 5 Epic → 1 Legendary | 5% |
 
-Thành công nhận ngẫu nhiên đều một trong 73 món ở bậc đích, không giới hạn theo CLB đầu vào; đồ trùng tiếp tục thêm bản sao. Thất bại mất cả 5 món, không nhận thưởng hoặc hoàn EX. Legendary/Mythic không thể mang đi đổi; Mythic chỉ mở từ rương. Lượt đổi được lưu cùng kho trước hoạt ảnh hợp nhất 1,4 giây. Keyboard và reduced motion hiển thị kết quả ngay.
+Thành công nhận ngẫu nhiên đều một trong 73 món ở bậc đích, không giới hạn theo CLB đầu vào; đồ trùng tiếp tục thêm bản sao. Thất bại mất cả 5 món, không nhận thưởng hoặc hoàn EX. Bàn đổi thường nhận Common–Epic; Legendary dùng ở Lò Thần Thoại riêng, Mythic không làm nguyên liệu. Lượt đổi được lưu cùng kho trước hoạt ảnh hợp nhất 1,4 giây. Keyboard và reduced motion hiển thị kết quả ngay.
 
 `/settings`: chỉnh riêng sáu tỷ lệ rương và bốn tỷ lệ đổi đồ. Mỗi ô 0–100%; tổng rương phải 100%. Nhập liệu và preset chỉ tạo bản nháp; chỉ áp dụng sau nút **Lưu tỷ lệ**. Có preset 100% Common/Mythic và đổi đồ 0%/100% để test. Tỷ lệ đã lưu xuất hiện ở rương, bảng đổi đồ và preview CLB; không thay đổi kết quả của lượt đã bắt đầu. Orbit luôn giữ 8 ô bằng nhau.
 
-Tham khảo có chọn lọc cơ chế công khai của CS: [tỷ lệ riêng theo độ hiếm và cơ hội đều trong cùng bậc](https://www.csgo.com.cn/news/gamebroad/20170911/206155.shtml), cùng khái niệm [tiêu thụ đầu vào để nhận bậc cao hơn](https://help.steampowered.com/en/faqs/view/0151-608B-BCAA-D7D5). Luật 5 món có thể mất trắng và Mythic chỉ từ rương là **luật riêng FPT**, không mô phỏng nguyên xi CS2. Không dùng asset Valve hoặc giao dịch tiền thật. Chi tiết nghiên cứu và quyết định thiết kế ở `design/trade-up-design.md`.
+Tham khảo có chọn lọc cơ chế công khai của CS: [tỷ lệ riêng theo độ hiếm và cơ hội đều trong cùng bậc](https://www.csgo.com.cn/news/gamebroad/20170911/206155.shtml), cùng khái niệm [tiêu thụ đầu vào để nhận bậc cao hơn](https://help.steampowered.com/en/faqs/view/0151-608B-BCAA-D7D5). Luật 5 món có thể mất trắng và XCoin luyện Mythic là **luật riêng FPT**, không mô phỏng nguyên xi CS2. Không dùng asset Valve hoặc giao dịch tiền thật. Nghiên cứu ban đầu ở `design/trade-up-design.md`; luật XCoin hiện tại ở `docs/event-economy.md`.
 
 ## Hiệu năng & trải nghiệm
 
@@ -110,7 +114,7 @@ Tham khảo có chọn lọc cơ chế công khai của CS: [tỷ lệ riêng th
 
 - 73 CLB trong 10 nhóm, lấy từ tài liệu Word người dùng cung cấp; tên, campus và liên kết nguồn lưu ở `src/data/clubs.json`.
 - Mỗi CLB đủ **6 bậc, 13 vật phẩm**: logo **Common**, huy hiệu **Uncommon**, avatar **Rare**, danh hiệu **Epic**, khung **Legendary** và **8 Mythic độc lập**. Tổng **949 vật phẩm** gồm 365 món bậc thấp và 584 Mythic. Đã bỏ 19 mẫu campus dùng biểu tượng chung khỏi catalog/rương/kho/lịch sử hiển thị; dữ liệu cũ vẫn được giữ trong bản lưu và backup, không xóa EX hoặc vật phẩm CLB đã sở hữu.
-- Tỷ lệ Mythic mặc định **0,2%**, chọn đều trong **584 Mythic**, nên một món cụ thể khoảng **0,000342%/rương**. Có thể thay đổi trong trang Tỷ lệ. Lucky Orbit và đổi đồ không cấp Mythic.
+- Tỷ lệ Mythic mặc định **0,2%**, chọn đều trong **584 Mythic**, nên một món cụ thể khoảng **0,000342%/rương**. Có thể thay đổi trong trang Tỷ lệ. Lucky Orbit và đổi đồ thường không cấp Mythic; Lò Thần Thoại và chợ là hai cách nhận thêm.
 - Nhận diện bậc thấp giữ một artwork ImageGen gốc cho mỗi CLB; avatar dùng khung tròn. Bộ Mythic mới có **73 crest độc quyền, một thiết kế riêng cho từng CLB**, khác cả artwork bậc thấp lẫn crest của CLB khác về chủ thể và hình dáng; không chỉ đổi màu hoặc tên trên cùng huy hiệu. Cả 8 món Mythic trong một CLB dùng crest riêng đó với 8 kiểu hoàn thiện / chuyển động tương ứng. Tên CLB và danh hiệu là chữ thật để giữ đúng dấu tiếng Việt.
 - `/clubs`: tìm kiếm không dấu / không gạch nối, lọc nhóm và campus, xem 5 món bậc thấp cùng 8 lựa chọn Mythic của mỗi CLB và xác suất mở từ rương. Có bản xem trước Mythic cùng nút tạm dừng, không cấp thưởng hoặc đổi RNG. Phân trang 12 CLB để tránh tải toàn bộ ảnh cùng lúc.
 - Mỗi Mythic có ID, loại trang bị và lớp hiệu ứng riêng. Trong reel, tất cả vẫn là một Vault niêm phong ẩn danh, không có artwork, tên CLB, loại vật phẩm hoặc ánh sáng báo trước thẻ thắng. Khi dừng mới hiện lễ mở **“Di sản đã thức tỉnh”** với đúng vật phẩm đã lưu vào kho.
