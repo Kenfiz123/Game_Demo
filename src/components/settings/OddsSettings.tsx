@@ -7,6 +7,7 @@ import { CHEST_RARITIES, getRarityConfig } from "@/data/chestConfig";
 import { cosmeticsByRarity } from "@/data/cosmetics";
 import { createDefaultSettings, TRADE_UP_PATHS, validateArcadeSettings, validateChestOdds, validateTradeUpOdds } from "@/data/economyConfig";
 import { useXperience } from "@/hooks/useXperience";
+import { CHEST_PITY_LIMIT } from "@/lib/chestPity";
 import type { ArcadeSettings, Rarity, TradeInputRarity } from "@/types/gamification";
 
 interface OddsDraft {
@@ -89,7 +90,7 @@ function OddsEditor() {
     <div className="odds-local-note"><LockKeyhole size={17}/><p>{demoToolsEnabled ? "Bảng test local: tỷ lệ được lưu riêng cho phiên ẩn danh trên server, không ảnh hưởng các phiên khác. Không áp dụng cho lượt chơi đã bắt đầu." : "Công cụ chỉnh tỷ lệ demo đã được tắt trên server. Tỷ lệ đang hiển thị là cấu hình của phiên này."}</p></div>
     <div className="odds-layout">
       <section className="odds-section panel" aria-labelledby="chest-odds-heading">
-        <div className="odds-section-heading"><div><h2 id="chest-odds-heading">Tỷ lệ mở rương</h2><p>Chọn độ hiếm trước, rồi chọn ngẫu nhiên một vật phẩm trong bậc đó.</p></div><SlidersHorizontal size={20}/></div>
+        <div className="odds-section-heading"><div><h2 id="chest-odds-heading">Tỷ lệ mở rương</h2><p>Tỷ lệ cơ bản: chọn độ hiếm trước, rồi chọn ngẫu nhiên một vật phẩm trong bậc đó.</p></div><SlidersHorizontal size={20}/></div>
         <div className="odds-active-distribution" aria-label="Phân bố độ hiếm đang áp dụng">{chestRows.map(row => <span key={row.rarity} title={`${row.label}: ${percentage.format(state.settings.chestOdds[row.rarity])}%`} style={{ width: state.settings.chestOdds[row.rarity] + "%", backgroundColor: row.color }}/>)}</div>
         <div className="odds-table-head"><span>Độ hiếm / số vật phẩm</span><span>Bản nháp</span><span>Đang áp dụng</span></div>
         <div className="odds-rows">{chestRows.map(row => <div className="odds-row" key={row.rarity} style={{ "--odds-rarity": row.color } as CSSProperties}>
@@ -99,6 +100,7 @@ function OddsEditor() {
         </div>)}</div>
         <div id="chest-total-status" className={"odds-total " + (chestValid ? "is-valid" : "is-invalid")} role="status" aria-live="polite"><span>Tổng bản nháp</span><strong>{Number.isFinite(total) ? percentage.format(total) + "%" : "Chưa đủ tỷ lệ"}</strong><small>{chestValid ? "Đủ 100% — có thể áp dụng" : chestFieldsValid ? "Điều chỉnh tổng về đúng 100%" : "Mỗi ô cần một số từ 0 đến 100"}</small></div>
         <div className="odds-test-presets"><span>Test nhanh · chỉ tạo bản nháp</span><div><button type="button" className="secondary-button" onClick={() => presetChest("COMMON")}>100% Common</button><button type="button" className="secondary-button" onClick={() => presetChest("MYTHIC")}>100% Mythic</button></div></div>
+        <p className="odds-section-note"><strong>Bảo chứng {CHEST_PITY_LIMIT} rương:</strong> sau {CHEST_PITY_LIMIT - 1} rương liên tiếp chưa nhận Mythic, rương thứ {CHEST_PITY_LIMIT} chắc chắn ra Mythic, kể cả khi tỷ lệ cơ bản Mythic là 0%. Trúng Mythic từ rương sẽ đếm lại từ 0. Đổi tỷ lệ không xóa tiến độ bảo chứng; vòng quay, luyện Mythic và giao dịch không cộng hoặc đặt lại bộ đếm.</p>
         <p className="odds-section-note">Mythic trong rương luôn đi qua ô bí mật. Ngoài rương, có thể luyện 5 Legendary ở Lò Thần Thoại với tỷ lệ riêng. Vòng quay không có Mythic và không dùng bảng tỷ lệ này.</p>
       </section>
       <section className="odds-section panel" aria-labelledby="trade-odds-heading">

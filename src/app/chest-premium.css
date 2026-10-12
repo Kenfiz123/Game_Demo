@@ -16,6 +16,18 @@
 .chest-journey li[aria-current="step"] { color: #ecd8b2; }
 .chest-journey li[aria-current="step"] > span:first-of-type, .chest-journey li.is-complete > span:first-of-type { color: #c7a76c; }
 .chest-journey li.is-complete { color: #a9a08e; }
+.chest-pity { width: min(calc(100% - 48px), 460px); align-self: center; margin: 20px auto 0; padding: 14px 16px; border: 1px solid #66563750; border-radius: 6px; background: #b99b5f05; }
+.chest-pity-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: #c4b08d; font-size: 11px; }
+.chest-pity-heading strong { color: #e9d6b2; font-size: 16px; font-weight: 550; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chest-pity-heading small { color: #8e8c82; font-size: 11px; font-weight: 400; }
+.chest-pity-progress { display: block; width: 100%; height: 3px; margin: 10px 0; border: 0; background: #34352e; accent-color: #bea374; }
+.chest-pity-progress::-webkit-progress-bar { background: #34352e; border-radius: 2px; }
+.chest-pity-progress::-webkit-progress-value { background: #bea374; border-radius: 2px; }
+.chest-pity-progress::-moz-progress-bar { background: #bea374; border-radius: 2px; }
+.chest-pity-status { margin: 0; color: #c8baa1; font-size: 10px; line-height: 1.6; }
+.chest-pity-rule { margin: 5px 0 0; color: #92999f; font-size: 9px; line-height: 1.65; }
+.chest-pity.is-guaranteed { border-color: #bd9a5e88; background: #b99b5f0d; }
+.chest-pity.is-guaranteed .chest-pity-status { color: #f1d29b; }
 .chest-panel .game-intro { margin: 27px 24px 0; }
 .chest-intro-eyebrow { color: #ae9975; font-size: 8px; letter-spacing: .19em; }
 .chest-panel .game-intro h2 { margin: 13px auto 11px; max-width: 530px; font-family: var(--font-royal); font-size: clamp(30px, 3.2vw, 43px); font-weight: 400; letter-spacing: -.035em; line-height: 1.06; text-wrap: balance; color: #f1e8d6; }
@@ -78,6 +90,7 @@
   .chest-experience .chest-panel { min-height: 430px; }
   .chest-panel .panel-topline { padding-top: 15px; padding-bottom: 12px; }
   .chest-panel .game-intro { margin-top: 16px; }
+  .chest-pity { margin-top: 13px; padding-block: 10px; }
   .chest-panel .chest-intro-eyebrow { display: none; }
   .chest-panel .game-intro h2 { font-size: 30px; margin-block: 5px 8px; }
   .chest-panel .game-intro h2 br { display: none; }
@@ -94,6 +107,7 @@
   .chest-experience .chest-panel { min-height: 540px; }
   .chest-panel .panel-topline { padding: 14px 17px 12px; font-size: 6px; letter-spacing: .08em; }
   .chest-journey { padding: 0 14px; }
+  .chest-pity { width: calc(100% - 32px); padding: 12px; margin-top: 16px; }
   .chest-journey li { gap: 5px; font-size: 8px; }
   .chest-journey li + li::before { width: 13px; margin-right: 8px; margin-left: 4px; }
   .chest-panel .game-intro { margin: 14px 18px 0; }

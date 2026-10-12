@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, ArrowDownWideNarrow, RotateCcw, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { COSMETICS, getCosmeticById } from "@/data/cosmetics";
@@ -8,6 +9,9 @@ import { CosmeticCard } from "./CosmeticCard";
 import { EquippedProfile } from "./EquippedProfile";
 import { useXperience } from "@/hooks/useXperience";
 import type { CosmeticItem, CosmeticType, EquipSlot, Rarity } from "@/types/gamification";
+import type { ItemCopy } from "@/types/collector";
+
+const ItemPassportDialog = dynamic(() => import("@/components/collector/ItemPassportDialog").then(module => module.ItemPassportDialog), { ssr: false });
 
 type TypeFilter = "ALL" | CosmeticType;
 type RarityFilter = "ALL" | Rarity;
@@ -53,7 +57,8 @@ export function shouldRestoreInventoryFocus(equippedOnly: boolean, focusedCard: 
 }
 
 export function InventoryGrid() {
-  const { state, hydrated } = useXperience();
+  const { state, hydrated, collector, playerId } = useXperience();
+  const [passport, setPassport] = useState<{ playerId: string; copyId: string } | null>(null);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
   const [rarityFilter, setRarityFilter] = useState<RarityFilter>("ALL");
   const [clubFilter, setClubFilter] = useState("");
@@ -79,6 +84,14 @@ export function InventoryGrid() {
     }
     return counts;
   }, [state.ownedItemIds]);
+  const copiesByItem = useMemo(() => {
+    const grouped = new Map<string, ItemCopy[]>();
+    for (const copy of collector.copies) {
+      const copies = grouped.get(copy.itemId);
+      if (copies) copies.push(copy); else grouped.set(copy.itemId, [copy]);
+    }
+    return grouped;
+  }, [collector.copies]);
   const ownedItems = useMemo(() => COSMETICS.filter(item => quantities.has(item.id)), [quantities]);
   const equippedIds = useMemo(() => new Set(ownedItems.filter(item => item.rarity === "MYTHIC" && state.equipped[item.type as EquipSlot] === item.id).map(item => item.id)), [ownedItems, state.equipped]);
   const totalCopies = Array.from(quantities.values()).reduce((sum, quantity) => sum + quantity, 0);
@@ -108,7 +121,7 @@ export function InventoryGrid() {
       <div className="inventory-duplicate-summary"><span>BẢN SAO DƯ</span><strong>{hydrated ? (totalCopies - ownedItems.length).toLocaleString("vi-VN") : "—"}<small> bản giữ lại</small></strong></div>
       <Link href="/trade-up" className="secondary-button">Mang đồ đi đổi <ArrowUpRight size={15}/></Link>
     </div>
-    <div className="inventory-collection-heading"><div><span className="inventory-eyebrow">BỘ SƯU TẬP CÁ NHÂN</span><h2>Từng món, một dấu ấn.</h2></div><Link href="/clubs">Khám phá bộ CLB <ArrowUpRight size={15}/></Link></div>
+    <div className="inventory-collection-heading"><div><span className="inventory-eyebrow">BỘ SƯU TẬP CÁ NHÂN</span><h2>Từng món, một dấu ấn.</h2></div><Link href="/profile">Phòng trưng bày Mythic <ArrowUpRight size={15}/></Link></div>
     <div className="inventory-search-row">
       <div className="inventory-search"><Search size={18} aria-hidden="true"/><label htmlFor="inventory-search">Tìm trong kho đồ</label><input id="inventory-search" type="search" value={query} placeholder="Tên vật phẩm, CLB hoặc di sản…" onChange={event => { setQuery(event.target.value); setPage(0); }}/>{query ? <button type="button" aria-label="Xóa từ khóa tìm kiếm" onClick={() => { setQuery(""); setPage(0); }}><X size={16}/></button> : null}</div>
       <label className="inventory-sort"><ArrowDownWideNarrow size={17} aria-hidden="true"/><span>Sắp xếp</span><select value={sort} onChange={event => { setSort(event.target.value as InventorySort); setPage(0); }}><option value="rarity">Độ hiếm cao nhất</option><option value="name">Tên A–Z</option><option value="quantity">Nhiều bản nhất</option></select></label>
@@ -134,12 +147,13 @@ export function InventoryGrid() {
         // A null destination is ambiguous: preserve intent until the effect can
         // test removal; real focus moves and outside pointer actions clear it.
         if (event.relatedTarget !== null) focusedCard.current = null;
-      }}>{visibleItems.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE).map(item => <CosmeticCard item={item} quantity={quantities.get(item.id)} key={item.id}/>)}</div>
+      }}>{visibleItems.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE).map(item => <CosmeticCard item={item} quantity={quantities.get(item.id)} copies={copiesByItem.get(item.id)} onInspect={copyId => { if (playerId) setPassport({ playerId, copyId }); }} key={item.id}/>)}</div>
       {pages > 1 && <nav className="club-pagination" aria-label="Phân trang kho đồ"><button className="secondary-button" disabled={current === 0} onClick={() => setPage(current - 1)}>Trang trước</button><span>{current + 1} / {pages}</span><button className="secondary-button" disabled={current + 1 >= pages} onClick={() => setPage(current + 1)}>Trang sau</button></nav>}
     </> : <div className="empty-state panel"><SearchX size={28}/><h2>{ownedItems.length ? "Không có đồ khớp bộ lọc" : "Kho đồ đang chờ khám phá"}</h2>
       <p>{ownedItems.length ? (query.trim() ? "Không tìm thấy “" + query.trim() + "” trong bộ lọc hiện tại. Thử tên CLB hoặc xóa bộ lọc." : "Thử CLB, độ hiếm hoặc loại vật phẩm khác.") : "Mở rương để nhận vật phẩm đầu tiên. Mọi bản sao đều được giữ lại trong kho."}</p>
       {ownedItems.length ? <button className="secondary-button" onClick={clear}>Xóa bộ lọc</button> : <Link className="primary-button" href="/chest">Mở rương</Link>}
     </div>}
     <p className="collection-footnote">Mỗi lần nhận đều giữ thêm một bản sao. Dùng đồ Common–Epic để Đổi đồ, 5 Legendary để luyện Mythic, hoặc rao bán bằng XCoin trên chợ. Mythic không làm nguyên liệu; trang bị đồ đã sở hữu để giữ hiệu ứng trên hồ sơ. Vật phẩm concept, không xác nhận tư cách thành viên.</p>
+    {passport && passport.playerId === playerId ? <ItemPassportDialog key={passport.copyId} copyId={passport.copyId} onClose={() => setPassport(null)}/> : null}
   </section>;
 }

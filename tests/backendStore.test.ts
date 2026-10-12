@@ -14,7 +14,9 @@ import { createDemoState } from "../src/lib/storage";
 import { XperienceStore } from "../src/lib/server/store";
 import { StoreError } from "../src/lib/server/storeError";
 import { parseLegacyImport } from "../src/lib/server/legacyImport";
+import { CollectorStore } from "../src/lib/server/collectorStore";
 import type { BackendCommand, BackendErrorCode } from "../src/types/backend";
+import type { XperienceState } from "../src/types/gamification";
 
 function expectCode(operation: () => unknown, code: BackendErrorCode) {
   assert.throws(operation, (error: unknown) => error instanceof StoreError && error.code === code);
@@ -39,6 +41,19 @@ function guest(store: XperienceStore) {
 }
 function command(store: XperienceStore, player: ReturnType<typeof guest>, value: BackendCommand, key = randomUUID()) {
   return store.execute(player.token, key, value, player.id);
+}
+/** Native-save fixtures must include the copy ledger, unlike a bounded browser import. */
+function seedNativeState(db: DatabaseSync, playerId: string, state: XperienceState): void {
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const collector = new CollectorStore(db, Date.now);
+    collector.reset(playerId);
+    for (const id of state.ownedItemIds) collector.mint(playerId, id, "LEGACY");
+    db.prepare("UPDATE players SET state_json = ? WHERE id = ?").run(JSON.stringify(state), playerId);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK"); throw error;
+  }
 }
 
 test("SQLite creates an anonymous player and persists EX, rewards, history, and settings across restart", () => {
@@ -329,7 +344,7 @@ test("server store rejects malformed identities, commands, and unsupported datab
     expectCode(() => command(store, player, { type: "unequip", slot: "INVALID" } as unknown as BackendCommand), "INVALID_REQUEST");
     assert.deepEqual(store.getSnapshot(player.token), player.snapshot);
     h.close(store);
-    const database = new DatabaseSync(h.path); database.exec("PRAGMA user_version = 3"); database.close();
+    const database = new DatabaseSync(h.path); database.exec("PRAGMA user_version = 999"); database.close();
     expectCode(() => h.open(), "STORAGE_UNAVAILABLE");
   } finally { h.cleanup(); }
 });
@@ -384,7 +399,7 @@ test("valid server saves beyond legacy byte/list caps retain archived IDs and fu
     state.history = Array.from({ length: 10_001 }, (_, index) => ({ ...record, id: `${record.id}-${index}` }));
     const raw = JSON.stringify(state); assert.ok(Buffer.byteLength(raw) > 1024 * 1024);
     const db = new DatabaseSync(h.path);
-    try { db.prepare("UPDATE players SET state_json = ? WHERE id = ?").run(raw, player.id); }
+    try { seedNativeState(db, player.id, state); }
     finally { db.close(); }
     const loaded = store.getSnapshot(player.token)!;
     assert.deepEqual(loaded.state, state);
@@ -402,7 +417,7 @@ test("catalog retirement preserves owned archived loadout references without ena
     state.ownedItemIds = ["retired-avatar-mythic", "retired-avatar-mythic"];
     state.equipped = { AVATAR: "retired-avatar-mythic" };
     const db = new DatabaseSync(h.path);
-    try { db.prepare("UPDATE players SET state_json = ? WHERE id = ?").run(JSON.stringify(state), player.id); }
+    try { seedNativeState(db, player.id, state); }
     finally { db.close(); }
     assert.deepEqual(store.getSnapshot(player.token)!.state, state);
     const granted = command(store, player, { type: "grant-test-ex" });

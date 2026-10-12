@@ -31,6 +31,8 @@ export interface TradeUpHistoryRecord {
 }
 export interface XperienceState {
   version: 2; exPoints: number;
+  /** Consecutive non-Mythic chest rewards, 0..199; Lucky Orbit is independent. */
+  chestPity: number;
   /** A multiset: repeated IDs represent independently consumable copies. */
   ownedItemIds: string[];
   history: OpeningHistoryRecord[];

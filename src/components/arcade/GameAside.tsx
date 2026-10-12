@@ -11,7 +11,7 @@ import type { GameId } from "@/types/gamification";
 export function GameAside({ game }: { game: GameId }) {
   const { state } = useXperience();
   const rates = CHEST_RARITIES.map(config => ({ ...config, probability: state.settings.chestOdds[config.rarity] }));
-  return <aside className="game-aside"><div><DropRates rates={game === "chest" ? rates : ORBIT_RARITIES}/>{game === "chest" && <Link className="odds-edit-link" href="/settings">Chỉnh tỷ lệ mở rương <ArrowUpRight size={13}/></Link>}</div>
+  return <aside className="game-aside"><div><DropRates game={game} rates={game === "chest" ? rates : ORBIT_RARITIES}/>{game === "chest" && <Link className="odds-edit-link" href="/settings">Chỉnh tỷ lệ mở rương <ArrowUpRight size={13}/></Link>}</div>
     <TestCredits/>
     <div className="reward-guarantees"><h3><ShieldCheck size={15}/> Trước khi khám phá</h3>
       <p><Check size={14}/> Luôn nhận 1 vật phẩm mỗi lượt</p><p><CopyPlus size={14}/> Đồ trùng vẫn được cất vào kho</p>

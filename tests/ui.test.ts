@@ -13,6 +13,7 @@ import { CHEST_RARITIES } from "../src/data/chestConfig";
 import { COSMETICS, cosmeticsByRarity, getCosmeticById } from "../src/data/cosmetics";
 import { createDemoState } from "../src/lib/storage";
 import { emptyEconomy } from "../src/data/eventEconomy";
+import { collectorFixtureDefaults } from "./collectorFixture";
 import type { CosmeticItem, EquipSlot, OpeningHistoryRecord, TradeUpHistoryRecord, XperienceState } from "../src/types/gamification";
 
 // tsx uses the classic JSX runtime for imported TSX under this repo's jsx: preserve.
@@ -26,6 +27,7 @@ const articleCount = (html: string) => Array.from(html.matchAll(/<article\b[^>]*
 function fixture(state: XperienceState = createDemoState()) {
   let settingsWrites = 0;
   const context: XperienceContextValue = {
+    ...collectorFixtureDefaults(),
     economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state, hydrated: true, isPlaying: false,
     backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,

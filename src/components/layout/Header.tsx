@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowUpFromLine, Coins, Flame, Gift, History, Menu, Orbit, Package, ShoppingBag, SlidersHorizontal, Sparkles, Trophy, UserRound, UsersRound, X } from "lucide-react";
+import { ArrowUpFromLine, BookOpen, Coins, Crown, Flame, Gift, History, KeyRound, Menu, Orbit, Package, ShoppingBag, SlidersHorizontal, Sparkles, Trophy, UserRound, UsersRound, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useXperience } from "@/hooks/useXperience";
@@ -15,16 +15,19 @@ export const navigation = [
   { label: "Chợ người chơi", shortLabel: "Chợ", href: "/market", icon: ShoppingBag },
   { label: "Bộ CLB", shortLabel: "CLB", href: "/clubs", icon: UsersRound },
   { label: "Kho đồ", shortLabel: "Kho đồ", href: "/inventory", icon: Package },
+  { label: "Hồ sơ Mythic", shortLabel: "Hồ sơ", href: "/profile", icon: Crown },
+  { label: "Sổ sưu tập CLB", shortLabel: "Sổ CLB", href: "/collection", icon: BookOpen },
+  { label: "Tài khoản", shortLabel: "Tài khoản", href: "/account", icon: KeyRound },
   { label: "Lịch sử", shortLabel: "Lịch sử", href: "/history", icon: History },
   { label: "Tỷ lệ", shortLabel: "Tỷ lệ", href: "/settings", icon: SlidersHorizontal },
 ];
 const quickNavigation = ["/chest", "/events", "/market", "/forge", "/inventory"].map(href => navigation.find(entry => entry.href === href)!);
 export function Header() {
-  const pathname = usePathname();
-  const { state, hydrated, economy } = useXperience();
+  const pathname = usePathname() ?? "";
+  const { state, hydrated, economy, collector } = useXperience();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const currentPage = navigation.find(entry => entry.href === pathname)?.label ?? "Không gian trải nghiệm";
+  const currentPage = navigation.find(entry => entry.href === pathname)?.label ?? (pathname.startsWith("/profile/") ? "Hồ sơ nhà sưu tầm" : "Không gian trải nghiệm");
   useEffect(() => {
     if (!menuOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -53,7 +56,7 @@ export function Header() {
         <div className="ex-pill" aria-label={hydrated ? state.exPoints.toLocaleString("vi-VN") + " EX" : "Đang tải điểm EX"}>
           <span className="ex-symbol">EX</span><strong>{hydrated ? state.exPoints.toLocaleString("vi-VN") : "—"}</strong>
         </div>
-        <Link href="/inventory" className="profile-button header-equipped-profile" aria-label="Xem hồ sơ và trang bị"><span className={"avatar" + (equippedAvatar ? " header-equipped-avatar" : "")}>{equippedAvatar ? <CosmeticArt item={equippedAvatar} compact animated/> : <UserRound size={17}/>}</span><span>Student<small className={equippedTitle ? "header-equipped-title" : ""} title={equippedTitle?.name}>{equippedTitle ? <><span className="header-title-effects" aria-hidden="true"><CosmeticArt item={equippedTitle} compact animated/></span><span>{equippedTitle.name}</span></> : "FPT University"}</small></span></Link>
+        <Link href="/profile" className="profile-button header-equipped-profile" aria-label="Xem hồ sơ và trang bị"><span className={"avatar" + (equippedAvatar ? " header-equipped-avatar" : "")}>{equippedAvatar ? <CosmeticArt item={equippedAvatar} compact animated/> : <UserRound size={17}/>}</span><span>{collector.profile.displayName}<small className={equippedTitle ? "header-equipped-title" : ""} title={equippedTitle?.name}>{equippedTitle ? <><span className="header-title-effects" aria-hidden="true"><CosmeticArt item={equippedTitle} compact animated/></span><span>{equippedTitle.name}</span></> : "FPT University"}</small></span></Link>
         <button ref={menuButton} className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label={menuOpen ? "Đóng điều hướng" : "Mở điều hướng"}>{menuOpen ? <X /> : <Menu />}</button>
       </div>
     </header>

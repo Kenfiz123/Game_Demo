@@ -2,6 +2,9 @@ import type { BackendCommand, BackendCommandReply, BackendErrorCode, BackendSnap
 import { validateArcadeSettings } from "@/data/economyConfig";
 import type { MarketListing, MarketPage, PlayerEconomy } from "@/types/economy";
 import { EVENT_TASKS, MAX_ACTIVE_LISTINGS, MAX_MARKET_PRICE, forgeChance, isRecordedForgeChance } from "@/data/eventEconomy";
+import type { AccountAction, AccountIdentity, CollectorSnapshot, ItemCopy, ItemPassport, PublicCollectorProfile } from "@/types/collector";
+import { validCollectorProfile, validDisplayName, validUsername } from "@/lib/collectorValidation";
+import { getChestPity, isValidChestPity } from "@/lib/chestPity";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 export class BackendRequestError extends Error {
@@ -18,6 +21,7 @@ interface RequestOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
+  retry?: boolean;
 }
 const abortError = () => new DOMException("Request aborted", "AbortError");
 
@@ -27,7 +31,8 @@ export async function backendRequest<T>(path: string, options: RequestOptions = 
   const body = options.body === undefined ? undefined : JSON.stringify(options.body);
   const headers = { ...(method === "POST" ? { "Content-Type": "application/json" } : {}), ...options.headers };
   const fetchImpl = options.fetchImpl ?? fetch;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  const attempts = options.retry === false ? 1 : 2;
+  for (let attempt = 0; attempt < attempts; attempt++) {
     if (options.signal?.aborted) throw abortError();
     const controller = new AbortController();
     const abort = () => controller.abort();
@@ -43,7 +48,7 @@ export async function backendRequest<T>(path: string, options: RequestOptions = 
         const code = error && typeof error === "object" && "code" in error && typeof error.code === "string" ? error.code as BackendErrorCode : undefined;
         const message = error && typeof error === "object" && "message" in error && typeof error.message === "string" && error.message.length <= 500
           ? error.message : "Không thể kết nối bộ lưu dữ liệu. Hãy thử kết nối lại.";
-        if (response.status === 503 && attempt === 0) continue;
+        if (response.status === 503 && attempt === 0 && attempts > 1) continue;
         throw new BackendRequestError(message, response.status, code);
       }
       if (value === null) throw new BackendRequestError("Server trả về dữ liệu không hợp lệ.", 502);
@@ -51,7 +56,7 @@ export async function backendRequest<T>(path: string, options: RequestOptions = 
     } catch (error) {
       if (options.signal?.aborted) throw abortError();
       if (error instanceof BackendRequestError) throw error;
-      if (attempt === 1) throw new BackendRequestError("Mất kết nối với backend. Kết quả đã lưu (nếu có) sẽ được tải lại khi kết nối lại.");
+      if (attempt === attempts - 1) throw new BackendRequestError("Mất kết nối với backend. Kết quả đã lưu (nếu có) sẽ được tải lại khi kết nối lại.");
     } finally {
       clearTimeout(timeout);
       options.signal?.removeEventListener("abort", abort);
@@ -63,17 +68,63 @@ function verifySnapshot(value: BackendSnapshot): BackendSnapshot {
   if (!value || typeof value !== "object" || !value.player || typeof value.player.id !== "string" || typeof value.player.createdAt !== "string" ||
     !Number.isSafeInteger(value.revision) || value.revision < 0 || typeof value.demoToolsEnabled !== "boolean" || typeof value.canImportLegacy !== "boolean" ||
     !value.state || value.state.version !== 2 || !Number.isSafeInteger(value.state.exPoints) || value.state.exPoints < 0 ||
+    ("chestPity" in value.state && !isValidChestPity(value.state.chestPity)) ||
     !Array.isArray(value.state.ownedItemIds) || !value.state.ownedItemIds.every(id => typeof id === "string") ||
     !Array.isArray(value.state.history) || !Array.isArray(value.state.tradeHistory) || !validateArcadeSettings(value.state.settings) ||
     !value.state.equipped || typeof value.state.equipped !== "object" || Array.isArray(value.state.equipped)) {
     throw new BackendRequestError("Dữ liệu lưu trên server chưa hợp lệ. Hãy kết nối lại.", 502);
   }
   if (value.economy !== undefined && !validEconomy(value.economy)) throw new BackendRequestError("Ví XCoin trên server chưa hợp lệ. Hãy kết nối lại.", 502);
-  return value;
+  if (value.account !== undefined && value.account !== null && !validAccount(value.account)) throw new BackendRequestError("Tài khoản trên server chưa hợp lệ. Hãy kết nối lại.", 502);
+  if (value.collector !== undefined && !validCollector(value.collector, value.state.ownedItemIds)) throw new BackendRequestError("Dấu ấn vật phẩm chưa hợp lệ. Hãy kết nối lại.", 502);
+  // Older servers/saves have no counter; never replace the rest of their progress.
+  return isValidChestPity(value.state.chestPity) ? value : { ...value, state: { ...value.state, chestPity: getChestPity(value.state) } };
 }
 const validUuid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 const validTimestamp = (value: unknown): value is string => typeof value === "string" && value.length <= 64 && Number.isFinite(Date.parse(value));
 const validId = (value: unknown): value is string => typeof value === "string" && value.length > 0 && value.length <= 256;
+function validAccount(value: AccountIdentity): boolean {
+  return !!value && validUsername(value.username) && validDisplayName(value.displayName) && validTimestamp(value.createdAt);
+}
+function validCopy(value: ItemCopy): boolean {
+  return !!value && validUuid(value.id) && validId(value.itemId) && validId(value.serial) &&
+    ["CHEST", "ORBIT", "TRADE_UP", "FORGE", "LEGACY", "IMPORT"].includes(value.origin) &&
+    (value.mintedAt === null || validTimestamp(value.mintedAt)) && validTimestamp(value.recordedAt) && validTimestamp(value.acquiredAt) &&
+    (value.originalOwnerName === null || validDisplayName(value.originalOwnerName)) && Number.isSafeInteger(value.transferCount) && value.transferCount >= 0;
+}
+function validCollector(value: CollectorSnapshot, ownedIds: readonly string[]): boolean {
+  if (!value || !validCollectorProfile(value.profile) || !Array.isArray(value.copies) || !value.copies.every(validCopy) ||
+    !Array.isArray(value.discoveredItemIds) || !value.discoveredItemIds.every(validId) || new Set(value.discoveredItemIds).size !== value.discoveredItemIds.length ||
+    new Set(value.copies.map(copy => copy.id)).size !== value.copies.length || new Set(value.copies.map(copy => copy.serial)).size !== value.copies.length || value.copies.length !== ownedIds.length) return false;
+  const counts = new Map<string, number>();
+  for (const id of ownedIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+  for (const copy of value.copies) counts.set(copy.itemId, (counts.get(copy.itemId) ?? 0) - 1);
+  return [...counts.values()].every(count => count === 0);
+}
+export async function sendAccountAction(action: AccountAction, playerId: string, signal?: AbortSignal): Promise<BackendSnapshot> {
+  // Auth rotates cookies: never replay an uncertain request as a second login/logout.
+  return verifySnapshot(await backendRequest<BackendSnapshot>("/api/auth", {
+    method: "POST", body: action, signal, retry: false, timeoutMs: 15_000, headers: { "X-Xperience-Player": playerId },
+  }));
+}
+export async function readPublicProfile(username: string, signal?: AbortSignal): Promise<PublicCollectorProfile> {
+  const profile = await backendRequest<PublicCollectorProfile>(`/api/profiles/${encodeURIComponent(username)}`, { signal });
+  if (!profile || !validUsername(profile.username) || !validDisplayName(profile.displayName) || !validTimestamp(profile.joinedAt) ||
+    !validCollectorProfile({ ...profile, isPublic: true }) || !Array.isArray(profile.discoveredItemIds) || !profile.discoveredItemIds.every(validId) ||
+    !profile.equipped || typeof profile.equipped !== "object" || Array.isArray(profile.equipped) ||
+    !Object.entries(profile.equipped).every(([slot, id]) => ["AVATAR", "FRAME", "TITLE", "LOGO", "EFFECT"].includes(slot) && validId(id))) {
+    throw new BackendRequestError("Hồ sơ chưa trả về dữ liệu hợp lệ.", 502);
+  }
+  return profile;
+}
+export async function readItemPassport(copyId: string, signal?: AbortSignal): Promise<ItemPassport> {
+  const passport = await backendRequest<ItemPassport>(`/api/items/${encodeURIComponent(copyId)}`, { signal });
+  if (!passport || !validCopy(passport.copy) || passport.copy.id !== copyId || !Array.isArray(passport.trail) ||
+    !passport.trail.every(entry => !!entry && ["MINT", "TRANSFER", "LIST", "RETURN", "CONSUME"].includes(entry.kind) && validTimestamp(entry.timestamp) && (entry.ownerName === null || validDisplayName(entry.ownerName)))) {
+    throw new BackendRequestError("Dấu ấn vật phẩm chưa trả về dữ liệu hợp lệ.", 502);
+  }
+  return passport;
+}
 function validEconomy(value: PlayerEconomy): boolean {
   if (!value || typeof value !== "object" || !Number.isSafeInteger(value.coinBalance) || value.coinBalance < 0 ||
     typeof value.day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value.day) || !validTimestamp(`${value.day}T00:00:00Z`) ||
@@ -108,7 +159,7 @@ export async function sendBackendCommand(command: BackendCommand, playerId: stri
     method: "POST", body: command, signal,
     headers: { "Idempotency-Key": crypto.randomUUID(), "X-Xperience-Player": playerId },
   });
-  verifySnapshot(reply?.snapshot);
+  const confirmed = verifySnapshot(reply?.snapshot);
   if (!reply.result || typeof reply.result.success !== "boolean") throw new BackendRequestError("Server chưa xác nhận thao tác. Hãy kết nối lại.", 502);
   if (reply.result.success && (command.type === "play" || command.type === "trade-up")) {
     if (!("id" in reply.result) || typeof reply.result.id !== "string" || !("reward" in reply.result) ||
@@ -122,5 +173,5 @@ export async function sendBackendCommand(command: BackendCommand, playerId: stri
       !("reward" in reply.result) || (reply.result.won ? (!reply.result.reward || !validId(reply.result.reward.item?.id) || reply.result.reward.item.rarity !== "MYTHIC") : reply.result.reward !== null))) {
     throw new BackendRequestError("Server chưa xác nhận kết quả luyện Mythic. Hãy tải lại dữ liệu.", 502);
   }
-  return reply;
+  return { ...reply, snapshot: confirmed };
 }

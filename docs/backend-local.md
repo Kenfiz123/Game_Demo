@@ -16,12 +16,14 @@ Nguồn kỹ thuật: [Node 22.20 – node:sqlite / DatabaseSync](https://nodejs
 ## Dữ liệu và phiên
 
 - Mỗi phiên ẩn danh có player UUID riêng. Cookie HttpOnly / SameSite=Strict / Path=/ giữ token ngẫu nhiên trong 30 ngày; dùng Secure khi truy cập HTTPS. DB chỉ giữ hash token, không giữ token thô. Không gửi token trong JSON, URL hoặc localStorage.
-- Lưu state v2: EX, danh sách **từng bản sao** vật phẩm, lịch sử mở rương/vòng quay, lịch sử đổi đồ (kể cả thất bại), tỷ lệ và 5 ô trang bị. ID catalog / artwork không đổi.
-- SQLite schema version 2 có players, sessions, operations, player_economies và market_listings. Tự migrate v1 và giữ nguyên state v2, bổ sung ví XCoin riêng. Revision tăng khi thực sự thay đổi dữ liệu; mua bán tăng revision cả người mua lẫn người bán.
+- Lưu state v2: EX, danh sách **từng bản sao** vật phẩm, lịch sử mở rương/vòng quay, lịch sử đổi đồ (kể cả thất bại), tỷ lệ, pity rương và 5 ô trang bị. ID catalog / artwork không đổi.
+- SQLite **schema version 3** giữ players, sessions, operations, player_economies và market_listings; thêm accounts, account_attempts, collector_profiles, item_copies, item_trail, collector_discoveries. Tự migrate bổ sung từ v1/v2, giữ nguyên state v2, EX/XCoin, lịch sử, tỷ lệ, trang bị và các bản sao. Kho cũ/ký gửi được gắn serial riêng, nguồn LEGACY, thời điểm nhận gốc chưa biết để null; không dựng lại ngày mở hay người nhận đầu tiên. Revision tăng khi thực sự thay đổi dữ liệu game; mua bán tăng revision cả người mua lẫn người bán.
 - Server tạo kết quả, kiểm tra quyền sở hữu và trừ EX/đồ trong cùng transaction `BEGIN IMMEDIATE`. WAL / busy timeout hỗ trợ các kết nối local. Không giữ transaction trong suốt animation.
+- `state.chestPity` là số rương liên tiếp không ra Mythic (0–199). Khi đang 199, lượt mở rương hợp lệ kế tiếp ưu tiên bảo hiểm **100% Mythic** hơn tỷ lệ cơ bản/tùy chỉnh, rồi reset về 0. Mythic tự nhiên cũng reset ngay; lượt rương khác tăng 1. Orbit/forge/trade/market không tác động. Retry cùng Idempotency-Key không quay hoặc tăng pity lại. Save cũ thiếu field được suy ra từ lịch sử rương mới nhất, bỏ qua Orbit, chặn ở 199; đọc không ghi lại state/revision, mutation kế tiếp lưu counter. Field có mặt nhưng sai kiểu/phạm vi bị từ chối, không tự xóa kho. Không cần đổi schema SQLite.
 - Idempotency-Key theo player: cùng mã + cùng lệnh trả lại kết quả cũ với snapshot hiện tại; mã cũ + lệnh khác bị từ chối. Không được tự retry một lượt chơi mới bằng mã mới khi chưa biết lượt cũ đã lưu chưa.
 - Frontend chỉ giữ snapshot tạm trong bộ nhớ. Các tab nhận thông báo cần tải lại; refresh khi tab hiện lại / có focus. Không có polling mỗi frame. Lỗi API khóa thao tác; nút Kết nối lại tải trạng thái mới nhất.
-- Chưa có đăng nhập. Cùng trình duyệt/cookie đọc lại được sau refresh và restart server; xóa cookie, hết hạn, trình duyệt khác hoặc máy khác tạo player mới. Dữ liệu player cũ vẫn nằm trong DB nhưng chưa có luồng tự phục hồi.
+- `/account` có tên đăng nhập ASCII 3–24 ký tự không phân biệt hoa/thường và mật khẩu 12–128 ký tự. Đăng ký gắn tài khoản vào player hiện tại, giữ kho/ví/dấu ấn; đăng nhập chuyển sang player tài khoản, **không gộp kho khách** và cần xác nhận trên UI. Đăng xuất tạo khách mới. Đổi mật khẩu cần mật khẩu hiện tại, thu hồi mọi phiên tài khoản rồi cấp phiên mới cho người đang đổi.
+- Trình duyệt khác kết nối cùng máy chủ/DB có thể đăng nhập lại. Chưa có email/Google/FPT/MFA hoặc quên mật khẩu. Khách chưa đăng ký vẫn phụ thuộc cookie; mất cookie không xóa DB nhưng chưa có cách tự tìm lại khách cũ. [Hồ sơ, serial và sổ CLB](collector-account.md).
 
 ## Cấu hình
 
@@ -54,19 +56,26 @@ Chỉ nhập một lần, trước mutation đầu tiên. Reset không mở lạ
 
 ## API
 
-Tất cả response có `Cache-Control: private, no-store`. Mọi POST chỉ nhận JSON giới hạn 1 MiB và Origin khớp chính xác origin của URL request; cross-site bị từ chối. Không mở CORS. Lỗi chỉ trả code/message, không trả đường dẫn DB, SQL hay token.
+Tất cả response có `Cache-Control: private, no-store`. Mọi POST chỉ nhận JSON giới hạn tối đa 1 MiB (**auth: 4 KiB**) và Origin khớp chính xác origin của URL request; cross-site bị từ chối. Không mở CORS. Lỗi chỉ trả code/message cố định, không trả đường dẫn DB, SQL, mật khẩu hay token.
 
 | Route | Chức năng |
 | --- | --- |
 | `POST /api/session` body `{}` | Tạo/khôi phục phiên ẩn danh, trả snapshot; đặt cookie nếu mới |
 | `GET /api/state` | Snapshot của cookie hợp lệ; thiếu/hết phiên trả 401 |
+| `POST /api/auth` | Đăng ký/đăng nhập/đăng xuất/đổi mật khẩu; body đúng DTO, kiểm tra phiên dự kiến, đổi cookie và trả snapshot |
+| `GET /api/profiles/<username>` | DTO hồ sơ đã chủ động công khai; riêng tư/không tồn tại cùng trả 404 |
+| `GET /api/items/<copy-id>` | Dấu ấn bản sao, chỉ chủ hiện tại có cookie hợp lệ được đọc |
 | `GET /api/market?cursor=<UUID>` | Tin đang bán phân trang 40 tin và tối đa 20 tin riêng; cần cookie, cursor tùy chọn |
 | `POST /api/commands` | Lệnh đã xác thực phiên, có `Idempotency-Key` UUID và `X-Xperience-Player` UUID |
 | `GET /api/health` | Kiểm tra storage, chỉ trả trạng thái và loại storage |
 
-Các command: `play` (`game: chest|orbit`), `trade-up` (`itemIds`: đúng 5 ID), `equip` (`itemId`), `unequip` (`slot`), `settings` (`settings`), `grant-test-ex`, `reset-demo`, `import-legacy` (`raw`), `claim-event` (`eventId`), `forge-mythic` (`itemIds`, `coins`), `market-list` (`itemId`, `price`), `market-buy` / `market-cancel` (`listingId`). Không có API PUT state/số dư tùy ý. Các tool demo bị kiểm tra cả ở server, không chỉ ẩn nút UI. [Luật XCoin](event-economy.md).
+Các command: `play` (`game: chest|orbit`), `trade-up` (`itemIds`: đúng 5 ID), `equip` (`itemId`), `unequip` (`slot`), `settings` (`settings`), `grant-test-ex`, `reset-demo`, `import-legacy` (`raw`), `claim-event` (`eventId`), `forge-mythic` (`itemIds`, `coins`), `market-list` (`itemId`, `price`, `copyId` tùy chọn), `market-buy` / `market-cancel` (`listingId`), `profile-update` (`displayName`, `bio`, `isPublic`, `featuredItemIds`). Không có API PUT state/số dư tùy ý. Các tool demo bị kiểm tra cả ở server, không chỉ ẩn nút UI. [Luật XCoin](event-economy.md).
 
-Snapshot: player `{id, createdAt}`, state, economy (coinBalance, day, progress, claimedEventIds, forgeHistory), revision, `demoToolsEnabled`, `canImportLegacy`. Command trả `{snapshot,result}`. Cookie quyết định player; header public player UUID chỉ giúp phát hiện phiên bị thay đổi, không dùng để truy cập player khác.
+Snapshot: player `{id, createdAt}`, state, economy (coinBalance, day, progress, claimedEventIds, forgeHistory), revision, `demoToolsEnabled`, `canImportLegacy`, `account` (hoặc null), `collector` (profile, bản sao đang có, danh sách mẫu từng khám phá). Command trả `{snapshot,result}`. Cookie quyết định player; header public player UUID chỉ giúp phát hiện phiên bị thay đổi, không dùng để truy cập player khác.
+
+Auth DTO: `register` có username/password/displayName; `login` có username/password; `logout` chỉ có action; `password` có currentPassword/password. Client auth gửi `X-Xperience-Player`; đăng ký/đăng xuất/đổi mật khẩu cần phiên hiện tại. Login cũng kiểm tra player dự kiến khi gửi header; API cho phép login không có cookie/header để khôi phục quyền truy cập. Không tự retry auth khi response không rõ vì cookie có thể đã đổi. Credential được băm scrypt; giới hạn 5 lần thử/tên trong 15 phút, 30 auth không phải logout/phút/process và 2 đang xử lý. Cấu hình, vòng đời cookie và nguồn kỹ thuật ở [collector-account.md](collector-account.md#xác-thực-và-giới-hạn).
+
+Profile công khai chỉ trả tên, bio, ngày tham gia, Mythic nổi bật, trang bị và mẫu từng khám phá; không trả ví, bản sao, serial, player UUID hay lịch sử. Mỗi bản sao có serial ổn định xuyên giao dịch; đổi/luyện tiêu thụ bản hợp lệ cũ nhất trước. Tiến độ CLB là tập mẫu từng khám phá, không giảm khi bán/tiêu thụ và không tăng bởi đồ trùng; bộ hoàn chỉnh là huy hiệu hiển thị, không cấp coin/EX hoặc tăng tỷ lệ.
 
 Origin được đối chiếu với Host thực của request (hỗ trợ localhost / 127.0.0.1), không tin `X-Forwarded-Host` hoặc port forwarded. Bản này dành cho truy cập local trực tiếp; chưa cấu hình trusted reverse proxy / TLS termination. Nếu đưa qua proxy cần xác định rõ origin/protocol tin cậy trước khi triển khai.
 
@@ -76,11 +85,11 @@ Origin được đối chiếu với Host thực của request (hỗ trợ local
 2. Copy cả thư mục `data` sang một thư mục backup riêng. Nếu còn file `-wal` / `-shm`, giữ chúng cùng file `.sqlite`; không copy chỉ file chính khi DB đang chạy.
 3. Khởi động lại với đường dẫn DB cũ. Để phục hồi, dừng server, giữ một bản sao hiện tại rồi thay bằng bộ backup đã kiểm tra; không ghi đè DB đang mở.
 
-Backup DB không thay thế cookie trình duyệt: token phiên không được xuất ra. Chưa có backup tự động hoặc công cụ khôi phục tài khoản. Dữ liệu demo và lịch sử/idempotency tăng dần, chưa có retention/archiving tự động.
+Backup DB không xuất token phiên ra ngoài. Tài khoản đã đăng ký có thể đăng nhập lại bằng credential sau khi phục hồi đúng DB; khách chưa đăng ký vẫn cần cookie còn hợp lệ. Không có backup tự động, quên mật khẩu qua email hay công cụ khôi phục credential. Dữ liệu demo, serial/trail và lịch sử/idempotency tăng dần, chưa có retention/archiving tự động.
 
 ## Phạm vi an toàn
 
-Backend này dành cho local demo, chưa triển khai Internet. Mặc định công cụ test bật và phiên mới được 50.000 EX. Dù kết quả thường được tính ở server, người dùng demo vẫn có thể cộng EX/chỉnh tỷ lệ hoặc nhập bản save của họ. Chưa có tài khoản, phân quyền quản trị, xác minh hoạt động kiếm EX, quota/rate limit phân tán hoặc thu hồi phiên qua UI. Không mô tả bản này là chống gian lận/production-ready. Muốn public cần thiết kế những phần đó, HTTPS, backup/retention và ổ đĩa bền vững.
+Backend này dành cho local demo, chưa triển khai Internet. Mặc định công cụ test bật và phiên mới được 50.000 EX. Dù kết quả được tính ở server, người dùng demo vẫn có thể cộng EX/chỉnh tỷ lệ hoặc nhập bản save của họ. Đã có tài khoản local, rate limit cơ bản và thu hồi phiên khi đổi mật khẩu, nhưng chưa có quản trị viên, xác minh hoạt động kiếm EX, quota phân tán, MFA, quên mật khẩu hay dịch vụ email. HTTP local không mã hóa credential trên đường truyền. Không mô tả bản này là chống gian lận/production-ready. Muốn public cần thiết kế những phần đó, HTTPS, backup/retention và ổ đĩa bền vững.
 
 ## Kiểm chứng · 10/10/2026
 

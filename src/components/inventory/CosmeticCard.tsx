@@ -7,6 +7,7 @@ import type { CosmeticItem, EquipSlot } from "@/types/gamification";
 import { getClubById } from "@/data/clubs";
 import { getMythicVariant } from "@/data/mythicCatalog";
 import { useXperience } from "@/hooks/useXperience";
+import type { ItemCopy } from "@/types/collector";
 
 function MythicEquipControl({ item }: { item: CosmeticItem }) {
   const { state, hydrated, isPlaying, equipItem, unequipItem } = useXperience();
@@ -37,12 +38,24 @@ function MythicEquipControl({ item }: { item: CosmeticItem }) {
   return <div className="mythic-equip-control" data-equipped={equipped && owned ? "true" : "false"}>{equipped && owned ? <span className="mythic-equipped-indicator">Đang trang bị</span> : null}<button type="button" className="mythic-equip-button" aria-label={(equipped ? "Gỡ trang bị " : "Trang bị ") + item.name} aria-pressed={equipped} aria-disabled={unavailable || pending ? true : undefined} aria-busy={pending} disabled={unavailable} onClick={toggle}>{pending ? "Đang lưu…" : equipped ? "Gỡ trang bị" : "Trang bị"}</button><p role="status">{message}</p></div>;
 }
 
-export function CosmeticCard({ item, quantity }: { item: CosmeticItem; quantity?: number }) {
+function CopyPassportControl({ item, copies, onInspect }: { item: CosmeticItem; copies: readonly ItemCopy[]; onInspect: (copyId: string) => void }) {
+  const [selectedId, setSelectedId] = useState(copies[0]?.id ?? "");
+  const selected = copies.find(copy => copy.id === selectedId) ?? copies[0];
+  if (!selected) return null;
+  const selectId = `copy-${item.id}`;
+  return <div className="copy-passport-control">
+    {copies.length > 1 ? <><label htmlFor={selectId}>Chọn bản sao ({copies.length})</label><select id={selectId} value={selected.id} onChange={event => setSelectedId(event.target.value)}>{copies.map((copy, index) => <option key={copy.id} value={copy.id}>#{index + 1} · {copy.serial.slice(-8)}</option>)}</select></> : null}
+    <button type="button" className="copy-passport-button" aria-label={`Xem dấu ấn ${item.name}, serial ${selected.serial}`} onClick={() => onInspect(selected.id)}>Dấu ấn bản sao <span aria-hidden="true">↗</span></button>
+    <span className="copy-passport-serial" title={selected.serial}>Serial · {selected.serial.slice(-8)}</span>
+  </div>;
+}
+
+export function CosmeticCard({ item, quantity, copies, onInspect }: { item: CosmeticItem; quantity?: number; copies?: readonly ItemCopy[]; onInspect?: (copyId: string) => void }) {
   const club = item.clubId ? getClubById(item.clubId) : undefined;
   const edition = item.mythicVariant ? getMythicVariant(item.mythicVariant) : undefined;
   return <article className={"cosmetic-card" + (item.rarity === "MYTHIC" ? " cosmetic-card-mythic" : "")} data-inventory-item={quantity !== undefined ? item.id : undefined}>
     <CosmeticArt item={item} animated/>
     {quantity !== undefined && <span className="cosmetic-quantity" aria-label={quantity + " bản trong kho"}>×{quantity.toLocaleString("vi-VN")}</span>}
-    <div className="cosmetic-card-content"><RarityBadge rarity={item.rarity}/><h3>{item.name}</h3><p>{edition ? cosmeticTypeLabels[item.type] + " · " + edition.label : cosmeticTypeLabels[item.type]}</p>{item.heritage && <p className="cosmetic-heritage">Di sản {item.heritage}</p>}{club && <p className="cosmetic-club-label">{club.shortName} · {club.campus}</p>}{item.rarity === "MYTHIC" && quantity !== undefined && quantity > 0 ? <MythicEquipControl item={item}/> : null}</div>
+    <div className="cosmetic-card-content"><RarityBadge rarity={item.rarity}/><h3>{item.name}</h3><p>{edition ? cosmeticTypeLabels[item.type] + " · " + edition.label : cosmeticTypeLabels[item.type]}</p>{item.heritage && <p className="cosmetic-heritage">Di sản {item.heritage}</p>}{club && <p className="cosmetic-club-label">{club.shortName} · {club.campus}</p>}{item.rarity === "MYTHIC" && quantity !== undefined && quantity > 0 ? <MythicEquipControl item={item}/> : null}{quantity !== undefined && quantity > 0 && copies?.length && onInspect ? <CopyPassportControl item={item} copies={copies} onInspect={onInspect}/> : null}</div>
   </article>;
 }

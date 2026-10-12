@@ -452,7 +452,10 @@ test("unsupported or blocked Web Audio fails safely without breaking chest openi
 test("chest integration unlocks before the server request and reveals rarity sound only at result", () => {
   const chest = readFileSync(new URL("../src/components/chest/ChestOpening.tsx", import.meta.url), "utf8");
   const hook = readFileSync(new URL("../src/hooks/useChestAudio.ts", import.meta.url), "utf8");
-  assert.match(chest, /const openChest = \(\) => \{ audio\.unlock\(\); void game\.start\(\); \}/);
+  const handler = chest.slice(chest.indexOf("const openChest ="), chest.indexOf("const pityCount ="));
+  assert.ok(handler.includes("audio.unlock();"));
+  assert.ok(handler.includes("game.start()"));
+  assert.ok(handler.indexOf("audio.unlock();") < handler.indexOf("game.start()"), "audio unlock remains synchronous before the backend request");
   assert.match(chest, /onOpenAgain=\{openChest\}/);
   assert.match(chest, /aria-pressed=\{audio\.enabled\}/);
   assert.match(hook, /phase === "result" && rarity/);

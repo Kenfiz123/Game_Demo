@@ -8,6 +8,7 @@ import { XperienceContext, type XperienceContextValue } from "../src/hooks/useXp
 import { cosmeticsByRarity } from "../src/data/cosmetics";
 import { emptyEconomy, FORGE_RULE_VERSION } from "../src/data/eventEconomy";
 import { createDemoState } from "../src/lib/storage";
+import { collectorFixtureDefaults } from "./collectorFixture";
 
 Object.assign(globalThis, { React });
 // Node does not load Next's CSS modules. Keep this SSR fixture independent of the stylesheet.
@@ -31,6 +32,7 @@ function fixture(balance: number, hydrated = true) {
   state.ownedItemIds = Array(5).fill(cosmeticsByRarity("LEGENDARY")[0].id);
   let actions = 0;
   const context: XperienceContextValue = {
+    ...collectorFixtureDefaults(),
     state, economy: { ...emptyEconomy(0), coinBalance: balance }, hydrated, isPlaying: false,
     playerId: "forge-ui-test", backendStatus: "ready", backendError: null, demoToolsEnabled: true,
     retryBackend: async () => {}, canImportLegacy: false, legacyAvailable: false, importLegacy: async () => false,

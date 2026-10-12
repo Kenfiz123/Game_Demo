@@ -25,7 +25,7 @@ export interface MarketPage {
 export type EconomyCommand =
   | { type: "claim-event"; eventId: EventId }
   | { type: "forge-mythic"; itemIds: string[]; coins: number }
-  | { type: "market-list"; itemId: string; price: number }
+  | { type: "market-list"; itemId: string; price: number; copyId?: string }
   | { type: "market-buy"; listingId: string }
   | { type: "market-cancel"; listingId: string };
 export interface EconomyResult {

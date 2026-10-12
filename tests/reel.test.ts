@@ -13,6 +13,7 @@ import { MYTHIC_VARIANTS } from "../src/data/mythicCatalog";
 import { getClubMythics } from "../src/data/clubCosmetics";
 import { createDemoState } from "../src/lib/storage";
 import { emptyEconomy } from "../src/data/eventEconomy";
+import { collectorFixtureDefaults } from "./collectorFixture";
 import { REEL_WINNER_INDEX } from "../src/data/arcadeConfig";
 import type { ChestReward, CosmeticItem } from "../src/types/gamification";
 
@@ -24,6 +25,7 @@ function context(): XperienceContextValue {
   const state = createDemoState();
   state.settings.chestOdds = { COMMON: 0, UNCOMMON: 0, RARE: 0, EPIC: 0, LEGENDARY: 0, MYTHIC: 100 };
   return {
+    ...collectorFixtureDefaults(),
     economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state, hydrated: true, isPlaying: true,
     backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,

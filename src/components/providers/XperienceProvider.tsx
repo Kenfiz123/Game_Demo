@@ -2,15 +2,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { copyArcadeSettings, validateArcadeSettings } from "@/data/economyConfig";
 import { emptyEconomy } from "@/data/eventEconomy";
-import { BackendRequestError, bootstrapBackend, readBackend, reconcileBackendSnapshot, sendBackendCommand } from "@/lib/backendClient";
+import { BackendRequestError, bootstrapBackend, readBackend, reconcileBackendSnapshot, sendAccountAction, sendBackendCommand } from "@/lib/backendClient";
 import { createDemoState, parseStoredState, STORAGE_KEY } from "@/lib/storage";
 import { XperienceContext, type BackendStatus } from "@/hooks/useXperience";
 import type { BackendCommand, BackendCommandResult, BackendSnapshot } from "@/types/backend";
 import type { ArcadeSettings, EquipSlot, GameId, OpeningAttempt, TradeUpAttempt } from "@/types/gamification";
 import type { EconomyCommand, EconomyResult } from "@/types/economy";
+import type { AccountAction, CollectorProfile, CollectorSnapshot } from "@/types/collector";
+import { validCollectorProfile } from "@/lib/collectorValidation";
 
 const SYNC_CHANNEL = "fptu-xperience-backend-v1";
 const MAX_LEGACY_LENGTH = 512 * 1024;
+const EMPTY_COLLECTOR: CollectorSnapshot = { profile: { displayName: "Student", bio: "", isPublic: false, featuredItemIds: [] }, copies: [], discoveredItemIds: [] };
+const AUTH_MESSAGES: Partial<Record<import("@/types/backend").BackendErrorCode, string>> = {
+  ACCOUNT_EXISTS: "Tên tài khoản đã được sử dụng. Hãy chọn tên khác.",
+  INVALID_CREDENTIALS: "Tên tài khoản hoặc mật khẩu không đúng.",
+  INVALID_REQUEST: "Thông tin chưa hợp lệ. Kiểm tra tên tài khoản và mật khẩu.",
+  ACCOUNT_REQUIRED: "Hãy đăng nhập tài khoản trước khi thực hiện thao tác này.",
+  RATE_LIMITED: "Đã thử quá nhiều lần. Vui lòng chờ rồi thử lại.",
+  NO_SESSION: "Phiên đã hết hạn. Hãy tải lại dữ liệu rồi thử lại.",
+  SESSION_CHANGED: "Tài khoản ở tab khác đã thay đổi. Hãy tải lại dữ liệu.",
+};
 export function hasLegacyProgress(raw: string | null): boolean {
   if (!raw || raw.length > MAX_LEGACY_LENGTH) return false;
   try {
@@ -21,7 +33,7 @@ export function hasLegacyProgress(raw: string | null): boolean {
       !Number.isSafeInteger(candidate.exPoints) || (candidate.exPoints as number) < 0 || !Array.isArray(candidate.ownedItemIds) || !Array.isArray(candidate.history)) return false;
     const legacy = parseStoredState(raw), initial = createDemoState();
     return legacy.ownedItemIds.length > 0 || legacy.history.length > 0 || legacy.tradeHistory.length > 0 ||
-      legacy.exPoints !== initial.exPoints || Object.keys(legacy.equipped).length > 0 || JSON.stringify(legacy.settings) !== JSON.stringify(initial.settings);
+      legacy.exPoints !== initial.exPoints || legacy.chestPity > 0 || Object.keys(legacy.equipped).length > 0 || JSON.stringify(legacy.settings) !== JSON.stringify(initial.settings);
   } catch { return false; }
 }
 function readLegacySave(): string | null {
@@ -39,6 +51,7 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
   const [backendError, setBackendError] = useState<string | null>(null);
   const [legacyAvailable, setLegacyAvailable] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const snapshotRef = useRef<BackendSnapshot | null>(null);
   const statusRef = useRef<BackendStatus>("connecting");
   const activeOpening = useRef<string | symbol | null>(null);
@@ -222,15 +235,55 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
     // The local save remains untouched as a backup. Only this explicit action uploads it.
     return (await runMutation({ type: "import-legacy", raw }))?.success ?? false;
   }, [runMutation]);
+  const authAction = useCallback(async (action: AccountAction): Promise<boolean> => {
+    const current = snapshotRef.current;
+    if (!mounted.current || !current || statusRef.current !== "ready" || activeOpening.current) return false;
+    const token = Symbol("pending account action"), controller = new AbortController();
+    activeOpening.current = token;
+    if (connectionController.current) {
+      connectionController.current.abort(); connectionController.current = null; connectionPromise.current = null; syncQueued.current = true;
+    }
+    mutationController.current = controller;
+    setAuthError(null); setIsPlaying(true);
+    let reconnect = false;
+    try {
+      const next = await sendAccountAction(action, current.player.id, controller.signal);
+      if (!mounted.current || controller.signal.aborted || activeOpening.current !== token) return false;
+      applySnapshot(next, true);
+      setStatus("ready");
+      try { channel.current?.postMessage({ type: "invalidate" }); } catch { /* Focus refresh remains available. */ }
+      return true;
+    } catch (error) {
+      if (!mounted.current || controller.signal.aborted) return false;
+      const known = error instanceof BackendRequestError ? error.code : undefined;
+      setAuthError(known && AUTH_MESSAGES[known] ? AUTH_MESSAGES[known]! : "Chưa thể xác nhận thao tác tài khoản. Kết nối lại để kiểm tra trạng thái.");
+      reconnect = error instanceof BackendRequestError && (error.uncertain || known === "NO_SESSION" || known === "SESSION_CHANGED");
+      if (reconnect) setStatus("error", "Cần tải lại trạng thái sau thao tác tài khoản.");
+      return false;
+    } finally {
+      if (mutationController.current === controller) mutationController.current = null;
+      if (activeOpening.current === token) {
+        activeOpening.current = null;
+        if (mounted.current) setIsPlaying(false);
+        if (mounted.current && (reconnect || syncQueued.current)) { syncQueued.current = false; void retryBackend(); }
+      }
+    }
+  }, [applySnapshot, retryBackend, setStatus]);
+  const updateProfile = useCallback(async (profile: CollectorProfile): Promise<boolean> => {
+    if (!validCollectorProfile(profile)) return false;
+    return (await runMutation({ type: "profile-update", ...profile, featuredItemIds: [...profile.featuredItemIds] }))?.success ?? false;
+  }, [runMutation]);
   const state = snapshot?.state ?? emptyState;
   const hydrated = snapshot !== null && backendStatus === "ready";
   const demoToolsEnabled = snapshot?.demoToolsEnabled ?? false;
   const canImportLegacy = snapshot?.canImportLegacy ?? false;
   const economy = snapshot?.economy ?? initialEconomy;
   const playerId = snapshot?.player.id ?? null;
+  const account = snapshot?.account ?? null;
+  const collector = snapshot?.collector ?? EMPTY_COLLECTOR;
   const value = useMemo(() => ({ state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    economy, playerId, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
+    economy, playerId, account, collector, authAction, authError, updateProfile, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
   [state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    economy, playerId, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
+    economy, playerId, account, collector, authAction, authError, updateProfile, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
   return <XperienceContext.Provider value={value}>{children}</XperienceContext.Provider>;
 }

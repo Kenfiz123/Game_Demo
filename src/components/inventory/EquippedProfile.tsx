@@ -14,7 +14,7 @@ const slots: readonly { slot: EquipSlot; label: string }[] = [
 ];
 
 export function EquippedProfile() {
-  const { state, hydrated, isPlaying, unequipItem } = useXperience();
+  const { state, hydrated, isPlaying, unequipItem, collector } = useXperience();
   const [pending, setPending] = useState<EquipSlot | null>(null);
   const [message, setMessage] = useState("");
   const inFlight = useRef(false), mounted = useRef(true);
@@ -52,7 +52,7 @@ export function EquippedProfile() {
           <div className="equipped-profile-avatar">{equipped.AVATAR ? <CosmeticArt item={equipped.AVATAR} animated/> : <div className="equipped-profile-default-avatar" aria-hidden="true"><UserRound size={43}/></div>}</div>
           <span className="equipped-profile-portrait-label">{equipped.AVATAR ? "AVATAR MYTHIC" : "CHƯA TRANG BỊ AVATAR"}</span>
         </div>
-        <div className="equipped-profile-name"><span>Student</span><small>FPT University</small>
+        <div className="equipped-profile-name"><span>{collector.profile.displayName}</span><small>FPT University</small>
           {equipped.TITLE ? <div className="equipped-profile-title"><div className="equipped-profile-title-art"><CosmeticArt item={equipped.TITLE} animated/></div><h3 className="equipped-profile-title-name">{equipped.TITLE.name}</h3>{equipped.TITLE.heritage ? <p>Di sản {equipped.TITLE.heritage}</p> : null}</div> : <p className="equipped-profile-empty-title">Chưa trang bị danh hiệu Mythic</p>}
         </div>
       </div>

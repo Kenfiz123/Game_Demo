@@ -11,12 +11,15 @@ import { cosmeticsByRarity } from "../src/data/cosmetics";
 import { getClubById, normalizeClubSearch } from "../src/data/clubs";
 import { createDemoState } from "../src/lib/storage";
 import { emptyEconomy } from "../src/data/eventEconomy";
+import { collectorFixtureDefaults } from "./collectorFixture";
 import type { EquipSlot, XperienceState } from "../src/types/gamification";
+import type { ItemCopy } from "../src/types/collector";
 
 Object.assign(globalThis, { React });
 const base: InventoryFilters = { query: "", type: "ALL", rarity: "ALL", club: "", duplicatesOnly: false, equippedOnly: false, sort: "rarity" };
 function render(Component: ComponentType, state: XperienceState = createDemoState(), hydrated = true) {
   const context: XperienceContextValue = {
+    ...collectorFixtureDefaults(),
     economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state, hydrated, isPlaying: false,
     backendStatus: "ready", backendError: null, retryBackend: async () => {}, demoToolsEnabled: true,
@@ -35,6 +38,21 @@ test("inventory search matches Vietnamese names, club names and heritage without
     assert.ok(filterInventoryItems(items, quantities, new Set(), { ...base, query }).some(item => item.id === mythic.id), query);
   }
   assert.deepEqual(filterInventoryItems(items, quantities, new Set(), { ...base, query: "khong-the-co-trong-kho-123" }), []);
+});
+
+test("owned duplicate cards expose every serial while catalog previews have no private passport action", () => {
+  const item = cosmeticsByRarity("COMMON")[0];
+  const copies: ItemCopy[] = ["00000001", "00000002"].map((suffix, index) => ({
+    id: `00000000-0000-4000-8000-0000${suffix}`, itemId: item.id, serial: `XP-00000000${suffix}`, origin: "LEGACY",
+    mintedAt: null, recordedAt: "2026-10-11T10:00:00Z", acquiredAt: "2026-10-11T10:00:00Z", originalOwnerName: null, transferCount: index,
+  }));
+  const Card = () => createElement(CosmeticCard, { item, quantity: 2, copies, onInspect: () => {} });
+  const html = render(Card);
+  for (const copy of copies) assert.ok(html.includes(`value="${copy.id}"`));
+  assert.ok(html.includes("Chọn bản sao (2)"));
+  assert.ok(html.includes("Dấu ấn bản sao"));
+  const Preview = () => createElement(CosmeticCard, { item, copies, onInspect: () => {} });
+  assert.equal(render(Preview).includes("Dấu ấn bản sao"), false);
 });
 
 test("inventory filters compose, sort without mutation and never manufacture extra copies", () => {

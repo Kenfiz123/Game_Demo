@@ -25,7 +25,7 @@ export function Sidebar() {
     <div className="collection-progress">
       <span><BookOpen size={15}/> Bộ sưu tập</span><strong>{hydrated ? count : "—"} <small>/ {COSMETICS.length}</small></strong>
       <div className="collection-track"><i style={{ width: count / COSMETICS.length * 100 + "%" }}/></div>
-      <p>{hydrated ? copies.toLocaleString("vi-VN") : "—"} bản trong kho · {hydrated ? count : "—"} mẫu khác nhau.</p><Link href="/inventory">Xem kho đồ <ArrowUpRight size={14}/></Link>
+      <p>{hydrated ? copies.toLocaleString("vi-VN") : "—"} bản trong kho · {hydrated ? count : "—"} mẫu khác nhau.</p><Link href="/collection">Sổ sưu tập CLB <ArrowUpRight size={14}/></Link>
     </div>
     <div className="sidebar-footer"><ShieldCheck size={17}/><p>EX trải nghiệm.<br/>Dấu ấn của riêng bạn.</p></div>
     {demoToolsEnabled && <div className="demo-control">

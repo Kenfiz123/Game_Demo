@@ -1,0 +1,132 @@
+.collector-page { --collector-gold: #dfc79e; --collector-paper: #f0e8da; --collector-steel: #8595a7; max-width: 1320px; margin-inline: auto; }
+.collector-page-links { display: flex; justify-content: flex-end; gap: 22px; margin-bottom: 28px; font-size: 12px; color: var(--collector-steel); }
+.collector-page-links a:hover, .collector-section-heading a:hover { color: var(--collector-gold); }
+.collector-gallery { border-top: 1px solid #7e6a493f; }
+.collector-identity { display: grid; grid-template-columns: 1fr minmax(200px, 360px); gap: 30px; align-items: end; padding: 32px 0 8px; }
+.collector-gallery-label { color: var(--collector-gold); font-size: 12px; margin-bottom: 13px; }
+.collector-identity h1 { font-family: var(--font-royal); color: var(--collector-paper); font-size: clamp(35px, 4.5vw, 62px); font-weight: 500; line-height: 1.15; letter-spacing: -.025em; margin: 0 0 12px; overflow-wrap: anywhere; }
+.collector-handle { color: var(--collector-steel); font-size: 12px; }
+.collector-identity > p { color: #a6adba; font-size: 14px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 50ch; margin-bottom: 4px; }
+.collector-stage { min-height: 490px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; position: relative; isolation: isolate; padding: 16px 5%; border-bottom: 1px solid #7e6a493f; }
+.collector-stage::before { content: ""; position: absolute; z-index: -1; inset: 10% 2%; background: radial-gradient(ellipse at 32% 50%, #40455238, transparent 65%); pointer-events: none; }
+.collector-stage-art { width: min(100%, 430px); justify-self: center; }
+.collector-stage-art > .cosmetic-art { height: 390px; background: transparent; overflow: visible; }
+.collector-stage-art > .cosmetic-art::after { display: none; }
+.collector-stage-art .royal-mythic { width: min(100%, 340px); height: 340px; max-width: 100%; max-height: none; }
+.collector-stage-art .mythic-art.royal-mythic.variant-legacy { width: min(100%, 430px); height: 230px; }
+.collector-stage-caption { padding: 20px; min-width: 0; }
+.collector-stage-caption > span { color: #c1ad8e; font-size: 12px; line-height: 1.6; }
+.collector-stage-caption h2 { font-family: var(--font-royal); font-size: clamp(26px, 3vw, 42px); font-weight: 500; line-height: 1.25; color: var(--collector-paper); margin: 14px 0 12px; overflow-wrap: anywhere; }
+.collector-stage-caption > p { color: #ad8394; font-size: 12px; margin-bottom: 24px; }
+.collector-motion-button { display: inline-flex; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid #65708255; color: #b9c2cd; background: transparent; min-height: 40px; padding: 8px 0; font-size: 12px; }
+.collector-exhibits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 25px 0; }
+.collector-exhibits > button { display: grid; grid-template-columns: 80px minmax(0, 1fr); align-items: center; gap: 12px; text-align: left; border: 1px solid transparent; border-bottom-color: #303947; border-radius: 3px; background: transparent; color: #9daabb; padding: 6px; font-size: 12px; line-height: 1.5; transition: border-color 160ms ease, background-color 160ms ease; }
+.collector-exhibits > button[aria-pressed="true"] { border-color: #8f734960; background: #ab8a4609; color: #edd4aa; }
+.collector-exhibits > button > .cosmetic-art { width: 80px; height: 80px; background: transparent; pointer-events: none; }
+.collector-exhibits > button > .cosmetic-art::after { display: none; }
+.collector-exhibits > button > span { overflow-wrap: anywhere; }
+/* Tiny selectors use a crest thumbnail; the readable title remains in the adjacent label. */
+.collector-exhibits .royal-legacy-copy, .collector-public-equipment .royal-legacy-copy,
+.collector-exhibits .royal-title-line, .collector-public-equipment .royal-title-line { display: none; }
+.collector-exhibits .royal-legacy-plaque, .collector-public-equipment .royal-legacy-plaque { width: 100%; height: 100%; min-height: 0; padding: 8px; justify-content: center; }
+.collector-exhibits .royal-core.royal-legacy-crest, .collector-public-equipment .royal-core.royal-legacy-crest { flex-basis: 100%; width: 100%; max-width: 60px; }
+.collector-empty-stage { min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; padding: 40px 20px; border-block: 1px solid #7e6a492f; }
+.collector-empty-stage > svg { color: #c8ae7f; margin-bottom: 10px; }
+.collector-empty-stage h2, .collector-empty-stage h1 { font-family: var(--font-royal); font-size: 30px; font-weight: 500; margin-bottom: 0; }
+.collector-empty-stage > p { max-width: 54ch; font-size: 13px; line-height: 1.7; color: #97a6b7; margin-bottom: 5px; }
+.collector-loading { padding: 60px 20px; color: #b7a58b; text-align: center; font-size: 14px; }
+.collector-editor { margin-top: 36px; padding: 28px; border: 1px solid #303845; background: #121a25; border-radius: 10px; }
+.collector-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 22px; margin-bottom: 24px; }
+.collector-section-heading h2, .collector-public-record h2 { font-family: var(--font-royal); font-size: 28px; font-weight: 500; color: #ead9bb; margin: 0 0 8px; }
+.collector-section-heading p, .collector-section-heading > span { font-size: 12px; line-height: 1.7; color: #96a4b5; margin-bottom: 0; }
+.collector-section-heading a { color: #d7bc8e; font-size: 12px; white-space: nowrap; }
+.collector-form-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 24px; }
+.collector-editor label, .collector-ledger-filters label { display: flex; flex-direction: column; gap: 9px; color: #c5cdd7; font-size: 12px; min-width: 0; }
+.collector-editor input:not([type="checkbox"]), .collector-editor textarea, .collector-editor select, .collector-ledger-filters input, .collector-ledger-filters select { width: 100%; min-width: 0; min-height: 44px; padding: 11px 12px; background: #0c131d; border: 1px solid #364252; color: #e4e7eb; border-radius: 5px; font: inherit; }
+.collector-editor textarea { resize: vertical; line-height: 1.6; }
+.collector-editor label > small { color: #8996a7; text-align: right; font-size: 11px; }
+.collector-featured-fields { padding: 0; border: 0; margin: 26px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.collector-featured-fields legend { color: #ddc6a1; font-size: 14px; margin-bottom: 16px; }
+.collector-publish { border-top: 1px solid #2a3543; padding-top: 22px; }
+.collector-publish > label { flex-direction: row; align-items: flex-start; gap: 12px; cursor: pointer; }
+.collector-publish input[type="checkbox"] { flex: 0 0 auto; width: 17px; height: 17px; accent-color: #cfad71; margin: 0; }
+.collector-publish label small { display: block; max-width: 78ch; color: #91a0b1; line-height: 1.65; margin-top: 6px; }
+.collector-publish > p, .collector-publish > a { color: #b7a58b; font-size: 12px; margin-top: 16px; }
+.collector-publish > a { display: inline-flex; align-items: center; gap: 8px; }
+.collector-editor-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.collector-editor-actions > p { width: 100%; color: #b0c6ae; font-size: 12px; margin: 0; min-height: 18px; }
+.collector-editor-actions button, .collector-pagination button, .collector-club-cover { touch-action: manipulation; }
+.collector-public-record { padding: 38px 0; }
+.collector-public-equipment { padding: 28px 0; border-bottom: 1px solid #74634544; }
+.collector-public-equipment h2 { font-size: 16px; font-weight: 500; color: #d8c3a0; }
+.collector-public-equipment ul { display: flex; flex-wrap: wrap; gap: 20px; list-style: none; padding: 0; margin: 0; }
+.collector-public-equipment li { display: flex; align-items: center; gap: 10px; width: min(100%, 230px); font-size: 12px; line-height: 1.6; color: #aebccb; }
+.collector-public-equipment li > .cosmetic-art { width: 60px; height: 60px; flex: 0 0 auto; background: transparent; }
+.collector-public-equipment li > .cosmetic-art::after { display: none; }
+.collector-public-record p { font-size: 14px; color: #a5b1c0; line-height: 1.7; }
+.collector-public-record > small, .collector-note { color: #8999ad; font-size: 12px; line-height: 1.7; max-width: 90ch; }
+.collector-public-record ul { display: flex; flex-wrap: wrap; list-style: none; gap: 12px; padding: 0; margin: 25px 0; }
+.collector-public-record li { border: 1px solid #62563f; padding: 12px 15px; color: #dcc298; font-size: 12px; border-radius: 5px; }
+.collector-ledger-heading { display: flex; justify-content: space-between; align-items: end; gap: 25px; padding-bottom: 26px; }
+.collector-ledger-heading svg { color: #bda47c; margin-bottom: 17px; }
+.collector-ledger-heading h1 { font-family: var(--font-royal); font-size: clamp(32px, 4vw, 52px); font-weight: 500; color: #f0e8da; margin-bottom: 14px; line-height: 1.2; }
+.collector-ledger-heading p { color: #9eacbd; font-size: 14px; max-width: 65ch; line-height: 1.75; margin-bottom: 0; }
+.collector-ledger-heading > a { flex: 0 0 auto; }
+.collector-ledger-summary { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; border-block: 1px solid #74634555; padding: 18px 0; margin-bottom: 28px; color: #a3aebb; }
+.collector-ledger-summary p { margin: 0; font-size: 12px; }
+.collector-ledger-summary strong { color: #e5c998; font-size: 25px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.collector-ledger-summary > span { margin-left: auto; font-size: 11px; color: #8c9aab; }
+.collector-ledger-filters { display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr; gap: 16px; align-items: end; }
+.collector-search > span { display: flex; align-items: center; gap: 7px; }
+.collector-result-count { color: #97a7b9; font-size: 12px; margin: 23px 0 12px; }
+.collector-ledger-list { display: grid; gap: 0; border-top: 1px solid #303b49; }
+.collector-club-entry { border-bottom: 1px solid #303b49; }
+.collector-club-cover { display: grid; grid-template-columns: 88px minmax(0, 1fr) 155px 18px; gap: 22px; align-items: center; width: 100%; padding: 20px 10px; border: 0; text-align: left; background: transparent; color: #b9c5d3; }
+.collector-club-cover > img { width: 80px; height: 80px; object-fit: contain; }
+.collector-club-identity { display: flex; flex-direction: column; gap: 8px; }
+.collector-club-identity > strong { font-size: 18px; font-weight: 550; color: #e3ddd1; }
+.collector-club-identity > span:not(.collector-complete-badge) { color: #91a1b3; font-size: 12px; line-height: 1.6; }
+.collector-complete-badge { display: inline-flex; width: fit-content; align-items: center; gap: 6px; color: #dfc184; font-size: 11px; }
+.collector-club-progress { display: grid; gap: 5px; }
+.collector-club-progress > strong { color: #d5be97; font-size: 23px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.collector-club-progress > strong > small { font-size: 15px; color: #8d9daf; }
+.collector-club-progress > span, .collector-club-progress > small { font-size: 10px; color: #8c9daf; line-height: 1.5; }
+.collector-club-progress progress { width: 100%; height: 3px; border: 0; accent-color: #c2a269; background: #26313d; margin: 3px 0; }
+.collector-club-progress progress::-webkit-progress-bar { background: #26313d; }
+.collector-club-progress progress::-webkit-progress-value { background: #c2a269; }
+.collector-club-cover > svg { color: #a4957b; }
+.collector-club-entry.is-open { background: #121a2511; }
+.collector-club-entry.is-open .collector-club-cover > svg { transform: rotate(180deg); }
+.collector-club-detail { border-top: 1px solid #25313d; padding: 26px 15px 30px; }
+.collector-slot-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 16px; margin-bottom: 24px; }
+.collector-slot { min-width: 0; }
+.collector-slot-art { border: 1px solid #303944; border-radius: 6px; background: #121925; opacity: .42; }
+.collector-slot.is-discovered .collector-slot-art { opacity: 1; border-color: #77613d88; }
+.collector-slot-art > .cosmetic-art { height: 130px; background: transparent; }
+.collector-slot-art > .cosmetic-art::after { display: none; }
+.collector-slot > .rarity-badge { margin-top: 12px; }
+.collector-slot h3 { font-size: 12px; line-height: 1.6; font-weight: 500; margin: 8px 0 4px; color: #d9dfe6; overflow-wrap: anywhere; }
+.collector-slot p { color: #8f9fb2; font-size: 10px; line-height: 1.6; margin-bottom: 0; }
+.collector-slot.is-discovered p { color: #b2c3aa; }
+.collector-pagination { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 28px 0; font-size: 12px; color: #97a7b9; }
+.collector-ledger > .collector-note { margin-top: 30px; }
+.collector-passport-dialog { inset: 0; margin: auto; width: min(620px, calc(100% - 28px)); max-height: min(85dvh, 850px); overflow-y: auto; border: 1px solid #7d6849; background: #111a26; color: #dfe5ed; border-radius: 12px; padding: 26px; box-shadow: 0 22px 80px #0008; }
+.collector-passport-dialog::backdrop { background: #03070dc9; }
+.collector-passport-dialog > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 22px; }
+.collector-passport-dialog h2 { display: flex; align-items: center; gap: 10px; color: #e7cfaa; font-family: var(--font-royal); font-size: 26px; font-weight: 500; margin: 0; }
+.collector-passport-dialog > header > button { display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 auto; border: 1px solid #3a4859; border-radius: 5px; color: #c4cedb; background: #1b2735; }
+.collector-passport-name { font-size: 16px; line-height: 1.5; }
+.collector-serial { display: block; font-size: 16px; color: #e3c188; overflow-wrap: anywhere; padding: 14px; background: #0a121c; border: 1px solid #51452f; border-radius: 5px; }
+.collector-passport-facts { margin: 24px 0; display: grid; gap: 0; }
+.collector-passport-facts > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 18px; padding: 11px 0; border-bottom: 1px solid #293544; font-size: 12px; line-height: 1.6; }
+.collector-passport-facts dt { color: #92a3b6; }
+.collector-passport-facts dd { margin: 0; overflow-wrap: anywhere; }
+.collector-passport-dialog > h3 { font-size: 16px; margin-top: 28px; color: #d9c29d; }
+.collector-passport-trail { list-style: none; padding: 0; margin: 20px 0; }
+.collector-passport-trail li { display: grid; gap: 5px; border-left: 1px solid #726044; padding: 0 0 22px 17px; font-size: 12px; }
+.collector-passport-trail li > strong { font-weight: 500; color: #d7c5a9; }
+.collector-passport-trail time, .collector-passport-trail li > span { color: #95a5b8; }
+@media (hover: hover) and (pointer: fine) { .collector-exhibits > button:hover, .collector-club-cover:hover { background: #dfc79e06; } }
+@media (max-width: 1100px) { .collector-stage { padding-inline: 0; }.collector-stage-art > .cosmetic-art { height: 330px; }.collector-stage-art .royal-mythic { width: 290px; height: 290px; }.collector-stage-art .variant-legacy { width: min(100%, 380px); height: 210px; }.collector-stage { min-height: 420px; }.collector-ledger-filters { grid-template-columns: 1fr 1fr; }.collector-exhibits > button { grid-template-columns: 60px minmax(0,1fr); gap: 6px; }.collector-exhibits > button > .cosmetic-art { width: 60px; height: 70px; }.collector-slot-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 700px) { .collector-identity { grid-template-columns: 1fr; gap: 20px; padding-top: 26px; }.collector-identity > p { font-size: 13px; }.collector-stage { grid-template-columns: 1fr; min-height: 0; padding: 20px 0 28px; }.collector-stage-art { width: min(100%,380px); }.collector-stage-art > .cosmetic-art { height: 320px; }.collector-stage-caption { text-align: center; padding: 8px 8px 0; }.collector-stage-caption h2 { font-size: 30px; }.collector-exhibits { gap: 9px; }.collector-exhibits > button { display: flex; flex-direction: column; font-size: 10px; text-align: center; padding: 6px 3px 12px; }.collector-exhibits > button > .cosmetic-art { width: 70px; height: 70px; }.collector-editor { padding: 22px 16px; }.collector-section-heading { flex-direction: column; gap: 10px; }.collector-form-grid, .collector-featured-fields { grid-template-columns: 1fr; }.collector-page-links { justify-content: flex-start; font-size: 11px; gap: 20px; }.collector-ledger-heading { flex-direction: column; align-items: flex-start; gap: 18px; }.collector-ledger-summary { gap: 18px; }.collector-ledger-summary > span { width: 100%; margin-left: 0; }.collector-ledger-filters { gap: 16px 10px; }.collector-club-cover { grid-template-columns: 56px minmax(0,1fr) 18px; gap: 12px; padding: 18px 2px; }.collector-club-cover > img { width: 56px; height: 56px; }.collector-club-identity > strong { font-size: 15px; }.collector-club-identity > span:not(.collector-complete-badge) { font-size: 10px; }.collector-club-progress { grid-column: 2; grid-row: 2; }.collector-club-cover > svg { grid-column: 3; grid-row: 1; }.collector-club-detail { padding: 22px 0; }.collector-slot-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 12px; }.collector-slot-art > .cosmetic-art { height: 120px; }.collector-pagination { gap: 12px; }.collector-pagination button { padding-inline: 12px; }.collector-passport-dialog { padding: 20px 16px; }.collector-passport-facts > div { grid-template-columns: 1fr; gap: 3px; }.collector-empty-stage h1, .collector-empty-stage h2 { font-size: 26px; } }
+@media (max-width: 370px) { .collector-stage-art .royal-mythic { width: 255px; height: 255px; }.collector-stage-art .variant-legacy { width: 100%; height: 195px; }.collector-stage-art > .cosmetic-art { height: 280px; }.collector-ledger-filters { grid-template-columns: 1fr; }.collector-stage-caption h2 { font-size: 27px; }.collector-exhibits > button > .cosmetic-art { width: 62px; height: 64px; }.collector-editor-actions > button, .collector-editor-actions > a { width: 100%; justify-content: center; } }

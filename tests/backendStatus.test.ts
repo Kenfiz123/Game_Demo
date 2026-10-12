@@ -8,10 +8,12 @@ import { OddsSettings } from "../src/components/settings/OddsSettings";
 import { XperienceContext, type XperienceContextValue } from "../src/hooks/useXperience";
 import { createDemoState } from "../src/lib/storage";
 import { emptyEconomy } from "../src/data/eventEconomy";
+import { collectorFixtureDefaults } from "./collectorFixture";
 
 Object.assign(globalThis, { React });
 function render(component: typeof BackendStatus | typeof TestCredits | typeof OddsSettings, overrides: Partial<XperienceContextValue> = {}) {
   const context: XperienceContextValue = {
+    ...collectorFixtureDefaults(),
     economy: emptyEconomy(0), playerId: "test-player", economyAction: async () => ({ success: false, reason: "BUSY" }),
     state: createDemoState(), hydrated: true, isPlaying: false,
     backendStatus: "ready", backendError: null, demoToolsEnabled: true,

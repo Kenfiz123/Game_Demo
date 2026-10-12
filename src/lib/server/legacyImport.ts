@@ -2,6 +2,7 @@ import { CHEST_RARITIES } from "@/data/chestConfig";
 import { TRADE_UP_PATHS, validateArcadeSettings } from "@/data/economyConfig";
 import { EQUIP_SLOTS } from "@/lib/equipmentEngine";
 import { parseStoredState } from "@/lib/storage";
+import { isValidChestPity } from "@/lib/chestPity";
 import type { OpeningHistoryRecord, TradeUpHistoryRecord, XperienceState } from "@/types/gamification";
 import { StoreError } from "./storeError";
 
@@ -45,6 +46,7 @@ export function parseLegacyImport(raw: string): XperienceState {
       !nonnegative(value.exPoints) || !Array.isArray(value.ownedItemIds) || value.ownedItemIds.length > 20_000 ||
       !value.ownedItemIds.every(id => text(id)) || !Array.isArray(value.history) || value.history.length > 10_000 ||
       !value.history.every(isStoredOpeningRecord)) throw new Error();
+    if (Object.hasOwn(value, "chestPity") && !isValidChestPity(value.chestPity)) throw new Error();
     if (value.tradeHistory !== undefined && (!Array.isArray(value.tradeHistory) || value.tradeHistory.length > 10_000 ||
       !value.tradeHistory.every(isStoredTradeRecord))) throw new Error();
     if (value.settings !== undefined && !validateArcadeSettings(value.settings)) throw new Error();

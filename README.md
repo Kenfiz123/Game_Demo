@@ -1,6 +1,6 @@
 # FPTU Xperience · Reward Arcade
 
-Prototype Next.js / React với rương, vòng quay, đổi đồ, luyện Mythic, sự kiện XCoin và chợ người chơi. Giao diện midnight titanium / champagne gold, artwork gốc được tạo bằng ImageGen.
+Prototype Next.js / React với rương, vòng quay, đổi đồ, luyện Mythic, sự kiện XCoin, chợ người chơi và tài khoản nhà sưu tầm local. Giao diện midnight titanium / champagne gold, artwork gốc được tạo bằng ImageGen.
 
 ## Chạy dự án
 
@@ -15,11 +15,17 @@ Mở `http://localhost:3000`. Trang đầu chuyển đến `/chest`.
 
 ### Sự kiện XCoin và chợ người chơi
 
-`/events`: tối đa 160 XCoin/ngày từ điểm danh, mở rương và đổi đồ. `/market`: đăng bán, mua hoặc thu hồi từng bản sao bằng XCoin. `/forge`: 5 Legendary → 1 Mythic ngẫu nhiên, bắt buộc dùng 10–250 XCoin, tỷ lệ 1–25% (mỗi 10 coin = 1 điểm %). Cả đồ và coin đều mất nếu luyện thất bại. Rương có âm thanh tổng hợp và nhạc ăn mừng sôi động riêng khi hiện Mythic, nút bật/tắt và âm lượng. XCoin không có giá trị tiền thật. [Luật và cách thử hai người chơi](docs/event-economy.md).
+`/events`: tối đa 160 XCoin/ngày từ điểm danh, mở rương và đổi đồ. `/market`: đăng bán, mua hoặc thu hồi từng bản sao bằng XCoin. `/forge`: 5 Legendary → 1 Mythic ngẫu nhiên, bắt buộc dùng 10–250 XCoin, tỷ lệ 1–25% (mỗi 10 coin = 1 điểm %). Cả đồ và coin đều mất nếu luyện thất bại. Rương có âm thanh ngắn và phát toàn bộ `The_Rare_Unlock.mp3` khi hiện Mythic: lặp tới khi người chơi thao tác tiếp, có nút bật/tắt và âm lượng. XCoin không có giá trị tiền thật. [Luật và cách thử hai người chơi](docs/event-economy.md).
 
-### Backend local · phiên ẩn danh
+### Nhà sưu tầm · hồ sơ, dấu ấn và sổ CLB
 
-EX, toàn bộ bản sao vật phẩm, 5 ô trang bị, lịch sử rương/vòng quay/đổi đồ và tỷ lệ được lưu trên server. Cookie phiên ẩn danh HttpOnly giữ quyền truy cập trên cùng trình duyệt (30 ngày); chưa có tài khoản hoặc đồng bộ sang máy khác. Xóa cookie / hết hạn sẽ tạo phiên mới, **không xóa dữ liệu cũ trong database** nhưng chưa có cách tự khôi phục phiên cũ.
+`/profile`: chọn tối đa ba Mythic đang sở hữu, một sân khấu chuyển động chính và hồ sơ chia sẻ opt-in tại `/profile/<username>`. `/inventory`: mỗi bản sao có serial riêng, xem nguồn nhận và lịch sử chuyển chủ; mua bán giữ nguyên serial. `/collection`: sổ 73 CLB, tiến độ mẫu từng khám phá giữ lại sau bán/đổi đồ, 12 CLB/trang và dấu mốc **Bộ hoàn chỉnh** không tăng tỷ lệ hay cấp coin. Không công khai EX/XCoin, serial hoặc lịch sử giao dịch. [Hướng dẫn đầy đủ](docs/collector-account.md).
+
+### Backend local · phiên khách và tài khoản
+
+EX, toàn bộ bản sao vật phẩm, 5 ô trang bị, lịch sử rương/vòng quay/đổi đồ, tỷ lệ và dấu ấn được lưu trên server. Cookie HttpOnly giữ phiên trên trình duyệt (30 ngày). `/account` hỗ trợ tên đăng nhập ASCII 3–24 ký tự + mật khẩu 12–128 ký tự: **đăng ký giữ nguyên kho/EX/XCoin hiện tại**, đăng nhập tài khoản có sẵn **không gộp kho khách**, đăng xuất tạo khách mới, đổi mật khẩu thu hồi các phiên khác. Tài khoản cho phép quay lại từ trình duyệt khác kết nối **cùng máy chủ local/DB**, không phải đồng bộ cloud. Không có khôi phục mật khẩu qua email.
+
+SQLite tự migrate bổ sung lên schema 3, không xóa kho cũ. Bản cũ được gắn serial nhưng không bịa ngày nhận/người nhận đầu tiên. Xóa cookie / hết hạn sẽ tạo phiên khách mới, **không xóa dữ liệu cũ trong database**; tài khoản đã đăng ký có thể đăng nhập lại, khách chưa đăng ký chưa có cách tự phục hồi nếu mất cookie.
 
 Dữ liệu localStorage đời trước **không bị xóa hoặc tự gửi lên server**. Với phiên mới chưa thao tác, chọn **Nhập bản demo cũ → Xác nhận nhập** nếu thấy thông báo. Bản gốc vẫn nằm trong trình duyệt. Sau thao tác đầu tiên, nhập bị khóa để tránh ghi đè kho mới.
 
@@ -55,7 +61,13 @@ npm run start -- -p 3100
 | Legendary | 1.8% | 12.5% (1 ô) |
 | Mythic | 0.2% | Không có |
 
-Mỗi lượt độc lập. RNG dùng `crypto.getRandomValues`. Trong mỗi rarity, các cosmetic có xác suất bằng nhau. Orbit không có lợi thế từ timing / tốc độ click. EX chỉ là điểm demo, không mua bán, nạp hoặc rút tiền.
+Tỷ lệ trong bảng là tỷ lệ cơ bản, trước bảo hiểm pity. RNG dùng `crypto.getRandomValues`. Trong mỗi rarity, các cosmetic có xác suất bằng nhau. Orbit không có lợi thế từ timing / tốc độ click. EX chỉ là điểm demo, không mua bán, nạp hoặc rút tiền.
+
+- **Pity rương 200:** sau 199 rương liên tiếp không ra Mythic, rương thứ 200 chắc chắn ra một Mythic ngẫu nhiên, kể cả khi tỷ lệ Mythic tùy chỉnh bằng 0%. Ra Mythic từ rương ở bất kỳ lượt nào đều reset pity ngay về 0. Không có soft pity tăng tỷ lệ dần.
+- Bộ đếm lưu theo player trên backend, giữ khi tải lại/đăng nhập; Orbit, đổi đồ, luyện Mythic và mua bán không tăng hoặc reset pity rương. Thiếu EX, lượt bị từ chối và retry cùng mã không tăng thêm. Reset demo xóa cả pity.
+- Save cũ thiếu bộ đếm được khôi phục từ lịch sử mở rương hiện có kể từ Mythic gần nhất, bỏ qua Orbit, tối đa 199 để bảo đảm lượt tiếp theo. UI chỉ đổi bộ đếm sau reveal, không tiết lộ kết quả khi reel còn chạy.
+
+[Chi tiết pity, tương thích dữ liệu và kiểm chứng](docs/chest-pity.md).
 
 - Demo mới khởi đầu với **50.000 EX** và collection trống. Số dư đã lưu được giữ nguyên.
 - Nút **+10.000 EX test** ở trang game và `/clubs` cho phép thử nhiều lượt mà không xóa collection / activity; vô hiệu hóa trong lúc chơi.
@@ -207,6 +219,6 @@ State v2 giữ các ID lặp như một multiset bản sao và lưu thêm `equip
 
 RNG, số dư EX và cấp đồ hiện được quyết định ở server, lưu trước animation; client không được gửi số dư/kết quả tùy ý. Tuy nhiên **đây vẫn là backend demo local**, không phải hệ thống chống gian lận production: công cụ cộng EX / chỉnh tỷ lệ / reset / nhập localStorage đang bật theo yêu cầu test. Tắt bằng `XPERIENCE_DEMO_TOOLS=false` trước khi cân nhắc mở truy cập công khai. EX vẫn chỉ là điểm trải nghiệm, không có tiền thật.
 
-Cookie không phân biệt cổng: hai bản cùng `localhost` mặc định dùng chung cookie, và dùng chung kho nếu cùng đường dẫn DB. Để test độc lập, đổi **cả** `XPERIENCE_SESSION_COOKIE` và `XPERIENCE_DB_PATH`. localStorage cũ vẫn phân biệt theo origin/cổng. Cookie chưa thay thế đăng nhập; chưa có khôi phục tài khoản, quản trị viên, backup tự động, xác minh earn EX hay triển khai Internet. Muốn phát hành cần bổ sung các phần đó, HTTPS, rate limit bền vững, kiểm soát quyền quản trị và cơ chế audit/retention phù hợp. SQLite local cần ổ đĩa bền vững, không đặt trên hosting filesystem tạm.
+Cookie không phân biệt cổng: hai bản cùng `localhost` mặc định dùng chung cookie, và dùng chung kho nếu cùng đường dẫn DB. Để test độc lập, đổi **cả** `XPERIENCE_SESSION_COOKIE` và `XPERIENCE_DB_PATH`. localStorage cũ vẫn phân biệt theo origin/cổng. Đã có tài khoản local và rate limit cơ bản, nhưng chưa có quên mật khẩu/email, MFA, quản trị viên, backup tự động, xác minh earn EX hay triển khai Internet. Muốn phát hành cần bổ sung các phần đó, HTTPS, quota phân tán, kiểm soát quyền quản trị và cơ chế audit/retention phù hợp. SQLite local cần ổ đĩa bền vững, không đặt trên hosting filesystem tạm.
 
 Bản audit dependency sau cập nhật: không còn cảnh báo ở thời điểm kiểm tra. PostCSS được override sang bản vá tương thích 8.5.x; không nâng major Next.js trong lần chỉnh này.

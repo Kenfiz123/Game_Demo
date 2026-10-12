@@ -1,11 +1,12 @@
 import { STARTING_EX_POINTS, CHEST_RARITIES } from "@/data/chestConfig";
 import { copyArcadeSettings, createDefaultSettings, TRADE_UP_PATHS, validateArcadeSettings } from "@/data/economyConfig";
 import { sanitizeEquipped, validateEquipped } from "./equipmentEngine";
+import { getChestPity, isValidChestPity } from "./chestPity";
 import type { OpeningHistoryRecord, TradeUpHistoryRecord, XperienceState } from "@/types/gamification";
 export const STORAGE_KEY = "fptu-xperience-demo-state";
 export const STORAGE_V1_BACKUP_KEY = STORAGE_KEY + "-v1-backup";
 export const createDemoState = (): XperienceState => ({
-  version: 2, exPoints: STARTING_EX_POINTS, ownedItemIds: [], history: [], tradeHistory: [], settings: createDefaultSettings(), equipped: {},
+  version: 2, exPoints: STARTING_EX_POINTS, chestPity: 0, ownedItemIds: [], history: [], tradeHistory: [], settings: createDefaultSettings(), equipped: {},
 });
 const isRecord = (value: unknown): value is OpeningHistoryRecord => {
   if (!value || typeof value !== "object") return false;
@@ -42,6 +43,7 @@ export function parseStoredState(raw: string | null): XperienceState {
     return {
       version: 2,
       exPoints: candidate.exPoints,
+      chestPity: getChestPity(candidate),
       // v1 owned a set, not stacks. Do not infer copies from its compensated history.
       // Keep obsolete IDs in the archive; current UI decides which are displayed.
       ownedItemIds: candidate.version === 2 ? ids : [...new Set(ids)],
@@ -62,6 +64,7 @@ export function loadXperienceState(storage?: StateStorage): XperienceState {
 export function saveXperienceState(state: XperienceState, storage?: StateStorage): boolean {
   if (!storage && typeof window === "undefined") return false;
   if (state.version !== 2 || !validateArcadeSettings(state.settings) ||
+    !isValidChestPity(state.chestPity) ||
     !Number.isSafeInteger(state.exPoints) || state.exPoints < 0 ||
     !Array.isArray(state.ownedItemIds) || !state.ownedItemIds.every(id => typeof id === "string") ||
     !Array.isArray(state.history) || !state.history.every(isRecord) ||

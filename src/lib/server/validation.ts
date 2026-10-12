@@ -2,6 +2,7 @@ import { copyArcadeSettings, validateArcadeSettings } from "../../data/economyCo
 import type { BackendCommand } from "../../types/backend";
 import { EVENT_TASKS, FORGE_COIN_STEP, FORGE_MIN_COINS, FORGE_MAX_COINS, MAX_MARKET_PRICE } from "../../data/eventEconomy";
 import type { EventId } from "../../types/economy";
+import { validCollectorProfile } from "../../lib/collectorValidation";
 
 export class CommandValidationError extends Error {
   readonly code = "INVALID_REQUEST";
@@ -49,9 +50,14 @@ export function validateCommand(value: unknown): BackendCommand {
       }
       break;
     case "market-list":
-      if (exactKeys(value, ["type", "itemId", "price"]) && isItemId(value.itemId) && typeof value.price === "number" &&
+      if ((exactKeys(value, ["type", "itemId", "price"]) || (exactKeys(value, ["type", "itemId", "price", "copyId"]) && isUuid(value.copyId))) && isItemId(value.itemId) && typeof value.price === "number" &&
           Number.isSafeInteger(value.price) && value.price > 0 && value.price <= MAX_MARKET_PRICE) {
-        return { type: "market-list", itemId: value.itemId, price: value.price };
+        return { type: "market-list", itemId: value.itemId, price: value.price, ...(typeof value.copyId === "string" ? { copyId: value.copyId.toLowerCase() } : {}) };
+      }
+      break;
+    case "profile-update":
+      if (exactKeys(value, ["type", "displayName", "bio", "isPublic", "featuredItemIds"]) && validCollectorProfile(value)) {
+        return { type: "profile-update", displayName: value.displayName.trim(), bio: value.bio.trim(), isPublic: value.isPublic, featuredItemIds: [...value.featuredItemIds] };
       }
       break;
     case "market-buy":
