@@ -59,14 +59,14 @@ test("schema v1 migrates without changing inventory, loadout, history, EX, revis
     seedItems(store, player, [legendary, legendary]);
     const before = command(store, player, { type: "play", game: "chest" });
     h.close(store);
-    h.database(db => db.exec(`DROP TABLE item_trail; DROP TABLE item_copies; DROP TABLE collector_discoveries;
+    h.database(db => db.exec(`DROP TABLE player_seasons; DROP TABLE collector_wishlist; DROP TABLE item_trail; DROP TABLE item_copies; DROP TABLE collector_discoveries;
       DROP TABLE collector_profiles; DROP TABLE account_attempts; DROP TABLE accounts;
       DROP TABLE market_listings; DROP TABLE player_economies; PRAGMA user_version = 1;`));
     store = h.open(); const after = store.getSnapshot(player.token)!;
     assert.deepEqual(after.state, before.snapshot.state); assert.equal(after.revision, before.snapshot.revision);
     assert.deepEqual(after.economy, emptyEconomy(NOW));
     h.database(db => {
-      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 3);
+      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 5);
       assert.equal(db.prepare("SELECT COUNT(*) AS count FROM player_economies").get()!.count, 1);
     });
     h.close(store); store = h.open(); assert.deepEqual(store.getSnapshot(player.token), after);

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRound } from "lucide-react";
 import { CosmeticArt } from "@/components/ui/CosmeticArt";
 import { getCosmeticById } from "@/data/cosmetics";
+import { getEquipSlot } from "@/lib/equipmentEngine";
 import { useXperience } from "@/hooks/useXperience";
 import type { CosmeticItem, EquipSlot } from "@/types/gamification";
 
@@ -24,7 +25,7 @@ export function EquippedProfile() {
     const items: Partial<Record<EquipSlot, CosmeticItem>> = {};
     for (const { slot } of slots) {
       const id = state.equipped[slot], item = id ? getCosmeticById(id) : undefined;
-      if (item && item.rarity === "MYTHIC" && item.type === slot && owned.has(item.id)) items[slot] = item;
+      if (item && getEquipSlot(item) === slot && owned.has(item.id)) items[slot] = item;
     }
     return items;
   }, [state.equipped, state.ownedItemIds]);
@@ -50,7 +51,7 @@ export function EquippedProfile() {
         <div className="equipped-profile-portrait">
           {equipped.FRAME ? <div className="equipped-profile-frame"><CosmeticArt item={equipped.FRAME} animated/></div> : null}
           <div className="equipped-profile-avatar">{equipped.AVATAR ? <CosmeticArt item={equipped.AVATAR} animated/> : <div className="equipped-profile-default-avatar" aria-hidden="true"><UserRound size={43}/></div>}</div>
-          <span className="equipped-profile-portrait-label">{equipped.AVATAR ? "AVATAR MYTHIC" : "CHƯA TRANG BỊ AVATAR"}</span>
+          <span className="equipped-profile-portrait-label">{equipped.AVATAR ? equipped.AVATAR.seasonId ? "AVATAR " + equipped.AVATAR.seasonId : "AVATAR MYTHIC" : "CHƯA TRANG BỊ AVATAR"}</span>
         </div>
         <div className="equipped-profile-name"><span>{collector.profile.displayName}</span><small>FPT University</small>
           {equipped.TITLE ? <div className="equipped-profile-title"><div className="equipped-profile-title-art"><CosmeticArt item={equipped.TITLE} animated/></div><h3 className="equipped-profile-title-name">{equipped.TITLE.name}</h3>{equipped.TITLE.heritage ? <p>Di sản {equipped.TITLE.heritage}</p> : null}</div> : <p className="equipped-profile-empty-title">Chưa trang bị danh hiệu Mythic</p>}

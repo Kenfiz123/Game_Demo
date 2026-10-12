@@ -38,6 +38,7 @@ export function economyError(reason?: string): string {
     ALREADY_CLAIMED: "Bạn đã nhận phần thưởng này hôm nay.",
     INSUFFICIENT_COINS: "Chưa đủ XCoin. Nhận thêm từ sự kiện hoặc giảm lượng coin sử dụng.",
     INSUFFICIENT_ITEMS: "Kho đã thay đổi. Một số bản sao không còn sẵn; hãy chọn lại.",
+    ITEM_LOCKED: "Một số bản sao đã khóa. Mở khóa trong kho hoặc chọn nguyên liệu khác; chưa tiêu hao đồ hay coin.",
     INVALID_SELECTION: "Chọn đúng 5 bản sao Legendary còn trong kho.",
     INVALID_COINS: "Phải dùng từ 10 đến 250 XCoin, theo bội số của 10 và không vượt số dư. Tỷ lệ luyện từ 1% đến tối đa 25%.",
     INVALID_PRICE: "Giá bán phải là số nguyên từ 1 đến 1.000.000 XCoin.",

@@ -1,10 +1,12 @@
 import type { BackendCommand, BackendCommandReply, BackendErrorCode, BackendSnapshot } from "@/types/backend";
 import { validateArcadeSettings } from "@/data/economyConfig";
-import type { MarketListing, MarketPage, PlayerEconomy } from "@/types/economy";
+import type { MarketFilters, MarketListing, MarketPage, MarketTransaction, PlayerEconomy } from "@/types/economy";
 import { EVENT_TASKS, MAX_ACTIVE_LISTINGS, MAX_MARKET_PRICE, forgeChance, isRecordedForgeChance } from "@/data/eventEconomy";
 import type { AccountAction, AccountIdentity, CollectorSnapshot, ItemCopy, ItemPassport, PublicCollectorProfile } from "@/types/collector";
 import { validCollectorProfile, validDisplayName, validUsername } from "@/lib/collectorValidation";
 import { getChestPity, isValidChestPity } from "@/lib/chestPity";
+import { isSeasonProgress } from "@/lib/seasonValidation";
+import { getSeasonAvatar, SEASON_MISSIONS } from "@/data/seasonCatalog";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 export class BackendRequestError extends Error {
@@ -75,6 +77,7 @@ function verifySnapshot(value: BackendSnapshot): BackendSnapshot {
     throw new BackendRequestError("Dữ liệu lưu trên server chưa hợp lệ. Hãy kết nối lại.", 502);
   }
   if (value.economy !== undefined && !validEconomy(value.economy)) throw new BackendRequestError("Ví XCoin trên server chưa hợp lệ. Hãy kết nối lại.", 502);
+  if (value.season !== undefined && !isSeasonProgress(value.season)) throw new BackendRequestError("Tiến độ mùa chưa hợp lệ. Hãy kết nối lại.", 502);
   if (value.account !== undefined && value.account !== null && !validAccount(value.account)) throw new BackendRequestError("Tài khoản trên server chưa hợp lệ. Hãy kết nối lại.", 502);
   if (value.collector !== undefined && !validCollector(value.collector, value.state.ownedItemIds)) throw new BackendRequestError("Dấu ấn vật phẩm chưa hợp lệ. Hãy kết nối lại.", 502);
   // Older servers/saves have no counter; never replace the rest of their progress.
@@ -88,12 +91,15 @@ function validAccount(value: AccountIdentity): boolean {
 }
 function validCopy(value: ItemCopy): boolean {
   return !!value && validUuid(value.id) && validId(value.itemId) && validId(value.serial) &&
-    ["CHEST", "ORBIT", "TRADE_UP", "FORGE", "LEGACY", "IMPORT"].includes(value.origin) &&
+    (value.locked === undefined || typeof value.locked === "boolean") &&
+    ["CHEST", "ORBIT", "TRADE_UP", "FORGE", "LEGACY", "IMPORT", "SEASON"].includes(value.origin) &&
     (value.mintedAt === null || validTimestamp(value.mintedAt)) && validTimestamp(value.recordedAt) && validTimestamp(value.acquiredAt) &&
     (value.originalOwnerName === null || validDisplayName(value.originalOwnerName)) && Number.isSafeInteger(value.transferCount) && value.transferCount >= 0;
 }
 function validCollector(value: CollectorSnapshot, ownedIds: readonly string[]): boolean {
   if (!value || !validCollectorProfile(value.profile) || !Array.isArray(value.copies) || !value.copies.every(validCopy) ||
+    (value.wishlistItemIds !== undefined && (!Array.isArray(value.wishlistItemIds) || value.wishlistItemIds.length > 200 ||
+      !value.wishlistItemIds.every(validId) || new Set(value.wishlistItemIds).size !== value.wishlistItemIds.length)) ||
     !Array.isArray(value.discoveredItemIds) || !value.discoveredItemIds.every(validId) || new Set(value.discoveredItemIds).size !== value.discoveredItemIds.length ||
     new Set(value.copies.map(copy => copy.id)).size !== value.copies.length || new Set(value.copies.map(copy => copy.serial)).size !== value.copies.length || value.copies.length !== ownedIds.length) return false;
   const counts = new Map<string, number>();
@@ -136,13 +142,38 @@ function validEconomy(value: PlayerEconomy): boolean {
     Array.isArray(record.inputItemIds) && record.inputItemIds.length === 5 && record.inputItemIds.every(validId) &&
     isRecordedForgeChance(record.coins, record.chance, record.ruleVersion) && typeof record.won === "boolean" && (record.won ? validId(record.rewardItemId) : record.rewardItemId === undefined));
 }
-export async function readMarketplace(cursor?: string, signal?: AbortSignal): Promise<MarketPage> {
-  const page = await backendRequest<MarketPage>(`/api/market${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`, { signal });
+export async function readMarketplace(cursor?: string, signal?: AbortSignal, filters: MarketFilters = {}): Promise<MarketPage> {
+  const parameters = new URLSearchParams();
+  if (cursor) parameters.set("cursor", cursor);
+  for (const key of ["query", "rarity", "clubId", "itemId", "minPrice", "maxPrice", "sort", "wishlistOnly"] as const) {
+    const value = filters[key];
+    if (value !== undefined && value !== "") parameters.set(key, String(value));
+  }
+  const search = parameters.toString();
+  const page = await backendRequest<MarketPage>(`/api/market${search ? `?${search}` : ""}`, { signal });
   const validListing = (item: MarketListing) => !!item && validUuid(item.id) && validId(item.itemId) &&
     validUuid(item.sellerId) && validTimestamp(item.createdAt) && Number.isSafeInteger(item.price) && item.price > 0 && item.price <= MAX_MARKET_PRICE;
   if (!page || !Array.isArray(page.listings) || page.listings.length > 40 || !page.listings.every(validListing) || !Array.isArray(page.ownListings) || page.ownListings.length > MAX_ACTIVE_LISTINGS ||
-      !page.ownListings.every(validListing) || (page.nextCursor !== null && !validUuid(page.nextCursor))) throw new BackendRequestError("Chợ chưa trả về dữ liệu hợp lệ. Hãy tải lại.", 502);
+      !page.ownListings.every(validListing) || (page.nextCursor !== null && !validUuid(page.nextCursor)) ||
+      (page.history !== undefined && (!Array.isArray(page.history) || page.history.length > 50 || !page.history.every(validMarketTransaction) ||
+        new Set(page.history.map(receipt => receipt.listingId)).size !== page.history.length)) ||
+      (page.wishlistMatches !== undefined && (!Number.isSafeInteger(page.wishlistMatches) || page.wishlistMatches < 0)) ||
+      (page.priceSummary !== undefined && page.priceSummary !== null && (!validPriceSummary(page.priceSummary) ||
+        Boolean(filters.itemId && page.priceSummary.itemId !== filters.itemId)))) {
+    throw new BackendRequestError("Chợ chưa trả về dữ liệu hợp lệ. Hãy tải lại.", 502);
+  }
   return page;
+}
+function validMarketTransaction(receipt: MarketTransaction): boolean {
+  return !!receipt && validUuid(receipt.listingId) && validId(receipt.itemId) && validTimestamp(receipt.completedAt) &&
+    (receipt.side === "buy" || receipt.side === "sell") && Number.isSafeInteger(receipt.price) && receipt.price > 0 && receipt.price <= MAX_MARKET_PRICE;
+}
+function validPriceSummary(summary: NonNullable<MarketPage["priceSummary"]>): boolean {
+  return !!summary && validId(summary.itemId) && Number.isSafeInteger(summary.salesCount) && summary.salesCount > 0 &&
+    Number.isSafeInteger(summary.minPrice) && summary.minPrice > 0 && Number.isSafeInteger(summary.maxPrice) &&
+    summary.maxPrice >= summary.minPrice && summary.maxPrice <= MAX_MARKET_PRICE &&
+    typeof summary.averagePrice === "number" && Number.isFinite(summary.averagePrice) && summary.averagePrice >= summary.minPrice && summary.averagePrice <= summary.maxPrice &&
+    Number.isSafeInteger(summary.lastPrice) && summary.lastPrice >= summary.minPrice && summary.lastPrice <= summary.maxPrice;
 }
 export function reconcileBackendSnapshot(current: BackendSnapshot | null, next: BackendSnapshot, allowPlayerChange = false): BackendSnapshot {
   if (current && current.player.id !== next.player.id && !allowPlayerChange) throw new BackendRequestError("Phiên lưu dữ liệu đã thay đổi. Hãy kết nối lại trước khi chơi.", 409, "SESSION_CHANGED");
@@ -161,6 +192,14 @@ export async function sendBackendCommand(command: BackendCommand, playerId: stri
   });
   const confirmed = verifySnapshot(reply?.snapshot);
   if (!reply.result || typeof reply.result.success !== "boolean") throw new BackendRequestError("Server chưa xác nhận thao tác. Hãy kết nối lại.", 502);
+  if (reply.result.success && (command.type === "claim-season-mission" || command.type === "redeem-season-avatar")) {
+    const valid = confirmed.season && (command.type === "claim-season-mission"
+      ? "pointsAwarded" in reply.result && reply.result.pointsAwarded === SEASON_MISSIONS.find(m => m.id === command.missionId)?.points &&
+        (confirmed.season.day !== command.day || confirmed.season.claimedMissionIds.includes(command.missionId))
+      : "reward" in reply.result && reply.result.reward?.item.id === command.itemId && getSeasonAvatar(command.itemId) &&
+        confirmed.season.redeemedItemIds.includes(command.itemId));
+    if (!valid) throw new BackendRequestError("Server chưa xác nhận thưởng S1. Hãy tải lại dữ liệu.", 502);
+  }
   if (reply.result.success && (command.type === "play" || command.type === "trade-up")) {
     if (!("id" in reply.result) || typeof reply.result.id !== "string" || !("reward" in reply.result) ||
       (command.type === "play" && (!reply.result.reward || typeof reply.result.reward.item?.id !== "string")) ||

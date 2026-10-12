@@ -7,7 +7,7 @@ export const EQUIP_SLOT_LABELS: Record<EquipSlot, string> = {
 };
 const isSlot = (value: string): value is EquipSlot => EQUIP_SLOTS.includes(value as EquipSlot);
 export function getEquipSlot(item: CosmeticItem): EquipSlot | null {
-  return item.rarity === "MYTHIC" && isSlot(item.type) ? item.type : null;
+  return (item.rarity === "MYTHIC" || item.seasonId === "S1" && item.type === "AVATAR") && isSlot(item.type) ? item.type : null;
 }
 export function sanitizeEquipped(value: unknown, ownedItemIds: readonly string[]): Partial<Record<EquipSlot, string>> {
   const equipped: Partial<Record<EquipSlot, string>> = {};

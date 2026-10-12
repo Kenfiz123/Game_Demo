@@ -21,11 +21,19 @@ Mở `http://localhost:3000`. Trang đầu chuyển đến `/chest`.
 
 `/profile`: chọn tối đa ba Mythic đang sở hữu, một sân khấu chuyển động chính và hồ sơ chia sẻ opt-in tại `/profile/<username>`. `/inventory`: mỗi bản sao có serial riêng, xem nguồn nhận và lịch sử chuyển chủ; mua bán giữ nguyên serial. `/collection`: sổ 73 CLB, tiến độ mẫu từng khám phá giữ lại sau bán/đổi đồ, 12 CLB/trang và dấu mốc **Bộ hoàn chỉnh** không tăng tỷ lệ hay cấp coin. Không công khai EX/XCoin, serial hoặc lịch sử giao dịch. [Hướng dẫn đầy đủ](docs/collector-account.md).
 
+### Mùa sưu tầm S1
+
+`/seasons/s1`: **146 avatar riêng cho 73 CLB**, mỗi CLB một Huyền thoại Hoàng Kim và một Thần thoại Tinh Tú. Hoàn thành bốn nhiệm vụ để nhận tối đa 8 điểm S1/ngày, chọn đổi Huyền thoại với 4 điểm hoặc Thần thoại với 12 điểm. Cả hai bậc trang bị được ở ô AVATAR, có serial và giữ trong kho qua ngày mới. Bộ mùa dùng điểm riêng, mỗi mẫu đổi một lần; pool rương và bộ 13 món thường của CLB giữ nguyên. [Luật, dữ liệu và pipeline artwork](docs/collection-season-s1.md).
+
+### Bảo vệ kho · wishlist · chợ nâng cao
+
+`/inventory`: khóa từng serial để tránh bán/đổi/luyện nhầm; chọn nhanh nguyên liệu chỉ lấy đồ dư chưa khóa, bỏ qua đồ đang trang bị. `/collection`: đánh dấu wishlist và tìm ngay món còn thiếu trên chợ. `/market`: bộ lọc toàn chợ, chọn serial khi bán, lịch sử mua/bán riêng tư và giá tham khảo từ giao dịch thật. Wishlist/khóa lưu theo player, không thay tỷ lệ hay pity. [Luật bảo vệ và API](docs/collector-protection.md).
+
 ### Backend local · phiên khách và tài khoản
 
 EX, toàn bộ bản sao vật phẩm, 5 ô trang bị, lịch sử rương/vòng quay/đổi đồ, tỷ lệ và dấu ấn được lưu trên server. Cookie HttpOnly giữ phiên trên trình duyệt (30 ngày). `/account` hỗ trợ tên đăng nhập ASCII 3–24 ký tự + mật khẩu 12–128 ký tự: **đăng ký giữ nguyên kho/EX/XCoin hiện tại**, đăng nhập tài khoản có sẵn **không gộp kho khách**, đăng xuất tạo khách mới, đổi mật khẩu thu hồi các phiên khác. Tài khoản cho phép quay lại từ trình duyệt khác kết nối **cùng máy chủ local/DB**, không phải đồng bộ cloud. Không có khôi phục mật khẩu qua email.
 
-SQLite tự migrate bổ sung lên schema 3, không xóa kho cũ. Bản cũ được gắn serial nhưng không bịa ngày nhận/người nhận đầu tiên. Xóa cookie / hết hạn sẽ tạo phiên khách mới, **không xóa dữ liệu cũ trong database**; tài khoản đã đăng ký có thể đăng nhập lại, khách chưa đăng ký chưa có cách tự phục hồi nếu mất cookie.
+SQLite tự migrate bổ sung lên schema 5, không xóa kho cũ. Bản cũ được gắn serial nhưng không bịa ngày nhận/người nhận đầu tiên. Xóa cookie / hết hạn sẽ tạo phiên khách mới, **không xóa dữ liệu cũ trong database**; tài khoản đã đăng ký có thể đăng nhập lại, khách chưa đăng ký chưa có cách tự phục hồi nếu mất cookie.
 
 Dữ liệu localStorage đời trước **không bị xóa hoặc tự gửi lên server**. Với phiên mới chưa thao tác, chọn **Nhập bản demo cũ → Xác nhận nhập** nếu thấy thông báo. Bản gốc vẫn nằm trong trình duyệt. Sau thao tác đầu tiên, nhập bị khóa để tránh ghi đè kho mới.
 
@@ -153,7 +161,7 @@ Bản chuyển động **v4** làm sống động cả bốn kiểu: Quân Vươ
 
 Danh hiệu và tiêu đề Royal dùng chung font Cambria / Times New Roman / Noto Serif thay cho Georgia thiếu ký tự tiếng Việt trên Windows. Đã sửa lỗi hở chữ trong “Truyền Nhân”, giữ nguyên tên và dữ liệu vật phẩm. Kiểm tra giao diện 320/390px, 139/139 tests, lint, TypeScript và build đạt; nguyên nhân và ảnh kiểm chứng: `design/mythic-title-font-fix.md`.
 
-Kho có **5 ô trang bị: LOGO, AVATAR, TITLE, FRAME, EFFECT**, mỗi ô một vật phẩm. Chỉ Mythic đang sở hữu mới trang bị được; thao tác không tiêu thụ bản sao và không tốn EX. Hai avatar hoặc ba hiệu ứng là các món riêng biệt, chọn món nào thì lưu đúng ID đó. Hồ sơ và header dùng đúng trang bị đã lưu sau chuyển trang / tải lại; hiệu ứng đi cùng vật phẩm khi trang bị, không chỉ lóe lên lúc mở rương.
+Kho có **5 ô trang bị: LOGO, AVATAR, TITLE, FRAME, EFFECT**, mỗi ô một vật phẩm. Mythic đang sở hữu trang bị theo ô tương ứng; avatar S1 ở cả hai bậc Huyền thoại và Thần thoại đều dùng ô AVATAR. Thao tác không tiêu thụ bản sao và không tốn EX. Hai avatar hoặc ba hiệu ứng là các món riêng biệt, chọn món nào thì lưu đúng ID đó. Hồ sơ và header dùng đúng trang bị đã lưu sau chuyển trang / tải lại; hiệu ứng đi cùng vật phẩm khi trang bị, không chỉ lóe lên lúc mở rương.
 
 Đã sửa hình Mythic bị mờ trong hồ sơ: bỏ hai lớp opacity chồng nhau (`.46 × .32`), chuyển món Hiệu ứng sang vùng trưng bày riêng không bị danh hiệu che, có nhãn phân biệt với Avatar và hàng riêng trên mobile. Không tự trang bị avatar hoặc thay đổi kho / EX. **145/145 tests**, lint, TypeScript và build đạt; chi tiết: `design/mythic-profile-clarity-fix.md`.
 
@@ -174,7 +182,8 @@ Danh hiệu bóng đá có **“Truyền Nhân Của Messi”**. Các lĩnh vự
 - `src/data/arcadeConfig.ts`: giá game, cấu hình 8 ô, thông số chuyển động.
 - `src/data/chestConfig.ts`: cấu hình màu, xác suất rương mặc định, số EX ban đầu.
 - `src/data/economyConfig.ts`: đường đổi 5 món, 80/60/30/5%, validators và bản nháp mặc định.
-- `src/data/cosmetics.ts`: 949 cosmetic CLB, với index tra cứu theo ID / rarity.
+- `src/data/cosmetics.ts`: 1.095 cosmetic (949 món CLB thường + 146 avatar S1), với index theo ID và pool rarity chỉ gồm món thường.
+- `src/data/seasonCatalog.ts`, `src/components/seasons`, `src/lib/server/seasonStore.ts`: catalog, nhiệm vụ, đổi avatar và ledger mùa S1.
 - `src/data/clubCosmetics.ts`: tạo 13 cosmetic cho mỗi CLB, giữ các ID cũ ổn định.
 - `src/data/mythicCatalog.ts`, `src/data/mythicHeritage.ts`: 8 biến thể, đường dẫn crest Mythic riêng theo ID CLB và hình tượng di sản; 12 chủ đề cũ chỉ giữ làm metadata tương thích / lưu trữ.
 - `src/components/ui/MythicArt.tsx`, `MythicVault.tsx`: renderer vật phẩm thực và Vault ẩn danh tách biệt.

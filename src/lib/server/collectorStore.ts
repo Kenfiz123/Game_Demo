@@ -8,7 +8,7 @@ import { StoreError } from "./storeError";
 interface CopyRow {
   id: string; item_id: string; serial: string; owner_id: string; status: "ACTIVE" | "ESCROW" | "CONSUMED";
   listing_id: string | null; origin: ItemOrigin; minted_at: string | null; recorded_at: string; acquired_at: string;
-  original_owner_name: string | null; transfer_count: number;
+  original_owner_name: string | null; transfer_count: number; locked: number;
 }
 export function validCollectorProfile(value: unknown): value is CollectorProfile {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -22,6 +22,7 @@ export function validCollectorProfile(value: unknown): value is CollectorProfile
 const copyDTO = (row: CopyRow): ItemCopy => ({
   id: row.id, itemId: row.item_id, serial: row.serial, origin: row.origin, mintedAt: row.minted_at,
   recordedAt: row.recorded_at, acquiredAt: row.acquired_at, originalOwnerName: row.original_owner_name, transferCount: row.transfer_count,
+  locked: row.locked === 1,
 });
 
 /** Copy identities are mutated inside the parent store's authoritative transaction. */
@@ -81,9 +82,23 @@ export class CollectorStore {
   }
 
   verifySchema(): void {
-    for (const table of ["accounts", "account_attempts", "collector_profiles", "item_copies", "item_trail", "collector_discoveries"]) {
+    for (const table of ["accounts", "account_attempts", "collector_profiles", "item_copies", "item_trail", "collector_discoveries", "collector_wishlist"]) {
       this.db.prepare(`SELECT * FROM ${table} LIMIT 1`).get();
     }
+    this.db.prepare("SELECT locked FROM item_copies LIMIT 1").get();
+  }
+  migrateProtection(): void {
+    this.db.exec(`ALTER TABLE item_copies ADD COLUMN locked INTEGER NOT NULL DEFAULT 0 CHECK(locked IN (0, 1));
+      CREATE TABLE collector_wishlist (
+        player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE, item_id TEXT NOT NULL,
+        PRIMARY KEY(player_id, item_id)
+      ) STRICT;
+      CREATE INDEX market_active_price_asc ON market_listings(status, price ASC, created_at DESC, id DESC);
+      CREATE INDEX market_active_price_desc ON market_listings(status, price DESC, created_at DESC, id DESC);
+      CREATE INDEX market_item_sales ON market_listings(status, item_id, closed_at DESC, id DESC);
+      CREATE INDEX market_buyer_history ON market_listings(buyer_id, status, closed_at DESC, id DESC);
+      CREATE INDEX market_seller_history ON market_listings(seller_id, status, closed_at DESC, id DESC);
+      PRAGMA user_version = 4;`);
   }
   initializePlayer(playerId: string): void {
     const profile: CollectorProfile = { displayName: "Student", bio: "", isPublic: false, featuredItemIds: [] };
@@ -139,8 +154,38 @@ export class CollectorStore {
   selectOwnedCopy(playerId: string, itemId: string, copyId?: string): ItemCopy | null {
     const row = (copyId
       ? this.db.prepare("SELECT * FROM item_copies WHERE owner_id = ? AND item_id = ? AND status = 'ACTIVE' AND id = ?").get(playerId, itemId, copyId.toLowerCase())
-      : this.db.prepare("SELECT * FROM item_copies WHERE owner_id = ? AND item_id = ? AND status = 'ACTIVE' ORDER BY acquired_at, rowid LIMIT 1").get(playerId, itemId)) as unknown as CopyRow | undefined;
+      : this.db.prepare("SELECT * FROM item_copies WHERE owner_id = ? AND item_id = ? AND status = 'ACTIVE' AND locked = 0 ORDER BY acquired_at, rowid LIMIT 1").get(playerId, itemId)) as unknown as CopyRow | undefined;
     return row ? copyDTO(row) : null;
+  }
+  hasLockedObstruction(playerId: string, itemIds: readonly string[]): boolean {
+    const requested = new Map<string, number>();
+    for (const id of itemIds) requested.set(id, (requested.get(id) ?? 0) + 1);
+    let blocked = false;
+    for (const [id, needed] of requested) {
+      const counts = this.db.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN locked = 0 THEN 1 ELSE 0 END) AS unlocked FROM item_copies WHERE owner_id = ? AND item_id = ? AND status = 'ACTIVE'")
+        .get(playerId, id)!;
+      // Let the original engines report malformed or truly insufficient selections.
+      if ((counts.total as number) < needed) return false;
+      if (((counts.unlocked as number | null) ?? 0) < needed) blocked = true;
+    }
+    return blocked;
+  }
+  setLocked(playerId: string, copyId: string, locked: boolean): boolean {
+    return this.db.prepare("UPDATE item_copies SET locked = ? WHERE owner_id = ? AND id = ? AND status = 'ACTIVE'")
+      .run(locked ? 1 : 0, playerId, copyId.toLowerCase()).changes === 1;
+  }
+  wishlist(playerId: string): string[] {
+    return this.db.prepare("SELECT item_id FROM collector_wishlist WHERE player_id = ? ORDER BY item_id").all(playerId)
+      .map(row => row.item_id as string).filter(id => !!getCosmeticById(id));
+  }
+  updateWishlist(playerId: string, itemId: string, wished: boolean): boolean {
+    if (!getCosmeticById(itemId)) throw new StoreError("INVALID_REQUEST");
+    if (!wished) { this.db.prepare("DELETE FROM collector_wishlist WHERE player_id = ? AND item_id = ?").run(playerId, itemId); return true; }
+    const existing = this.db.prepare("SELECT 1 FROM collector_wishlist WHERE player_id = ? AND item_id = ?").get(playerId, itemId);
+    const count = this.db.prepare("SELECT COUNT(*) AS count FROM collector_wishlist WHERE player_id = ?").get(playerId)!.count as number;
+    if (!existing && count >= 200) return false;
+    this.db.prepare("INSERT OR IGNORE INTO collector_wishlist (player_id, item_id) VALUES (?, ?)").run(playerId, itemId);
+    return true;
   }
   consume(playerId: string, itemIds: readonly string[]): void {
     for (const itemId of itemIds) {
@@ -156,7 +201,7 @@ export class CollectorStore {
     this.db.prepare("UPDATE item_copies SET status = 'CONSUMED', listing_id = NULL WHERE owner_id = ? AND status IN ('ACTIVE', 'ESCROW')").run(playerId);
   }
   list(playerId: string, copyId: string, listingId: string): void {
-    const updated = this.db.prepare("UPDATE item_copies SET status = 'ESCROW', listing_id = ? WHERE id = ? AND owner_id = ? AND status = 'ACTIVE'")
+    const updated = this.db.prepare("UPDATE item_copies SET status = 'ESCROW', listing_id = ? WHERE id = ? AND owner_id = ? AND status = 'ACTIVE' AND locked = 0")
       .run(listingId, copyId, playerId);
     if (updated.changes !== 1) throw new StoreError("STORAGE_UNAVAILABLE");
     this.trail(copyId, "LIST", playerId);
@@ -186,6 +231,7 @@ export class CollectorStore {
       profile: this.profile(playerId), copies: rows.map(copyDTO),
       discoveredItemIds: this.db.prepare("SELECT item_id FROM collector_discoveries WHERE player_id = ? ORDER BY item_id").all(playerId)
         .map(row => row.item_id as string).filter(id => !!getCosmeticById(id)),
+      wishlistItemIds: this.wishlist(playerId),
     };
   }
   passport(playerId: string, copyId: string): ItemPassport | null {

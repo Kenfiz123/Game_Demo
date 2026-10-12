@@ -12,9 +12,9 @@ import { createTradeUp } from "../src/lib/tradeUpEngine";
 import type { EquipSlot } from "../src/types/gamification";
 
 test("all 73 clubs have five preserved lower tiers and eight separate Mythic inventory IDs", () => {
-  assert.equal(COSMETICS.length, 949); assert.equal(CLUB_COSMETICS.length, 949);
+  assert.equal(COSMETICS.length, 1095); assert.equal(CLUB_COSMETICS.length, 949);
   assert.equal(cosmeticsByRarity("MYTHIC").length, 584); assert.equal(CLUB_REWARD_TIERS.length, 6);
-  assert.equal(new Set(COSMETICS.map(item => item.id)).size, 949);
+  assert.equal(new Set(COSMETICS.map(item => item.id)).size, 1095);
   for (const club of CLUBS) {
     const items = CLUB_COSMETICS.filter(item => item.clubId === club.id);
     assert.equal(items.length, 13);
@@ -85,7 +85,7 @@ test("unowned, unknown, ordinary, and mismatched-slot items cannot equip", () =>
   const mythic = cosmeticsByRarity("MYTHIC")[0];
   assert.equal(equipItemInState(createDemoState(), mythic.id), null);
   assert.equal(equipItemInState({ ...createDemoState(), ownedItemIds: ["retired-item"] }, "retired-item"), null);
-  for (const item of COSMETICS.filter(item => item.rarity !== "MYTHIC")) {
+  for (const item of COSMETICS.filter(item => item.rarity !== "MYTHIC" && !item.seasonId)) {
     assert.equal(getEquipSlot(item), null);
     assert.equal(equipItemInState({ ...createDemoState(), ownedItemIds: [item.id] }, item.id), null);
   }

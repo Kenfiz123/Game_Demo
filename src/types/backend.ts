@@ -13,6 +13,7 @@ export interface BackendSnapshot {
   economy?: PlayerEconomy;
   account?: AccountIdentity | null;
   collector?: CollectorSnapshot;
+  season?: import("./season").SeasonProgress;
 }
 export type BackendCommand =
   | { type: "play"; game: GameId }
@@ -24,6 +25,8 @@ export type BackendCommand =
   | { type: "reset-demo" }
   | { type: "import-legacy"; raw: string }
   | ({ type: "profile-update" } & CollectorProfile)
+  | { type: "copy-lock"; copyId: string; locked: boolean }
+  | { type: "wishlist-update"; itemId: string; wished: boolean }
   | EconomyCommand;
 export interface BackendSimpleResult { success: boolean; reason?: string; }
 export type BackendCommandResult = OpeningAttempt | TradeUpAttempt | BackendSimpleResult | EconomyResult;

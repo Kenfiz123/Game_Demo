@@ -2,7 +2,7 @@ import type { BackendErrorBody, BackendErrorCode } from "../../types/backend";
 import { getServerConfig, type ServerConfig } from "./config";
 import { getStore } from "./database";
 import type { XperienceStore } from "./store";
-import { CommandValidationError, isUuid, validateCommand } from "./validation";
+import { CommandValidationError, isUuid, parseMarketQuery, validateCommand } from "./validation";
 import { parseAccountAction, validUsername } from "../collectorValidation";
 
 export const MAX_BODY_BYTES = 1_048_576;
@@ -244,12 +244,11 @@ export function createApiHandlers(dependencies: ApiDependencies = {}) {
       try {
         const token = readToken(request, resolveConfig().sessionCookie);
         if (!token) throw new HttpError("NO_SESSION");
-        const params = new URL(request.url).searchParams;
-        const cursor = params.get("cursor");
-        if ([...params.keys()].some(key => key !== "cursor") || params.getAll("cursor").length > 1 || (cursor !== null && !isUuid(cursor))) throw new HttpError("INVALID_REQUEST");
+        if (request.url.length > 4096) throw new HttpError("INVALID_REQUEST");
+        const { cursor, filters } = parseMarketQuery(new URL(request.url).searchParams);
         const store = resolveStore();
         if (!store.getMarket) throw new HttpError("STORAGE_UNAVAILABLE");
-        const page = store.getMarket(token, cursor?.toLowerCase());
+        const page = store.getMarket(token, cursor, filters);
         if (!page) throw new HttpError("NO_SESSION");
         return json(page);
       } catch (error) { return failure(error); }

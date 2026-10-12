@@ -1,5 +1,5 @@
 import { getServerConfig } from "./config";
-import { XperienceStore } from "./store";
+import { STORE_SCHEMA_VERSION, XperienceStore } from "./store";
 
 interface StoreConnection { key: string; store: XperienceStore; }
 const databaseGlobal = globalThis as typeof globalThis & { __xperienceDatabaseConnection?: StoreConnection };
@@ -7,7 +7,8 @@ const databaseGlobal = globalThis as typeof globalThis & { __xperienceDatabaseCo
 /** Keep only the connection across Next.js hot reloads, not user-specific data. */
 export function getStore(): XperienceStore {
   const config = getServerConfig();
-  const key = `${config.databasePath}:${config.demoToolsEnabled}:${config.sessionLifetimeMs}`;
+  // A schema upgrade must reopen a connection retained by development hot reload.
+  const key = `${config.databasePath}:${config.demoToolsEnabled}:${config.sessionLifetimeMs}:${STORE_SCHEMA_VERSION}`;
   const connection = databaseGlobal.__xperienceDatabaseConnection;
   if (connection?.key === key) return connection.store;
   if (connection) connection.store.close();

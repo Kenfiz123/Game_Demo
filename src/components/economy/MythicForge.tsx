@@ -9,6 +9,8 @@ import { FORGE_COIN_STEP, FORGE_MAX_CHANCE, FORGE_MAX_COINS, FORGE_MIN_COINS, FO
 import { CosmeticArt } from "@/components/ui/CosmeticArt";
 import { RarityBadge } from "@/components/chest/RarityBadge";
 import { useXperience } from "@/hooks/useXperience";
+import { getUnlockedCounts, safeSurplusQuickPick, selectionProtectionWarnings } from "@/lib/itemProtection";
+import { SelectionProtectionWarning } from "@/components/inventory/SelectionProtectionWarning";
 import type { EconomyResult } from "@/types/economy";
 import { CoinSeal, EconomyNav, EconomyNotice, WalletBalance, countInventory, economyError } from "./EconomyChrome";
 import styles from "./economy.module.css";
@@ -17,7 +19,7 @@ const LEGENDARIES = COSMETICS.filter(item => item.rarity === "LEGENDARY");
 const PAGE_SIZE = 12;
 
 export function MythicForge() {
-  const { state, economy, hydrated, isPlaying, economyAction } = useXperience();
+  const { state, collector, playerId, economy, hydrated, isPlaying, economyAction } = useXperience();
   const [selected, setSelected] = useState<string[]>([]);
   const [coinDraft, setCoinDraft] = useState(FORGE_MIN_COINS);
   const [query, setQuery] = useState("");
@@ -26,16 +28,25 @@ export function MythicForge() {
   const [pending, setPending] = useState(false);
   const [receipt, setReceipt] = useState<{ result: EconomyResult; coins: number; animate: boolean } | null>(null);
   const [error, setError] = useState("");
+  const [riskAcceptedFor, setRiskAcceptedFor] = useState<string | null>(null);
   const inFlight = useRef(false);
   const mounted = useRef(false);
   const confirmButton = useRef<HTMLButtonElement>(null);
   const resultHeading = useRef<HTMLHeadingElement>(null);
-  const owned = useMemo(() => countInventory(state.ownedItemIds), [state.ownedItemIds]);
+  const owned = useMemo(() => getUnlockedCounts(state.ownedItemIds, collector.copies), [state.ownedItemIds, collector.copies]);
   const picked = useMemo(() => countInventory(selected), [selected]);
+  const equippedIds = useMemo(() => new Set(Object.values(state.equipped).filter((id): id is string => !!id)), [state.equipped]);
+  const protection = selectionProtectionWarnings(selected, state.ownedItemIds, equippedIds, owned);
+  const needsProtectionAcceptance = protection.lastCopyIds.length > 0 || protection.lastUnlockedCopyIds.length > 0 || protection.equippedItemIds.length > 0;
+  const ownedTotals = countInventory(state.ownedItemIds);
+  const protectionKey = JSON.stringify([playerId, selected, selected.map(id => ownedTotals.get(id)), protection]);
+  const protectionAccepted = !needsProtectionAcceptance || riskAcceptedFor === protectionKey;
   const eligible = useMemo(() => LEGENDARIES.filter(item => (owned.get(item.id) ?? 0) > 0), [owned]);
+  const quickSelection = useMemo(() => safeSurplusQuickPick(eligible.map(item => item.id), state.ownedItemIds, collector.copies, equippedIds), [eligible, state.ownedItemIds, collector.copies, equippedIds]);
   const term = normalizeClubSearch(query.trim());
   const filtered = eligible.filter(item => !term || normalizeClubSearch(item.name + " " + item.description).includes(term));
   const totalCopies = eligible.reduce((sum, item) => sum + (owned.get(item.id) ?? 0), 0);
+  const protectedCopies = collector.copies.filter(copy => copy.locked && getCosmeticById(copy.itemId)?.rarity === "LEGENDARY").length;
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pages - 1);
   const visible = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
@@ -48,20 +59,21 @@ export function MythicForge() {
   const locked = busy || confirming || receipt !== null;
 
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  useEffect(() => { if (confirming) confirmButton.current?.focus(); }, [confirming]);
+  useEffect(() => {
+    if (!confirming) return;
+    const button = confirmButton.current;
+    if (button?.disabled) button.closest('[role="group"]')?.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus();
+    else button?.focus();
+  }, [confirming]);
   useEffect(() => { if (receipt) resultHeading.current?.focus({ preventScroll: true }); }, [receipt]);
 
   function quickPick() {
-    const next: string[] = [];
-    for (const item of eligible) {
-      const count = Math.min(5 - next.length, owned.get(item.id) ?? 0);
-      for (let index = 0; index < count; index++) next.push(item.id);
-      if (next.length === 5) break;
-    }
-    setSelected(next); setError("");
+    if (locked) return;
+    setSelected(quickSelection); setRiskAcceptedFor(null); setError("");
   }
   async function forge(animate: boolean) {
     if (inFlight.current || busy || !valid) return;
+    if (!protectionAccepted) return;
     inFlight.current = true; setPending(true); setError("");
     const spentCoins = coins;
     try {
@@ -73,7 +85,7 @@ export function MythicForge() {
     } catch { if (mounted.current) { setConfirming(false); setError(economyError("STORAGE_UNAVAILABLE")); } }
     finally { inFlight.current = false; if (mounted.current) setPending(false); }
   }
-  function restart() { setSelected([]); setReceipt(null); setConfirming(false); setError(""); }
+  function restart() { setSelected([]); setReceipt(null); setConfirming(false); setRiskAcceptedFor(null); setError(""); }
 
   return <div className={`page-wrap ${styles.page}`}>
     <header className={styles.pageHeading}><div><h1>Lò luyện Mythic</h1><p>Năm Legendary. XCoin làm chất xúc tác. Một cơ hội thức tỉnh di sản.</p></div><WalletBalance balance={economy.coinBalance} ready={hydrated}/></header>
@@ -93,14 +105,14 @@ export function MythicForge() {
           })}</div>
           <div className={styles.catalyst}><div className={styles.catalystHeading}><label htmlFor="forge-coins">XCoin bắt buộc · chất xúc tác</label><strong>{coins.toLocaleString("vi")} <span>XC</span></strong></div><input id="forge-coins" type="range" min={hasCatalyst ? FORGE_MIN_COINS : 0} max={maxCoins} step={FORGE_COIN_STEP} disabled={locked || !hasCatalyst} value={coins} onChange={event => setCoinDraft(Number(event.target.value))} aria-describedby="forge-coins-rule forge-funding-status" aria-valuetext={`${coins} XCoin, ${chance}% cơ hội thành công`}/><div className={styles.catalystScale}><span>Tối thiểu {FORGE_MIN_COINS} XC · 1%</span><button className={styles.inlineButton} disabled={locked || !hasCatalyst} onClick={() => setCoinDraft(maxCoins)}>Dùng tối đa {maxCoins.toLocaleString("vi")} XC</button></div><p id="forge-coins-rule">Phải dùng XCoin mới có thể luyện. Mỗi {FORGE_COIN_STEP} XCoin cho 1 điểm phần trăm; từ 1% đến tối đa {FORGE_MAX_CHANCE}% ({FORGE_MAX_COINS} XCoin).</p><p id="forge-funding-status" className={!hasCatalyst && hydrated ? styles.fundingRequired : undefined} role={!hasCatalyst && hydrated ? "status" : undefined}>{!hydrated ? "Đang kết nối ví XCoin…" : !hasCatalyst ? <>Cần ít nhất {FORGE_MIN_COINS} XCoin. Chưa đủ coin nên chưa thể luyện; 5 Legendary vẫn được giữ nguyên. <Link href="/events">Nhận XCoin từ sự kiện <ArrowRight size={12}/></Link></> : "Không có lượt luyện miễn phí. XCoin và 5 Legendary đều tiêu hao dù thành công hay thất bại."}</p></div>
           <div className={styles.forgeChance}><span>Tỷ lệ thành công của lượt này</span><strong>{chance}<span>%</span></strong><div><span>5 Legendary</span><Plus size={12}/><span>{coins.toLocaleString("vi")} XCoin</span><ArrowRight size={13}/><span>1 Mythic ngẫu nhiên</span></div></div>
-          {confirming ? <div className={styles.confirmation} role="group" aria-label="Xác nhận tiêu hao nguyên liệu luyện Mythic" onKeyDown={event => { if (event.key === "Escape" && !pending) setConfirming(false); }}><strong>Tiêu hao cả 5 Legendary và {coins.toLocaleString("vi")} XCoin?</strong><p>Thành công {chance}%, thất bại {100 - chance}%. Dù kết quả thế nào, toàn bộ nguyên liệu đều mất. Không thể hoàn tác.</p><div><button ref={confirmButton} className={styles.goldButton} disabled={busy || !valid} onClick={event => void forge(event.detail !== 0 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches)}>{pending ? "Đang lưu nghi thức…" : "Xác nhận luyện Mythic"}</button><button className={styles.subtleButton} disabled={pending} onClick={() => setConfirming(false)}>Hủy, giữ nguyên liệu</button></div></div> : <div className={styles.forgeActions}><button className={styles.goldButton} disabled={busy || !valid} onClick={() => setConfirming(true)}><Flame size={17}/> Xem lại và luyện Mythic</button><button className={styles.inlineButton} disabled={busy || !selected.length} onClick={() => { setSelected([]); setError(""); }}>Bỏ chọn tất cả</button></div>}
+          {confirming ? <div className={styles.confirmation} role="group" aria-label="Xác nhận tiêu hao nguyên liệu luyện Mythic" onKeyDown={event => { if (event.key === "Escape" && !pending) setConfirming(false); }}><strong>Tiêu hao cả 5 Legendary và {coins.toLocaleString("vi")} XCoin?</strong><p>Thành công {chance}%, thất bại {100 - chance}%. Dù kết quả thế nào, toàn bộ nguyên liệu đều mất. Không thể hoàn tác.</p><SelectionProtectionWarning {...protection} accepted={riskAcceptedFor === protectionKey} disabled={pending} onAccept={accepted => setRiskAcceptedFor(accepted ? protectionKey : null)}/><div><button ref={confirmButton} className={styles.goldButton} disabled={busy || !valid || !protectionAccepted} onClick={event => void forge(event.detail !== 0 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches)}>{pending ? "Đang lưu nghi thức…" : "Xác nhận luyện Mythic"}</button><button className={styles.subtleButton} disabled={pending} onClick={() => setConfirming(false)}>Hủy, giữ nguyên liệu</button></div></div> : <div className={styles.forgeActions}><button className={styles.goldButton} disabled={busy || !valid} onClick={() => setConfirming(true)}><Flame size={17}/> Xem lại và luyện Mythic</button><button className={styles.inlineButton} disabled={busy || !selected.length} onClick={() => { setSelected([]); setRiskAcceptedFor(null); setError(""); }}>Bỏ chọn tất cả</button></div>}
           <p className={styles.riskNote}><ShieldAlert size={15}/> Thất bại mất cả 5 món và coin đã chọn.</p>
         </>}
         {error && <EconomyNotice error>{error}</EconomyNotice>}
       </section>
       <aside className={styles.forgeRules}><Sparkles size={25}/><h2>Chất xúc tác, không phải bảo chứng</h2><p>XCoin là nguyên liệu bắt buộc. Không dùng coin: không thể luyện. Tỷ lệ mỗi lượt từ 1% đến {FORGE_MAX_CHANCE}%, không cộng dồn may mắn sau thất bại.</p><dl><div><dt>{FORGE_MIN_COINS} XCoin</dt><dd>{forgeChance(FORGE_MIN_COINS)}%</dd></div><div><dt>100 XCoin</dt><dd>{forgeChance(100)}%</dd></div><div><dt>{FORGE_MAX_COINS} XCoin · tối đa</dt><dd>{FORGE_MAX_CHANCE}%</dd></div></dl><p>Chọn 5 bản sao Legendary bất kỳ, kể cả trùng nhau hoặc khác CLB. Thành công nhận ngẫu nhiên 1 Mythic trong bộ sưu tập.</p><p>Mythic đã nhận không dùng để luyện tiếp. Bản sao trùng vẫn được giữ trong kho.</p><Link href="/events">Nhận thêm XCoin <ArrowRight size={14}/></Link><Link href="/market">Tìm Legendary trên chợ <ArrowRight size={14}/></Link><Link href="/trade-up">Đổi đồ Common → Legendary <ArrowRight size={14}/></Link></aside>
     </div>
-    {!receipt && <section className={styles.forgeInventory} aria-labelledby="forge-picker-title"><div className={styles.sectionHeading}><div><h2 id="forge-picker-title">Legendary trong kho</h2><p>{hydrated ? `${totalCopies} bản sao có thể dùng · Đã chọn ${selected.length}/5` : "Đang tải kho…"}</p></div><button className={styles.subtleButton} disabled={locked || totalCopies < 5} onClick={quickPick}>Chọn nhanh 5 bản sao</button></div><label className={styles.search}><Search size={17}/><span className="sr-only">Tìm Legendary trong kho</span><input value={query} disabled={locked} placeholder="Tìm vật phẩm hoặc CLB…" onChange={event => { setQuery(event.target.value); setPage(0); }}/></label>{visible.length ? <div className={styles.inventoryGrid}>{visible.map(item => {
+    {!receipt && <section className={styles.forgeInventory} aria-labelledby="forge-picker-title"><div className={styles.sectionHeading}><div><h2 id="forge-picker-title">Legendary trong kho</h2><p>{hydrated ? `${totalCopies} bản chưa khóa · ${protectedCopies} bản được bảo vệ · Đã chọn ${selected.length}/5` : "Đang tải kho…"}</p><p>Chọn nhanh giữ lại một bản mỗi mẫu và bỏ qua đồ đang trang bị. Chỉ bản chưa khóa mới có thể làm nguyên liệu.</p></div><button className={styles.subtleButton} disabled={locked || quickSelection.length < 5} onClick={quickPick}>Chọn nhanh 5 bản dư</button></div><label className={styles.search}><Search size={17}/><span className="sr-only">Tìm Legendary trong kho</span><input value={query} disabled={locked} placeholder="Tìm vật phẩm hoặc CLB…" onChange={event => { setQuery(event.target.value); setPage(0); }}/></label>{visible.length ? <div className={styles.inventoryGrid}>{visible.map(item => {
       const available = owned.get(item.id) ?? 0;
       const chosen = picked.get(item.id) ?? 0;
       return <button className={styles.inventoryItem} key={item.id} disabled={locked || selected.length >= 5 || chosen >= available} onClick={() => { setSelected(ids => [...ids, item.id]); setError(""); }} aria-label={`Thêm ${item.name}, còn ${Math.max(0, available - chosen)} bản sao`}><div><CosmeticArt item={item} compact animated={false}/></div><span>{item.name}</span><small>{chosen ? `${chosen} đã chọn · ` : ""}Còn {Math.max(0, available - chosen)} / {available}</small><Plus size={16}/></button>;

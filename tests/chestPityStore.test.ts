@@ -71,7 +71,7 @@ test("old native rows normalize history-derived pity on read without rewriting S
     assert.equal(loaded.state.chestPity, 2); assert.equal(loaded.revision, 41);
     h.database(db => {
       assert.equal(db.prepare("SELECT state_json FROM players WHERE id = ?").get(player.id)!.state_json, raw);
-      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 3);
+      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 5);
     });
     const updated = command(h.store, player, { type: "grant-test-ex" });
     assert.equal(updated.snapshot.state.chestPity, 2); assert.equal(updated.snapshot.revision, 42);

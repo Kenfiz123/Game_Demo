@@ -1,0 +1,16 @@
+.cosmetic-wishlist { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; margin: 9px 0 2px; padding: 7px 10px; color: #aeb6c2; border: 1px solid #35404b; border-radius: 5px; background: #111a23; font-size: 11px; cursor: pointer; transition: transform 120ms ease-out, color 140ms ease, border-color 140ms ease; }
+.cosmetic-wishlist[aria-pressed="true"] { color: #e2c78c; border-color: #927746; background: #282318; }
+.cosmetic-wishlist:disabled, .copy-lock-button:disabled { cursor: not-allowed; opacity: .55; }
+.cosmetic-wishlist:focus-visible, .copy-lock-button:focus-visible { outline: 2px solid #e2c78c; outline-offset: 3px; transition: none; }
+.cosmetic-wishlist:active:not(:disabled), .copy-lock-button:active:not(:disabled) { transform: scale(.97); }
+.item-protection-message { margin: 5px 0; color: #c2b693; font-size: 10px; line-height: 1.6; }
+.copy-lock-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 7px 10px; border: 1px solid #53616b; border-radius: 5px; background: #14212a; color: #c7d5df; font-size: 11px; cursor: pointer; transition: transform 120ms ease-out, border-color 140ms ease; }
+.copy-lock-button[aria-pressed="true"] { color: #e2c78c; border-color: #927746; background: #282318; }
+.copy-protection-status { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: #aeb6c2; font-size: 10px; line-height: 1.55; }
+.copy-protection-status[data-locked="true"] { color: #dfc38c; }
+.selection-protection-warning { margin: 14px 0; padding: 14px 16px; border: 1px solid #8b6846; border-radius: 6px; background: #332619; color: #eddbbb; text-align: left; }
+.selection-protection-warning > strong { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.selection-protection-warning p { margin: 9px 0; color: #dcc7a6; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.selection-protection-warning label { display: flex; gap: 9px; align-items: flex-start; margin-top: 12px; font-size: 12px; line-height: 1.6; cursor: pointer; }
+.selection-protection-warning input { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 2px; accent-color: #d6b878; }
+@media (prefers-reduced-motion: reduce) { .cosmetic-wishlist, .copy-lock-button { transition: none; } .cosmetic-wishlist:active:not(:disabled), .copy-lock-button:active:not(:disabled) { transform: none; } }

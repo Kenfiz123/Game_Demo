@@ -61,7 +61,8 @@ test("schema2 migration preserves exact save/economy bytes, revisions, import st
     const economyJson = JSON.stringify(economy, null, 2); const listingId = randomUUID();
     h.close();
     h.database(db => {
-      db.exec(`DROP TABLE item_trail; DROP TABLE item_copies; DROP TABLE collector_discoveries;
+      db.exec(`DROP INDEX market_active_price_asc; DROP INDEX market_active_price_desc; DROP INDEX market_item_sales; DROP INDEX market_buyer_history; DROP INDEX market_seller_history;
+        DROP TABLE player_seasons; DROP TABLE collector_wishlist; DROP TABLE item_trail; DROP TABLE item_copies; DROP TABLE collector_discoveries;
         DROP TABLE collector_profiles; DROP TABLE account_attempts; DROP TABLE accounts; PRAGMA user_version = 2;`);
       db.prepare("UPDATE players SET state_json = ?, revision = 42, legacy_imported = 1 WHERE id = ?").run(stateJson, player.id);
       db.prepare("UPDATE player_economies SET economy_json = ? WHERE player_id = ?").run(economyJson, player.id);
@@ -81,7 +82,7 @@ test("schema2 migration preserves exact save/economy bytes, revisions, import st
     }
     assert.deepEqual(snapshot.collector!.discoveredItemIds, [common, mythic].sort());
     h.database(db => {
-      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 3);
+      assert.equal(db.prepare("PRAGMA user_version").get()!.user_version, 5);
       const row = db.prepare("SELECT * FROM players WHERE id = ?").get(player.id)!;
       assert.equal(row.state_json, stateJson); assert.equal(row.revision, 42); assert.equal(row.legacy_imported, 1);
       assert.equal(db.prepare("SELECT economy_json FROM player_economies WHERE player_id = ?").get(player.id)!.economy_json, economyJson);

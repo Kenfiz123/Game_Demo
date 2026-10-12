@@ -108,7 +108,9 @@ test("both confirmation and submission rely on the paid-catalyst validity guard"
   const source = await readFile(new URL("../src/components/economy/MythicForge.tsx", import.meta.url), "utf8");
   assert.ok(source.includes("const valid = coins >= FORGE_MIN_COINS && selected.length === 5"));
   assert.ok(source.includes("if (inFlight.current || busy || !valid) return;"));
-  assert.equal(Array.from(source.matchAll(/disabled=\{busy \|\| !valid\}/g)).length, 2);
+  assert.equal(Array.from(source.matchAll(/disabled=\{busy \|\| !valid(?: \|\| !protectionAccepted)?\}/g)).length, 2);
+  assert.ok(source.includes("if (!protectionAccepted) return;"));
+  assert.ok(source.includes("disabled={busy || !valid || !protectionAccepted}"));
   assert.ok(source.includes("coins: spentCoins"));
   assert.ok(source.includes("Không thể hoàn tác"));
 });

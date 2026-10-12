@@ -1,4 +1,4 @@
-import type { ChestReward } from "./gamification";
+import type { ChestReward, Rarity } from "./gamification";
 
 export type EventId = "daily-visit" | "open-three" | "open-ten" | "trade-once";
 export interface ForgeRecord {
@@ -21,8 +21,23 @@ export interface MarketPage {
   listings: MarketListing[];
   ownListings: MarketListing[];
   nextCursor: string | null;
+  history?: MarketTransaction[];
+  priceSummary?: MarketPriceSummary | null;
+  wishlistMatches?: number;
+}
+export interface MarketFilters {
+  query?: string; rarity?: Rarity; clubId?: string; itemId?: string;
+  minPrice?: number; maxPrice?: number; sort?: "newest" | "price-asc" | "price-desc"; wishlistOnly?: boolean;
+}
+export interface MarketTransaction {
+  listingId: string; itemId: string; price: number; completedAt: string; side: "buy" | "sell";
+}
+export interface MarketPriceSummary {
+  itemId: string; salesCount: number; minPrice: number; maxPrice: number; averagePrice: number; lastPrice: number;
 }
 export type EconomyCommand =
+  | { type: "claim-season-mission"; missionId: import("./season").SeasonMissionId; day: string }
+  | { type: "redeem-season-avatar"; itemId: string }
   | { type: "claim-event"; eventId: EventId }
   | { type: "forge-mythic"; itemIds: string[]; coins: number }
   | { type: "market-list"; itemId: string; price: number; copyId?: string }
@@ -33,6 +48,7 @@ export interface EconomyResult {
   reason?: string;
   id?: string;
   coinsAwarded?: number;
+  pointsAwarded?: number;
   listingId?: string;
   won?: boolean;
   chance?: number;

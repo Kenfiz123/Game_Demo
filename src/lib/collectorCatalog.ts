@@ -4,7 +4,7 @@ import type { CosmeticItem } from "@/types/gamification";
 
 const itemsByClub = new Map<string, CosmeticItem[]>();
 for (const item of COSMETICS) {
-  if (!item.clubId) continue;
+  if (!item.clubId || item.seasonId) continue;
   const items = itemsByClub.get(item.clubId) ?? [];
   items.push(item);
   itemsByClub.set(item.clubId, items);

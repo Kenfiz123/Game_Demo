@@ -9,7 +9,7 @@ export interface CollectorProfile {
   isPublic: boolean;
   featuredItemIds: string[];
 }
-export type ItemOrigin = "CHEST" | "ORBIT" | "TRADE_UP" | "FORGE" | "LEGACY" | "IMPORT";
+export type ItemOrigin = "CHEST" | "ORBIT" | "TRADE_UP" | "FORGE" | "LEGACY" | "IMPORT" | "SEASON";
 /** One persistent identity per copy, never a catalog item ID. */
 export interface ItemCopy {
   id: string;
@@ -21,6 +21,8 @@ export interface ItemCopy {
   acquiredAt: string;
   originalOwnerName: string | null;
   transferCount: number;
+  /** Optional only for older client fixtures; the server always includes it. */
+  locked?: boolean;
 }
 export interface ItemTrailEntry {
   kind: "MINT" | "TRANSFER" | "LIST" | "RETURN" | "CONSUME";
@@ -33,6 +35,8 @@ export interface CollectorSnapshot {
   copies: ItemCopy[];
   /** Discovered catalog IDs remain after a copy is sold or consumed. */
   discoveredItemIds: string[];
+  /** Private player preference, never included in a shared collector profile. */
+  wishlistItemIds?: string[];
 }
 export interface PublicCollectorProfile {
   username: string;

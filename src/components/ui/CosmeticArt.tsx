@@ -9,6 +9,9 @@ export function CosmeticArt({ item, compact = false, priority = false, animated 
   const club = item.clubId ? getClubById(item.clubId) : undefined;
   if (!club) return null;
   const style = { "--art-color": rarity.color, "--club-color": club?.color ?? rarity.color } as CSSProperties;
+  if (item.seasonId && item.image) return <div className={"cosmetic-art season-avatar-art" + (compact ? " art-compact" : "")} style={style} aria-hidden="true">
+    <Image src={item.image} alt="" width={256} height={256} sizes={compact ? "80px" : "(max-width: 700px) 140px, 256px"} priority={priority} style={{ width: "100%", height: "100%", objectFit: "contain" }}/>
+  </div>;
   return <div className={"cosmetic-art art-" + item.type.toLowerCase() + (compact ? " art-compact" : "") + (club ? " club-art" : "") + (item.rarity === "MYTHIC" ? " art-mythic" : "")} style={style} aria-hidden="true">
     {item.rarity === "MYTHIC" ? <MythicArt item={item} compact={compact} priority={priority} animated={animated}/> :
     item.type === "TITLE" ?

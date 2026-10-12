@@ -1,8 +1,13 @@
 import { copyArcadeSettings, validateArcadeSettings } from "../../data/economyConfig";
 import type { BackendCommand } from "../../types/backend";
 import { EVENT_TASKS, FORGE_COIN_STEP, FORGE_MIN_COINS, FORGE_MAX_COINS, MAX_MARKET_PRICE } from "../../data/eventEconomy";
-import type { EventId } from "../../types/economy";
+import type { EventId, MarketFilters } from "../../types/economy";
+import { getCosmeticById } from "../../data/cosmetics";
+import { getClubById } from "../../data/clubs";
+import type { Rarity } from "../../types/gamification";
 import { validCollectorProfile } from "../../lib/collectorValidation";
+import { getSeasonAvatar, SEASON_MISSIONS } from "../../data/seasonCatalog";
+import type { SeasonMissionId } from "../../types/season";
 
 export class CommandValidationError extends Error {
   readonly code = "INVALID_REQUEST";
@@ -21,6 +26,60 @@ const isItemId = (value: unknown): value is string =>
 
 export const isUuid = (value: unknown): value is string => typeof value === "string" &&
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+
+/** Bounded, catalog-aware filters; every value becomes a SQL bound parameter. */
+export function validateMarketFilters(value: unknown): MarketFilters {
+  const fields = ["query", "rarity", "clubId", "itemId", "minPrice", "maxPrice", "sort", "wishlistOnly"];
+  if (!isObject(value) || Object.keys(value).some(key => !fields.includes(key))) throw new CommandValidationError();
+  const result: MarketFilters = {};
+  if (Object.hasOwn(value, "query")) {
+    if (typeof value.query !== "string" || value.query.length > 80 || /[\p{Cc}\p{Cf}]/u.test(value.query)) throw new CommandValidationError();
+    result.query = value.query.trim();
+  }
+  if (Object.hasOwn(value, "rarity")) {
+    if (typeof value.rarity !== "string" || !rarities.includes(value.rarity)) throw new CommandValidationError();
+    result.rarity = value.rarity as Rarity;
+  }
+  if (Object.hasOwn(value, "clubId")) {
+    if (!isItemId(value.clubId) || !getClubById(value.clubId)) throw new CommandValidationError();
+    result.clubId = value.clubId;
+  }
+  if (Object.hasOwn(value, "itemId")) {
+    if (!isItemId(value.itemId) || !getCosmeticById(value.itemId)) throw new CommandValidationError();
+    result.itemId = value.itemId;
+  }
+  for (const field of ["minPrice", "maxPrice"] as const) {
+    if (Object.hasOwn(value, field)) {
+      const price = value[field];
+      if (typeof price !== "number" || !Number.isSafeInteger(price) || price < 0 || price > MAX_MARKET_PRICE) throw new CommandValidationError();
+      result[field] = price;
+    }
+  }
+  if (result.minPrice !== undefined && result.maxPrice !== undefined && result.minPrice > result.maxPrice) throw new CommandValidationError();
+  if (Object.hasOwn(value, "sort")) {
+    if (value.sort !== "newest" && value.sort !== "price-asc" && value.sort !== "price-desc") throw new CommandValidationError();
+    result.sort = value.sort;
+  }
+  if (Object.hasOwn(value, "wishlistOnly")) {
+    if (typeof value.wishlistOnly !== "boolean") throw new CommandValidationError();
+    result.wishlistOnly = value.wishlistOnly;
+  }
+  return result;
+}
+
+export function parseMarketQuery(params: URLSearchParams): { cursor?: string; filters: MarketFilters } {
+  const fields = ["cursor", "query", "rarity", "clubId", "itemId", "minPrice", "maxPrice", "sort", "wishlistOnly"];
+  const raw: Record<string, unknown> = {};
+  let cursor: string | undefined;
+  for (const [key, value] of params) {
+    if (!fields.includes(key) || params.getAll(key).length !== 1 || value === "") throw new CommandValidationError();
+    if (key === "cursor") { if (!isUuid(value)) throw new CommandValidationError(); cursor = value.toLowerCase(); }
+    else if (key === "minPrice" || key === "maxPrice") { if (!/^\d{1,10}$/.test(value)) throw new CommandValidationError(); raw[key] = Number(value); }
+    else if (key === "wishlistOnly") { if (value !== "true" && value !== "false") throw new CommandValidationError(); raw[key] = value === "true"; }
+    else raw[key] = value;
+  }
+  return { cursor, filters: validateMarketFilters(raw) };
+}
 
 /** Build a narrow DTO; reject extra fields instead of ever accepting client state. */
 export function validateCommand(value: unknown): BackendCommand {
@@ -42,6 +101,17 @@ export function validateCommand(value: unknown): BackendCommand {
         return { type: "claim-event", eventId: value.eventId as EventId };
       }
       break;
+    case "claim-season-mission":
+      if (exactKeys(value, ["type", "missionId", "day"]) && SEASON_MISSIONS.some(m => m.id === value.missionId) &&
+        typeof value.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.day)) {
+        return { type: "claim-season-mission", missionId: value.missionId as SeasonMissionId, day: value.day };
+      }
+      break;
+    case "redeem-season-avatar":
+      if (exactKeys(value, ["type", "itemId"]) && isItemId(value.itemId) && getSeasonAvatar(value.itemId)) {
+        return { type: "redeem-season-avatar", itemId: value.itemId };
+      }
+      break;
     case "forge-mythic":
       if (exactKeys(value, ["type", "itemIds", "coins"]) && Array.isArray(value.itemIds) &&
           value.itemIds.length === 5 && value.itemIds.every(isItemId) && typeof value.coins === "number" &&
@@ -58,6 +128,16 @@ export function validateCommand(value: unknown): BackendCommand {
     case "profile-update":
       if (exactKeys(value, ["type", "displayName", "bio", "isPublic", "featuredItemIds"]) && validCollectorProfile(value)) {
         return { type: "profile-update", displayName: value.displayName.trim(), bio: value.bio.trim(), isPublic: value.isPublic, featuredItemIds: [...value.featuredItemIds] };
+      }
+      break;
+    case "copy-lock":
+      if (exactKeys(value, ["type", "copyId", "locked"]) && isUuid(value.copyId) && typeof value.locked === "boolean") {
+        return { type: "copy-lock", copyId: value.copyId.toLowerCase(), locked: value.locked };
+      }
+      break;
+    case "wishlist-update":
+      if (exactKeys(value, ["type", "itemId", "wished"]) && isItemId(value.itemId) && getCosmeticById(value.itemId) && typeof value.wished === "boolean") {
+        return { type: "wishlist-update", itemId: value.itemId, wished: value.wished };
       }
       break;
     case "market-buy":

@@ -412,7 +412,7 @@ test("an equipped crown replaces only the nested avatar surround and label, pres
 
   const source = await readFile(new URL("../src/components/inventory/EquippedProfile.tsx", import.meta.url), "utf8");
   assert.match(source, /new Set\(state\.ownedItemIds\)/, "equipment must still be selected from owned items, not preview art");
-  assert.match(source, /item\.type\s*===\s*slot\s*&&\s*owned\.has\(item\.id\)/, "frame and avatar slots must validate ownership independently");
+  assert.match(source, /getEquipSlot\(item\)\s*===\s*slot\s*&&\s*owned\.has\(item\.id\)/, "frame and avatar slots must validate ownership independently");
   assert.match(source, /className="equipped-profile-frame"><CosmeticArt item=\{equipped\.FRAME\} animated\//);
   assert.match(source, /className="equipped-profile-avatar">\{equipped\.AVATAR\s*\?\s*<CosmeticArt item=\{equipped\.AVATAR\} animated\//, "a crown must not substitute its own club crest for the selected avatar");
   for (const variant of ["AURORA", "CELESTIAL"]) {

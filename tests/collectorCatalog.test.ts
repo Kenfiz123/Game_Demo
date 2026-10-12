@@ -8,7 +8,7 @@ test("collector ledger has exactly 73 independent CLB sets, each with 13 items a
   const rows = deriveClubCollection([], []);
   assert.equal(rows.length, 73);
   assert.equal(new Set(rows.map(row => row.club.id)).size, 73);
-  assert.equal(rows.flatMap(row => row.items).length, COSMETICS.length);
+  assert.equal(rows.flatMap(row => row.items).length, COSMETICS.filter(item => !item.seasonId).length);
   for (const row of rows) {
     assert.equal(row.items.length, 13);
     assert.equal(row.items.filter(item => item.rarity === "MYTHIC").length, 8);
@@ -35,7 +35,7 @@ test("current copies alone do not pretend to be recorded lifetime discoveries", 
   const rows = deriveClubCollection([], COSMETICS.map(item => item.id));
   assert.equal(rows.filter(row => row.complete).length, 0);
   assert.equal(rows.reduce((sum, row) => sum + row.discovered, 0), 0);
-  assert.equal(rows.reduce((sum, row) => sum + row.owned, 0), COSMETICS.length);
+  assert.equal(rows.reduce((sum, row) => sum + row.owned, 0), COSMETICS.filter(item => !item.seasonId).length);
 });
 
 test("ledger filters combine accent-insensitive terms, campus, group and true completion", () => {

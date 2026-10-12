@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useXperience } from "@/hooks/useXperience";
 import { getCosmeticById } from "@/data/cosmetics";
 import { CosmeticArt } from "@/components/ui/CosmeticArt";
+import { getEquipSlot } from "@/lib/equipmentEngine";
 export const navigation = [
   { label: "Rương bí ẩn", shortLabel: "Rương", href: "/chest", icon: Trophy },
   { label: "Lucky Orbit", shortLabel: "Vòng quay", href: "/orbit", icon: Orbit },
@@ -14,6 +15,7 @@ export const navigation = [
   { label: "Sự kiện XCoin", shortLabel: "Sự kiện", href: "/events", icon: Gift },
   { label: "Chợ người chơi", shortLabel: "Chợ", href: "/market", icon: ShoppingBag },
   { label: "Bộ CLB", shortLabel: "CLB", href: "/clubs", icon: UsersRound },
+  { label: "Mùa sưu tầm S1", shortLabel: "Mùa S1", href: "/seasons/s1", icon: Sparkles },
   { label: "Kho đồ", shortLabel: "Kho đồ", href: "/inventory", icon: Package },
   { label: "Hồ sơ Mythic", shortLabel: "Hồ sơ", href: "/profile", icon: Crown },
   { label: "Sổ sưu tập CLB", shortLabel: "Sổ CLB", href: "/collection", icon: BookOpen },
@@ -40,7 +42,7 @@ export function Header() {
   }, [menuOpen]);
   const candidateAvatar = hydrated && state.equipped.AVATAR ? getCosmeticById(state.equipped.AVATAR) : undefined;
   const candidateTitle = hydrated && state.equipped.TITLE ? getCosmeticById(state.equipped.TITLE) : undefined;
-  const equippedAvatar = candidateAvatar?.rarity === "MYTHIC" && candidateAvatar.type === "AVATAR" && state.ownedItemIds.includes(candidateAvatar.id) ? candidateAvatar : undefined;
+  const equippedAvatar = candidateAvatar && getEquipSlot(candidateAvatar) === "AVATAR" && state.ownedItemIds.includes(candidateAvatar.id) ? candidateAvatar : undefined;
   const equippedTitle = candidateTitle?.rarity === "MYTHIC" && candidateTitle.type === "TITLE" && state.ownedItemIds.includes(candidateTitle.id) ? candidateTitle : undefined;
   return <>
     <header className="site-header">

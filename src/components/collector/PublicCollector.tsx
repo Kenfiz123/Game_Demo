@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { readPublicProfile } from "@/lib/backendClient";
 import { getCosmeticById } from "@/data/cosmetics";
+import { getEquipSlot } from "@/lib/equipmentEngine";
 import { CosmeticArt } from "@/components/ui/CosmeticArt";
 import type { EquipSlot } from "@/types/gamification";
 import { deriveClubCollection, selectFeaturedMythics } from "@/lib/collectorCatalog";
@@ -28,7 +29,7 @@ export function PublicCollector({ username }: { username: string }) {
   const discovered = progress.reduce((sum, row) => sum + row.discovered, 0);
   const equipment = (Object.entries(profile.equipped) as [EquipSlot, string][]).flatMap(([slot, id]) => {
     const item = getCosmeticById(id);
-    return item?.rarity === "MYTHIC" && item.type === slot ? [item] : [];
+    return item && getEquipSlot(item) === slot ? [item] : [];
   });
   return <div className="collector-page"><nav className="collector-page-links" aria-label="Khu vực nhà sưu tầm"><Link href="/profile">Hồ sơ của tôi</Link><Link href="/collection">Sổ bộ sưu tập CLB</Link></nav><CollectorGallery displayName={profile.displayName} bio={profile.bio} username={profile.username} items={selectFeaturedMythics(profile.featuredItemIds)} publicView/>{equipment.length ? <section className="collector-public-equipment"><h2>Trang bị đang dùng</h2><ul>{equipment.map(item => <li key={item.id}><CosmeticArt item={item} compact animated={false}/><span>{item.name}</span></li>)}</ul></section> : null}<section className="collector-public-record"><h2>Hành trình sưu tầm</h2><p>{discovered} mẫu từng khám phá · {complete.length} bộ CLB hoàn chỉnh</p>{complete.length ? <ul>{complete.map(row => <li key={row.club.id}>Bộ hoàn chỉnh: {row.club.shortName} · {row.club.campus}</li>)}</ul> : <p>Những trang đầu tiên vẫn đang được viết.</p>}<small>Huy hiệu bộ hoàn chỉnh chỉ ghi nhận tiến độ trong game, không xác nhận thành tích hay tư cách thành viên CLB.</small></section></div>;
 }

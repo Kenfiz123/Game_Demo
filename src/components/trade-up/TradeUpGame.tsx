@@ -10,18 +10,16 @@ import { TRADE_UP_ITEM_COUNT, TRADE_UP_PATHS } from "@/data/economyConfig";
 import { CosmeticArt } from "@/components/ui/CosmeticArt";
 import { RarityBadge } from "@/components/chest/RarityBadge";
 import { useXperience } from "@/hooks/useXperience";
+import { countItemIds, getUnlockedCounts, safeSurplusQuickPick, selectionProtectionWarnings } from "@/lib/itemProtection";
+import { SelectionProtectionWarning } from "@/components/inventory/SelectionProtectionWarning";
 import type { TradeInputRarity, TradeUpSuccess } from "@/types/gamification";
 
 const PAGE_SIZE = 12;
 const indexed = COSMETICS.map(item => ({ item, search: normalizeClubSearch(item.name + " " + item.description).replace(/[\s-]+/g, "") }));
-function countCopies(ids: readonly string[]) {
-  const result = new Map<string, number>();
-  for (const id of ids) result.set(id, (result.get(id) ?? 0) + 1);
-  return result;
-}
 const errors = {
   INVALID_SELECTION: "Chọn đúng 5 món cùng bậc để đổi.",
   INSUFFICIENT_ITEMS: "Kho đã thay đổi. Một số bản sao đã được sử dụng; hãy chọn lại.",
+  ITEM_LOCKED: "Một số bản sao đã được khóa. Chỉ chọn bản chưa khóa, hoặc mở khóa đúng serial trong kho trước khi đổi.",
   UNSUPPORTED_RARITY: "Bàn này chỉ nhận Common đến Epic. Đổi Legendary tại Lò Thần Thoại.",
   INVALID_SETTINGS: "Tỷ lệ chưa hợp lệ. Hãy kiểm tra trang Tỷ lệ.",
   BUSY: "Một lượt chơi khác đang xử lý. Hãy đợi hoàn tất.",
@@ -30,7 +28,7 @@ const errors = {
 };
 
 export function TradeUpGame() {
-  const { state, hydrated, isPlaying, tradeUp, completeOpening } = useXperience();
+  const { state, collector, playerId, hydrated, isPlaying, tradeUp, completeOpening } = useXperience();
   const [rarity, setRarity] = useState<TradeInputRarity>("COMMON");
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
@@ -40,6 +38,7 @@ export function TradeUpGame() {
   const [phase, setPhase] = useState<"idle" | "forging" | "result">("idle");
   const [result, setResult] = useState<TradeUpSuccess | null>(null);
   const [error, setError] = useState("");
+  const [riskAcceptedFor, setRiskAcceptedFor] = useState<string | null>(null);
   const activeId = useRef<string | null>(null);
   const inFlight = useRef(false);
   const mounted = useRef(false);
@@ -49,10 +48,21 @@ export function TradeUpGame() {
     mounted.current = true;
     return () => { mounted.current = false; if (activeId.current) completeOpening(activeId.current); };
   }, [completeOpening]);
-  useEffect(() => { if (confirming) confirmButton.current?.focus(); }, [confirming]);
+  useEffect(() => {
+    if (!confirming) return;
+    const button = confirmButton.current;
+    if (button?.disabled) button.closest('[role="group"]')?.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus();
+    else button?.focus();
+  }, [confirming]);
   useEffect(() => { if (phase === "result") resultHeading.current?.focus(); }, [phase]);
-  const owned = useMemo(() => countCopies(state.ownedItemIds), [state.ownedItemIds]);
-  const picked = useMemo(() => countCopies(selected), [selected]);
+  const owned = useMemo(() => getUnlockedCounts(state.ownedItemIds, collector.copies), [state.ownedItemIds, collector.copies]);
+  const picked = useMemo(() => countItemIds(selected), [selected]);
+  const equippedIds = useMemo(() => new Set(Object.values(state.equipped).filter((id): id is string => !!id)), [state.equipped]);
+  const protection = selectionProtectionWarnings(selected, state.ownedItemIds, equippedIds, owned);
+  const needsProtectionAcceptance = protection.lastCopyIds.length > 0 || protection.lastUnlockedCopyIds.length > 0 || protection.equippedItemIds.length > 0;
+  const ownedTotals = countItemIds(state.ownedItemIds);
+  const protectionKey = JSON.stringify([playerId, selected, selected.map(id => ownedTotals.get(id)), protection]);
+  const protectionAccepted = !needsProtectionAcceptance || riskAcceptedFor === protectionKey;
   const path = TRADE_UP_PATHS.find(entry => entry.inputRarity === rarity)!;
   const chance = state.settings.tradeUpOdds[rarity];
   const eligible = useMemo(() => indexed.filter(({ item }) => item.rarity === rarity && (owned.get(item.id) ?? 0) > 0), [owned, rarity]);
@@ -61,20 +71,17 @@ export function TradeUpGame() {
     return eligible.filter(entry => !term || entry.search.includes(term));
   }, [eligible, query]);
   const totalCopies = eligible.reduce((total, { item }) => total + (owned.get(item.id) ?? 0), 0);
+  const protectedCopies = collector.copies.filter(copy => copy.locked && getCosmeticById(copy.itemId)?.rarity === rarity).length;
+  const quickSelection = useMemo(() => safeSurplusQuickPick(eligible.map(({ item }) => item.id), state.ownedItemIds, collector.copies, equippedIds, TRADE_UP_ITEM_COUNT), [eligible, state.ownedItemIds, collector.copies, equippedIds]);
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pages - 1);
   const visible = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
   const locked = !hydrated || isPlaying || submitting || phase !== "idle";
   const selectionValid = selected.length === TRADE_UP_ITEM_COUNT && [...picked].every(([id, count]) => count <= (owned.get(id) ?? 0) && getCosmeticById(id)?.rarity === rarity);
-  const clear = () => { setSelected([]); setConfirming(false); setError(""); };
+  const clear = () => { setSelected([]); setConfirming(false); setRiskAcceptedFor(null); setError(""); };
   const quickPick = () => {
-    const ids: string[] = [];
-    for (const { item } of eligible) {
-      const count = Math.min(TRADE_UP_ITEM_COUNT - ids.length, owned.get(item.id) ?? 0);
-      for (let index = 0; index < count; index++) ids.push(item.id);
-      if (ids.length === TRADE_UP_ITEM_COUNT) break;
-    }
-    setSelected(ids); setError("");
+    if (locked || confirming) return;
+    setSelected(quickSelection); setRiskAcceptedFor(null); setError("");
   };
   const finish = () => {
     if (activeId.current) { completeOpening(activeId.current); activeId.current = null; }
@@ -82,18 +89,21 @@ export function TradeUpGame() {
   };
   const submit = async (event: MouseEvent<HTMLButtonElement>) => {
     if (inFlight.current || locked || !selectionValid) return;
+    if (!protectionAccepted) return;
     const immediate = event.detail === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     inFlight.current = true;
     setSubmitting(true); setError("");
-    const attempt = await tradeUp(selected);
-    inFlight.current = false;
-    if (!mounted.current) { if (attempt.success) completeOpening(attempt.id); return; }
-    setSubmitting(false); setConfirming(false);
-    if (!attempt.success) { setError(errors[attempt.reason]); return; }
-    activeId.current = attempt.id;
-    setResult(attempt);
-    if (immediate) { completeOpening(attempt.id); activeId.current = null; setPhase("result"); }
-    else setPhase("forging");
+    try {
+      const attempt = await tradeUp(selected);
+      if (!mounted.current) { if (attempt.success) completeOpening(attempt.id); return; }
+      setConfirming(false);
+      if (!attempt.success) { setError(errors[attempt.reason]); return; }
+      activeId.current = attempt.id;
+      setResult(attempt);
+      if (immediate) { completeOpening(attempt.id); activeId.current = null; setPhase("result"); }
+      else setPhase("forging");
+    } catch { if (mounted.current) { setConfirming(false); setError(errors.STORAGE_UNAVAILABLE); } }
+    finally { inFlight.current = false; if (mounted.current) setSubmitting(false); }
   };
   const restart = () => { setResult(null); setPhase("idle"); clear(); };
   const tierStyle = { "--forge-color": getRarityConfig(path.targetRarity).color } as CSSProperties;
@@ -127,7 +137,8 @@ export function TradeUpGame() {
             })}</div>
             {confirming ? <div className="forge-confirm" role="group" aria-label="Xác nhận tiêu thụ 5 món" onKeyDown={event => { if (event.key === "Escape" && !submitting) setConfirming(false); }}>
               <strong>5 món sẽ mất, dù thành công hay thất bại.</strong><p>Bạn có {chance.toLocaleString("vi")}% cơ hội nhận 1 {getRarityConfig(path.targetRarity).label} ngẫu nhiên. Đây là thay đổi không thể hoàn tác.</p>
-              <div><button className="primary-button" ref={confirmButton} disabled={locked || !selectionValid} onClick={submit}>{submitting ? "Đang lưu hợp đồng…" : "Xác nhận đổi 5 món"}</button><button className="secondary-button" disabled={submitting} onClick={() => setConfirming(false)}>Hủy</button></div>
+              <SelectionProtectionWarning {...protection} accepted={riskAcceptedFor === protectionKey} disabled={submitting} onAccept={accepted => setRiskAcceptedFor(accepted ? protectionKey : null)}/>
+              <div><button className="primary-button" ref={confirmButton} disabled={locked || !selectionValid || !protectionAccepted} onClick={submit}>{submitting ? "Đang lưu hợp đồng…" : "Xác nhận đổi 5 món"}</button><button className="secondary-button" disabled={submitting} onClick={() => setConfirming(false)}>Hủy</button></div>
             </div> : <div className="forge-contract-action"><button className="primary-button" disabled={locked || !selectionValid} onClick={() => setConfirming(true)}><Layers3 size={16}/>{phase === "forging" ? "Đang hợp nhất…" : "Xem lại và đổi đồ"}<span>{chance.toLocaleString("vi")}%</span></button><button className="text-button" disabled={locked || !selected.length} onClick={clear}>Bỏ chọn tất cả</button></div>}
             <p className="forge-risk-note">Thất bại mất cả 5 món. Thành công nhận ngẫu nhiên 1 món của bậc kế tiếp.</p>
           </div>
@@ -143,9 +154,9 @@ export function TradeUpGame() {
       </aside>
     </div>
     <section className="forge-picker" aria-label="Chọn vật phẩm từ kho">
-      <div className="section-header"><div><h2>Chọn từ kho của bạn</h2><p>Được chọn nhiều bản sao của cùng một vật phẩm. Đã chọn {selected.length}/5.</p></div><div className="forge-picker-actions"><button className="secondary-button" disabled={locked || confirming || totalCopies < TRADE_UP_ITEM_COUNT} onClick={quickPick}>Chọn nhanh 5 món</button>{selectionValid && phase === "idle" && <button className="primary-button" disabled={locked || confirming} onClick={() => setConfirming(true)}>Xem lại 5 món <ArrowRight size={14}/></button>}</div></div>
+      <div className="section-header"><div><h2>Chọn từ kho của bạn</h2><p>Được chọn nhiều bản sao chưa khóa của cùng một vật phẩm. Đã chọn {selected.length}/5.</p><p>Chọn nhanh chỉ dùng bản dư, giữ lại ít nhất một bản mỗi mẫu và bỏ qua đồ đang trang bị.</p></div><div className="forge-picker-actions"><button className="secondary-button" disabled={locked || confirming || quickSelection.length < TRADE_UP_ITEM_COUNT} onClick={quickPick}>Chọn nhanh 5 bản dư</button>{selectionValid && phase === "idle" && <button className="primary-button" disabled={locked || confirming} onClick={() => setConfirming(true)}>Xem lại 5 món <ArrowRight size={14}/></button>}</div></div>
       <div className="forge-filters"><label className="forge-rarity-select"><span>Bậc mang đi đổi</span><select value={rarity} disabled={locked || confirming} onChange={event => { setRarity(event.target.value as TradeInputRarity); clear(); setQuery(""); setPage(0); }}>{TRADE_UP_PATHS.map(entry => <option value={entry.inputRarity} key={entry.inputRarity}>{getRarityConfig(entry.inputRarity).label}</option>)}</select></label><label className="club-search"><Search size={16}/><span className="sr-only">Tìm trong đồ có thể đổi</span><input value={query} disabled={locked || confirming} placeholder="Tìm vật phẩm hoặc CLB…" onChange={event => { setQuery(event.target.value); setPage(0); }}/></label></div>
-      <div className="collection-meta"><span role="status">{hydrated ? `${totalCopies} bản sao ${getRarityConfig(rarity).label} trong kho · ${filtered.length} mẫu phù hợp` : "Đang tải kho…"}</span><span>Trang {currentPage + 1}/{pages}</span></div>
+      <div className="collection-meta"><span role="status">{hydrated ? `${totalCopies} bản chưa khóa · ${protectedCopies} bản được bảo vệ · ${filtered.length} mẫu ${getRarityConfig(rarity).label} phù hợp` : "Đang tải kho…"}</span><span>Trang {currentPage + 1}/{pages}</span></div>
       {visible.length ? <div className="forge-item-grid">{visible.map(({ item }) => {
         const count = owned.get(item.id) ?? 0;
         const chosen = picked.get(item.id) ?? 0;

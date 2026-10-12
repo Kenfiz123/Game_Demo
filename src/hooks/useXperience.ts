@@ -7,12 +7,15 @@ export type BackendStatus = "connecting" | "ready" | "error";
 export interface XperienceContextValue {
   state: XperienceState; hydrated: boolean; isPlaying: boolean;
   economy: PlayerEconomy;
+  season: import("@/types/season").SeasonProgress;
   playerId: string | null;
   account: AccountIdentity | null;
   collector: CollectorSnapshot;
   authError: string | null;
   authAction: (action: AccountAction) => Promise<boolean>;
   updateProfile: (profile: CollectorProfile) => Promise<boolean>;
+  setCopyLock: (copyId: string, locked: boolean) => Promise<boolean>;
+  setWishlist: (itemId: string, wished: boolean) => Promise<boolean>;
   economyAction: (command: EconomyCommand) => Promise<EconomyResult>;
   backendStatus: BackendStatus;
   backendError: string | null;

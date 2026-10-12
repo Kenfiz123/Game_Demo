@@ -8,6 +8,7 @@ export type EquippedSlot = EquipSlot;
 export interface CosmeticItem {
   id: string; name: string; description: string; rarity: Rarity; type: CosmeticType; image?: string; clubId?: string;
   mythicVariant?: MythicVariant;
+  seasonId?: "S1";
   /** Symbolic creative tribute, never an endorsement or membership claim. */
   heritage?: string;
 }
@@ -53,6 +54,6 @@ export interface TradeUpSuccess {
 }
 export interface TradeUpFailure {
   success: false;
-  reason: "INVALID_SELECTION" | "INSUFFICIENT_ITEMS" | "UNSUPPORTED_RARITY" | "BUSY" | "NOT_READY" | "STORAGE_UNAVAILABLE" | "INVALID_SETTINGS";
+  reason: "INVALID_SELECTION" | "INSUFFICIENT_ITEMS" | "ITEM_LOCKED" | "UNSUPPORTED_RARITY" | "BUSY" | "NOT_READY" | "STORAGE_UNAVAILABLE" | "INVALID_SETTINGS";
 }
 export type TradeUpAttempt = TradeUpSuccess | TradeUpFailure;

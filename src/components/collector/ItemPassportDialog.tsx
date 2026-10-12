@@ -6,7 +6,7 @@ import { getCosmeticById } from "@/data/cosmetics";
 import type { ItemOrigin, ItemPassport, ItemTrailEntry } from "@/types/collector";
 import "./collector.css";
 
-const originLabels: Record<ItemOrigin, string> = { CHEST: "Rương bí ẩn", ORBIT: "Lucky Orbit", TRADE_UP: "Đổi đồ", FORGE: "Lò Thần Thoại", LEGACY: "Dữ liệu trước khi có serial", IMPORT: "Nhập kho cũ" };
+const originLabels: Record<ItemOrigin, string> = { CHEST: "Rương bí ẩn", ORBIT: "Lucky Orbit", TRADE_UP: "Đổi đồ", FORGE: "Lò Thần Thoại", LEGACY: "Dữ liệu trước khi có serial", IMPORT: "Nhập kho cũ", SEASON: "Mùa sưu tầm S1" };
 const trailLabels: Record<ItemTrailEntry["kind"], string> = { MINT: "Ghi nhận bản gốc", TRANSFER: "Chuyển chủ sở hữu", LIST: "Đưa lên chợ", RETURN: "Trở về kho", CONSUME: "Đã dùng làm nguyên liệu" };
 const date = (value: string | null) => value ? new Date(value).toLocaleString("vi-VN", { dateStyle: "medium", timeStyle: "short" }) : "Không có thời điểm gốc";
 

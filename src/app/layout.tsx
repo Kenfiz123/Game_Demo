@@ -14,6 +14,7 @@ import "./chest-premium.css";
 import "./inventory-premium.css";
 import "./backend-status.css";
 import "./economy-shell.css";
+import "@/components/inventory/itemProtection.css";
 export const metadata: Metadata = {
   title: { default: "Reward Arcade · FPTU Xperience", template: "%s · FPTU Xperience" },
   description: "Khám phá 73 CLB, mở rương, nhận XCoin từ sự kiện, giao dịch với người chơi và luyện Mythic từ 5 Legendary.",

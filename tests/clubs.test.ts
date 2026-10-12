@@ -22,7 +22,7 @@ test("all 73 source clubs in 10 groups are represented once", () => {
   assert.equal(CLUBS.find(c => c.id === "fcode")?.campus, "Hà Nội & Hồ Chí Minh");
 });
 test("every club has five lower-tier identities plus eight distinct royal Mythics", () => {
-  assert.equal(CLUB_COSMETICS.length, 949); assert.equal(COSMETICS.length, 949);
+  assert.equal(CLUB_COSMETICS.length, 949); assert.equal(COSMETICS.length, 1095);
   assert.equal(cosmeticsByRarity("MYTHIC").length, 584);
   assert.ok(COSMETICS.every(item => item.clubId));
   assert.equal(getCosmeticById("student-badge"), undefined);

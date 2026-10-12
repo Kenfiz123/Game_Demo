@@ -10,10 +10,11 @@ import type { ArcadeSettings, EquipSlot, GameId, OpeningAttempt, TradeUpAttempt 
 import type { EconomyCommand, EconomyResult } from "@/types/economy";
 import type { AccountAction, CollectorProfile, CollectorSnapshot } from "@/types/collector";
 import { validCollectorProfile } from "@/lib/collectorValidation";
+import { emptySeason } from "@/data/seasonCatalog";
 
 const SYNC_CHANNEL = "fptu-xperience-backend-v1";
 const MAX_LEGACY_LENGTH = 512 * 1024;
-const EMPTY_COLLECTOR: CollectorSnapshot = { profile: { displayName: "Student", bio: "", isPublic: false, featuredItemIds: [] }, copies: [], discoveredItemIds: [] };
+const EMPTY_COLLECTOR: CollectorSnapshot = { profile: { displayName: "Student", bio: "", isPublic: false, featuredItemIds: [] }, copies: [], discoveredItemIds: [], wishlistItemIds: [] };
 const AUTH_MESSAGES: Partial<Record<import("@/types/backend").BackendErrorCode, string>> = {
   ACCOUNT_EXISTS: "Tên tài khoản đã được sử dụng. Hãy chọn tên khác.",
   INVALID_CREDENTIALS: "Tên tài khoản hoặc mật khẩu không đúng.",
@@ -47,6 +48,7 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
   // Do not present the prototype's initial balance as server-confirmed progress.
   const [emptyState] = useState(() => ({ ...createDemoState(), exPoints: 0 }));
   const [initialEconomy] = useState(() => emptyEconomy(0));
+  const [initialSeason] = useState(() => emptySeason(0));
   const [backendStatus, setBackendStatus] = useState<BackendStatus>("connecting");
   const [backendError, setBackendError] = useState<string | null>(null);
   const [legacyAvailable, setLegacyAvailable] = useState(false);
@@ -273,17 +275,26 @@ export function XperienceProvider({ children }: { children: React.ReactNode }) {
     if (!validCollectorProfile(profile)) return false;
     return (await runMutation({ type: "profile-update", ...profile, featuredItemIds: [...profile.featuredItemIds] }))?.success ?? false;
   }, [runMutation]);
+  const setCopyLock = useCallback(async (copyId: string, locked: boolean): Promise<boolean> => {
+    if (typeof locked !== "boolean" || !snapshotRef.current?.collector?.copies.some(copy => copy.id === copyId)) return false;
+    return (await runMutation({ type: "copy-lock", copyId, locked }))?.success ?? false;
+  }, [runMutation]);
+  const setWishlist = useCallback(async (itemId: string, wished: boolean): Promise<boolean> => {
+    if (typeof wished !== "boolean" || typeof itemId !== "string" || !itemId || itemId.length > 200) return false;
+    return (await runMutation({ type: "wishlist-update", itemId, wished }))?.success ?? false;
+  }, [runMutation]);
   const state = snapshot?.state ?? emptyState;
   const hydrated = snapshot !== null && backendStatus === "ready";
   const demoToolsEnabled = snapshot?.demoToolsEnabled ?? false;
   const canImportLegacy = snapshot?.canImportLegacy ?? false;
   const economy = snapshot?.economy ?? initialEconomy;
+  const season = snapshot?.season ?? initialSeason;
   const playerId = snapshot?.player.id ?? null;
   const account = snapshot?.account ?? null;
   const collector = snapshot?.collector ?? EMPTY_COLLECTOR;
   const value = useMemo(() => ({ state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    economy, playerId, account, collector, authAction, authError, updateProfile, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
+    economy, season, playerId, account, collector, authAction, authError, updateProfile, setCopyLock, setWishlist, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy }),
   [state, hydrated, isPlaying, playGame, tradeUp, updateSettings, equipItem, unequipItem, completeOpening, resetDemoData, grantTestEx,
-    economy, playerId, account, collector, authAction, authError, updateProfile, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
+    economy, season, playerId, account, collector, authAction, authError, updateProfile, setCopyLock, setWishlist, economyAction, backendStatus, backendError, retryBackend, demoToolsEnabled, canImportLegacy, legacyAvailable, importLegacy]);
   return <XperienceContext.Provider value={value}>{children}</XperienceContext.Provider>;
 }

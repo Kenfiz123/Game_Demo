@@ -16,6 +16,7 @@
     "assets:royal": "node scripts/optimize-royal-mythic.mjs",
     "assets:mythic-clubs": "node scripts/optimize-mythic-clubs.mjs",
     "assets:mythic-finishes": "node scripts/optimize-mythic-finishes.mjs",
+    "assets:season-s1": "node scripts/optimize-season-s1.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
