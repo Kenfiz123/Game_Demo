@@ -1,0 +1,89 @@
+/* Engraved gold belongs to the collectible; the short lighting cue belongs to its reveal. */
+.cosmetic-art.art-legendary { background: radial-gradient(ellipse, #9d702019, transparent 72%), #101a27; }
+.legendary-art { position: relative; width: auto; height: 96%; max-width: 98%; aspect-ratio: 1; isolation: isolate; }
+.legendary-goldwork { display: block; width: 100%; height: 100%; }
+.legendary-emblem { position: absolute; width: 43%; height: 43%; left: 28.5%; top: 29.75%; display: grid; place-items: center; }
+.cosmetic-art .legendary-emblem img { width: 91%; height: 91%; object-fit: contain; }
+.legendary-reflection { position: absolute; inset: 18% 18% 17%; border-radius: 50%; overflow: hidden; pointer-events: none; }
+.legendary-reflection::after { content: ""; position: absolute; inset: -50% -100%; background: linear-gradient(110deg, transparent 44%, #fff4ce26 49%, #fff4ce05 53%, transparent 57%); transform: translateX(-65%); opacity: 0; }
+.art-compact .legendary-art { height: 100%; }
+
+.reward-reveal.premium-reveal.legendary-ceremony { position: relative; isolation: isolate; width: min(100%, 590px); padding: 30px 24px 16px; animation: legendary-arrival 650ms cubic-bezier(.16, 1, .3, 1) both; }
+.legendary-ceremony::before { content: ""; position: absolute; z-index: -1; inset: 10% -15% 18%; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, #d19a3c12, transparent 65%); }
+.legendary-ceremony-heading { width: 100%; }
+.legendary-discovery { display: inline-flex; align-items: center; gap: 9px; color: #d8b679; font-size: 10px; }
+.legendary-discovery svg { color: #f3d490; }
+.legendary-ceremony .legendary-ceremony-heading h2 { margin: 13px auto 9px; font-family: var(--font-royal); font-size: clamp(29px, 3.2vw, 41px); font-weight: 400; letter-spacing: -.035em; line-height: 1.12; color: #ffedc5; text-wrap: balance; }
+.legendary-ceremony .legendary-ceremony-heading p { margin: 0 auto; color: #ac9e85; font-size: 11px; }
+.premium-reveal.legendary-ceremony .reward-art { width: min(360px, 100%); height: 315px; margin: 13px 0 17px; background: none; animation: legendary-unseal 950ms cubic-bezier(.16, 1, .3, 1) both; }
+.legendary-ceremony .reward-art .cosmetic-art { background: none; }
+.legendary-ceremony .legendary-art { height: 100%; }
+.legendary-stage-light { position: absolute; inset: 0; pointer-events: none; }
+.legendary-rays { position: absolute; inset: -4% -6% 6%; border-radius: 50%; background: repeating-conic-gradient(from -10deg at 50% 54%, transparent 0deg 14deg, #ebbd6710 15deg 16deg, transparent 17deg 30deg); mask-image: radial-gradient(ellipse, transparent 30%, #000 44%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse, transparent 30%, #000 44%, transparent 70%); }
+.legendary-light-ring { position: absolute; inset: 13% 15% 14%; border: 1px solid #f7cd7355; border-radius: 50%; opacity: 0; animation: legendary-gold-burst 1200ms 180ms ease-out both; }
+.legendary-pedestal { position: absolute; height: 1px; width: 78%; bottom: -3px; left: 11%; background: linear-gradient(90deg, transparent, #b67e3477 25%, #ffe4a8 50%, #b67e3477 75%, transparent); }
+.legendary-pedestal::after { content: ""; position: absolute; left: 13%; top: 1px; width: 74%; height: 13px; background: radial-gradient(ellipse at top, #e4b65c1f, transparent 72%); }
+.legendary-spark { position: absolute; width: 7px; height: 7px; background: #ffe5a6; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); opacity: .6; animation: legendary-gold-dust 1600ms ease-out both; }
+.legendary-spark-0 { left: 12%; top: 29%; animation-delay: 120ms; }
+.legendary-spark-1 { right: 9%; top: 38%; width: 5px; height: 5px; animation-delay: 360ms; }
+.legendary-spark-2 { left: 23%; bottom: 18%; width: 4px; height: 4px; animation-delay: 230ms; }
+.legendary-spark-3 { right: 20%; bottom: 23%; animation-delay: 90ms; }
+.legendary-spark-4 { left: 30%; top: 12%; width: 4px; height: 4px; animation-delay: 400ms; }
+.legendary-spark-5 { right: 27%; top: 15%; width: 5px; height: 5px; animation-delay: 270ms; }
+.legendary-ceremony .legendary-reflection::after { animation: legendary-gold-sweep 1300ms 380ms ease-out both; }
+.legendary-ceremony-identity { width: 100%; min-width: 0; }
+.legendary-edition { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.legendary-edition > span:empty { height: 1px; width: 43px; background: linear-gradient(90deg, transparent, #bd934e77); }
+.legendary-edition > span:empty:last-child { transform: scaleX(-1); }
+.legendary-edition .rarity-badge { border-color: #b88a3a88; color: #ffe1a0; background: #c8953612; padding: 6px 12px; letter-spacing: .15em; }
+.legendary-ceremony-identity h3 { max-width: 100%; margin: 15px auto 8px; color: #fff0d2; font-size: clamp(23px, 2.7vw, 31px); font-weight: 550; letter-spacing: -.035em; line-height: 1.2; overflow-wrap: anywhere; text-wrap: balance; }
+.legendary-ceremony .reward-club { color: #d8b77a; font-size: 11px; margin: 0 auto 12px; }
+.legendary-ceremony .legendary-description { max-width: 390px; margin: 0 auto 11px; color: #aaa99f; font-size: 11px; }
+.legendary-ceremony .reward-type { display: inline-block; color: #c8b18a; font-size: 9px; letter-spacing: .05em; text-transform: none; }
+.legendary-ceremony .reward-saved { margin: 19px 0 17px; }
+.legendary-ceremony .reward-actions .primary-button { background: linear-gradient(115deg, #f2d59f, #d7ac65); border-color: #f5d99f; color: #281c10; box-shadow: inset 0 1px #fff2d9aa; }
+
+@keyframes legendary-arrival {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes legendary-unseal {
+  from { opacity: 0; transform: translateY(14px) scale(.88); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes legendary-gold-burst {
+  0% { opacity: 0; transform: scale(.65); }
+  20% { opacity: .65; }
+  100% { opacity: 0; transform: scale(1.48); }
+}
+@keyframes legendary-gold-dust {
+  0% { opacity: 0; transform: translateY(17px) scale(.4); }
+  40% { opacity: .85; }
+  100% { opacity: .55; transform: translateY(0) scale(1); }
+}
+@keyframes legendary-gold-sweep {
+  0% { opacity: 0; transform: translateX(-65%); }
+  20% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(65%); }
+}
+@media (min-width: 961px) and (max-height: 800px) {
+  .reward-reveal.premium-reveal.legendary-ceremony { padding-top: 20px; }
+  .premium-reveal.legendary-ceremony .reward-art { height: 255px; width: min(310px, 100%); }
+}
+@media (max-width: 700px) {
+  .reward-reveal.premium-reveal.legendary-ceremony { padding: 24px 15px 12px; }
+  .legendary-ceremony .legendary-ceremony-heading h2 { font-size: clamp(26px, 7.7vw, 35px); }
+  .premium-reveal.legendary-ceremony .reward-art { width: min(300px, 100%); height: 270px; margin: 12px 0 16px; }
+  .legendary-ceremony-identity h3 { font-size: clamp(23px, 6.5vw, 28px); }
+  .legendary-ceremony .legendary-description { font-size: 10px; }
+}
+@media (max-width: 370px) {
+  .premium-reveal.legendary-ceremony .reward-art { height: 235px; }
+  .legendary-discovery { font-size: 9px; }
+  .legendary-ceremony .legendary-ceremony-heading p { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reward-reveal.premium-reveal.legendary-ceremony, .premium-reveal.legendary-ceremony .reward-art,
+  .legendary-light-ring, .legendary-spark, .legendary-ceremony .legendary-reflection::after { animation: none; }
+}

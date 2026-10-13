@@ -11,6 +11,7 @@ import "./trade-up.css";
 import "./odds-settings.css";
 import "./experience-premium.css";
 import "./chest-premium.css";
+import "./legendary.css";
 import "./inventory-premium.css";
 import "./backend-status.css";
 import "./economy-shell.css";

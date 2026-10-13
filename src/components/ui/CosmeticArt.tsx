@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MythicArt } from "./MythicArt";
+import { LegendaryArt } from "./LegendaryArt";
 import { getRarityConfig } from "@/data/chestConfig";
 import { getClubById } from "@/data/clubs";
 import type { CosmeticItem } from "@/types/gamification";
@@ -12,7 +13,7 @@ export function CosmeticArt({ item, compact = false, priority = false, animated 
   if (item.seasonId && item.image) return <div className={"cosmetic-art season-avatar-art" + (compact ? " art-compact" : "")} style={style} aria-hidden="true">
     <Image src={item.image} alt="" width={256} height={256} sizes={compact ? "80px" : "(max-width: 700px) 140px, 256px"} priority={priority} style={{ width: "100%", height: "100%", objectFit: "contain" }}/>
   </div>;
-  return <div className={"cosmetic-art art-" + item.type.toLowerCase() + (compact ? " art-compact" : "") + (club ? " club-art" : "") + (item.rarity === "MYTHIC" ? " art-mythic" : "")} style={style} aria-hidden="true">
+  return <div className={"cosmetic-art art-" + item.type.toLowerCase() + (compact ? " art-compact" : "") + (club ? " club-art" : "") + (item.rarity === "MYTHIC" ? " art-mythic" : "") + (item.rarity === "LEGENDARY" && item.type === "FRAME" ? " art-legendary" : "")} style={style} aria-hidden="true">
     {item.rarity === "MYTHIC" ? <MythicArt item={item} compact={compact} priority={priority} animated={animated}/> :
     item.type === "TITLE" ?
       <div className="club-title-plate"><Image src={club.image} alt="" width={56} height={56} sizes="56px" priority={priority}/><span>{item.name}<small>{club.shortName}</small></span></div> :
@@ -21,7 +22,7 @@ export function CosmeticArt({ item, compact = false, priority = false, animated 
       item.type === "BADGE" ?
         <div className="club-badge-shield"><Image src={club.image} alt="" width={128} height={128} sizes={compact ? "70px" : "128px"} priority={priority}/><span/></div> :
       item.type === "FRAME" ?
-        <div className="club-legendary-frame"><Image src={club.image} alt="" width={144} height={144} sizes={compact ? "80px" : "144px"} priority={priority}/><span/><span/></div> :
+        item.rarity === "LEGENDARY" ? <LegendaryArt image={club.image} compact={compact} priority={priority}/> : <div className="club-legendary-frame"><Image src={club.image} alt="" width={144} height={144} sizes={compact ? "80px" : "144px"} priority={priority}/><span/><span/></div> :
         <Image className="club-crest-image" src={club.image} alt="" width={192} height={192} sizes={compact ? "96px" : "(max-width: 700px) 140px, 192px"} priority={priority}/>}
   </div>;
 }
